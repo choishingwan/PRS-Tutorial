@@ -1,1 +1,29 @@
-site_name: My Docs
+site_name: Basic Tutorial for Polygenic Risk Score Analyses
+repo_url: https://github.com/choishingwan/PRS-Tutorial
+site_author: Shing Wan CHOI
+pages:
+    - index.md
+    - QC of Summary Statistics: base.md
+    - Target Genotype QC: target.md
+    - PRSice-2: prsice.md
+    - LDpred: ldpred.md
+    - lassosum: lassosum.md
+theme: readthedocs
+markdown_extensions:
+    - admonition
+    - toc:
+        permalink: True
+    - codehilite
+    - pymdownx.arithmatex:
+        generic: True
+    - pymdownx.betterem:
+        smart_enable: all
+    - pymdownx.caret
+
+
+extra_css:
+  - css/extra.css
+
+
+extra_javascript:
+  - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'
