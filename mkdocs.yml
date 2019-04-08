@@ -11,6 +11,7 @@ pages:
 theme: readthedocs
 markdown_extensions:
     - admonition
+    - pymdownx.details
     - toc:
         permalink: True
     - codehilite
