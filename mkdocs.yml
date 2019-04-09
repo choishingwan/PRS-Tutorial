@@ -3,11 +3,13 @@ repo_url: https://github.com/choishingwan/PRS-Tutorial
 site_author: Shing Wan CHOI
 pages:
     - index.md
-    - QC of Summary Statistics: base.md
-    - Target Genotype QC: target.md
-    - PRSice-2: prsice.md
-    - LDpred: ldpred.md
-    - lassosum: lassosum.md
+    - 1. QC of Summary Statistics: base.md
+    - 2. Target Genotype QC: target.md
+    - Running PRS:
+        - PLINK: plink.md
+        - PRSice-2: prsice.md
+        - LDpred: ldpred.md
+        - lassosum: lassosum.md
 theme: readthedocs
 markdown_extensions:
     - admonition

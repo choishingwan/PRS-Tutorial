@@ -88,7 +88,38 @@ plink \
     --out EUR.QC.unrel
 ```
 
+# Remove samples with abnormal heterozygosity rate
+Individual with high or low heterozygosity rate can be contaminated or are inbreed.
+It is therefore a good idea to remove these samples from our dataset before continuing the analyse.
+Heterozygosity rate can be calculated using `plink` after performing prunning. 
+```bash
+plink \
+    --bfile EUR.QC.unrel \
+    --extract EUR.QC.prune.in \
+    --het \
+    --out EUR
+```
+This will generate the **EUR.het** file which contains the F coefficient estimates.
+It will be easier to filter the samples using `R` instead of `awk`:
+Open a `R` section by tying `R` in your terminal
+```R
+dat <- read.table("EUR.het", header=T) # Read in the EUR.het file, specify it has header
+m <- mean(dat$F) # Calculate the mean  
+s <- sd(dat$F) # Calculate the SD
+problem <- subset(dat, F> m+3*s | F< m-3*s) # Get any samples with F coefficient 3 sd away from population mean
+write.table(problem[,c(1,2)], "EUR.prob.sample", quote=F, row.names=F) # print FID and IID for problematic samples
+```
+With **EUR.prob.sample**, we can then remove the problematic samples from our genotype file using `plink`
+```bash
+plink \
+    --bfile EUR.QC.unrel \
+    --remove EUR.prob.sample \
+    --make-bed \
+    --out EUR.QC.unrel.het
+```
+
 # Check for mis-matched Sex information
+
 !!! note
     As sex chromosome information are missing from our simulated samples. 
     It is not possible to perform the mis-match sex check. (And we used simulated sex)
@@ -99,14 +130,31 @@ Sometimes, sample mislabeling can occur, which can lead to invalid results.
 A good indication of mislabeled sample is a mismatch between the biological sex and the reported sex. 
 If the biological sex does not match up with the reported sex, it is likely that the sample has been mislabeled.
 
-Sex check can easily be carried out using `plink`
+Before performing sex check, prunning should be performed (see [here](target.md#filter-related-samples)).
+Sex check can then easily be carried out using `plink`
 ```bash
 plink \
-    --bfile EUR.QC.unrel \
+    --bfile EUR.QC.unrel.het \
+    --extract EUR.QC.prune.in \
     --check-sex \
-    --out EUR.sex
+    --out EUR
 ```
 
+This will generate a file called **EUR.sexcheck** containing the F-statistics for each individual.
+For male, the F-statistic should be > 0.8 and Female should have a value < 0.2.
+
+```bash
+awk 'NR==FNR{a[$1]=$5} \
+    NR!=FNR && a[$1]==1 && $6 > 0.8 {print $1,$2} \
+    NR!=FNR && a[$1]==2 && $6 < 0.2 {print $1,$2} ' \
+    EUR.QC.unrel.het.fam EUR.sexcheck > EUR.valid.sex 
+```
+Here is a breakdown of the above script
+1. Read in the first file (`NR==FNR`) and store the sex (`$5`) into a dictionary using the FID (`$1`) as the key
+2. Read in the second file (`NR!=FNR`), if the individual is a male (`a[$1]==1`) and the F-statistic (`$6`) is larger than 0.8, print its FID and IID
+3. Read in the second file (`NR!=FNR`), if the individual is a female (`a[$1]==2`) and the F-statistic (`$6`) is less than 0.2, print its FID and IID
+
+The samples can then be extracted using the `--keep` command.
 
 # Remove Ambiguous SNPs
 If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. 
@@ -116,17 +164,18 @@ Ambiguous SNPs can be obtained by examining the bim file:
 awk '!( ($5=="A" && $6=="T") || \
         ($5=="T" && $6=="A") || \
         ($5=="G" && $6=="C") || \
-        ($5=="C" && $6=="G")) {print}' EUR.QC.unrel.bim > EUR.unambig.snp 
+        ($5=="C" && $6=="G")) {print}' \
+        EUR.QC.unrel.het.bim > EUR.unambig.snp 
 ```
 
 The ambiguous SNPs can then be removed by
 
 ```bash
 plink \
-    --bfile EUR.QC.unrel \
+    --bfile EUR.QC.unrel.het \
     --extract EUR.unambig.snp \
     --make-bed \
-    --out EUR.QC.unrel.NoAmbig
+    --out EUR.QC.unrel.het.NoAmbig
 ```
 
 ??? note "How many ambiguous SNPs were there?"
