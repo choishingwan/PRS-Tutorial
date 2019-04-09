@@ -155,28 +155,3 @@ Here is a breakdown of the above script
 3. Read in the second file (`NR!=FNR`), if the individual is a female (`a[$1]==2`) and the F-statistic (`$6`) is less than 0.2, print its FID and IID
 
 The samples can then be extracted using the `--keep` command.
-
-# Remove Ambiguous SNPs
-If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. 
-
-Ambiguous SNPs can be obtained by examining the bim file:
-```bash
-awk '!( ($5=="A" && $6=="T") || \
-        ($5=="T" && $6=="A") || \
-        ($5=="G" && $6=="C") || \
-        ($5=="C" && $6=="G")) {print}' \
-        EUR.QC.unrel.het.bim > EUR.unambig.snp 
-```
-
-The ambiguous SNPs can then be removed by
-
-```bash
-plink \
-    --bfile EUR.QC.unrel.het \
-    --extract EUR.unambig.snp \
-    --make-bed \
-    --out EUR.QC.unrel.het.NoAmbig
-```
-
-??? note "How many ambiguous SNPs were there?"
-    There are `17,260` ambiguous SNPs

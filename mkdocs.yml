@@ -5,7 +5,7 @@ pages:
     - index.md
     - 1. QC of Summary Statistics: base.md
     - 2. Target Genotype QC: target.md
-    - Running PRS:
+    - 3. Running PRS:
         - PLINK: plink.md
         - PRSice-2: prsice.md
         - LDpred: ldpred.md

@@ -18,7 +18,7 @@ intact. This can be done by performing the `md5sum` check:
 md5sum GIANT.height.gz
 ```
 
-if the file is intact, `md5sum` should generate a string of characters: `f994aca60a33b79c24640e8d5b0b36c2`. 
+if the file is intact, `md5sum` should generate a string of characters: `c79734b099cea663d2808bfde2e9a422`. 
 If a different string is generated, the file is likely corrupted 
 
 !!! note
@@ -39,7 +39,7 @@ which will shows the first 10 lines of the file
 
 The **GIANT.height.gz** file contains the following columns:
 
-|SNP|CHR|BP|A1|A2|MAF|BETA|SE|P|N|INFO|
+|SNP|CHR|BP|A1|A2|MAF|SE|P|N|INFO|OR|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 
 With each column corresponds to the following
@@ -50,11 +50,11 @@ With each column corresponds to the following
 - **A1**: The effective alllele of the SNP
 - **A2**: The non-effective allele of the SNP
 - **MAF**: The minor allele frequency of the SNP
-- **BETA**: The effect size estimate of the SNP. Can sometimes be the odd ratio, in which case, we will take the natural logarithm of it 
 - **SE**: The standard error of the effect size esimate
 - **P**: The P-value of association between the genotype of the SNP and the phenotype of interest
 - **N**: Number of samples used to obtain the effect size estimate
 - **INFO**: Usually the imputation information score. 
+- **OR**: The effect size estimate of the SNP. Can also be BETA
 
 !!! Important
     Some GWAS results files do not make clear which allele is the effect allele and which the non-effect allele. 
@@ -101,14 +101,14 @@ This is acheived by the following:
 
 ```bash
 zcat Height.gz |\
-awk 'NR==1 || ($6 > 0.05 && $6 < 0.95) && ($11 > 0.8) {print}' |\
+awk 'NR==1 || ($6 > 0.05 && $6 < 0.95) && ($10 > 0.8) {print}' |\
 gzip - > Height.QC.gz
 ```
 
 1. Decompress and read the **Height.gz** file
-2. Print the header line (NR==1)
-3. Print any line with MAF above 0.05 and less than 0.95 ($6 because the sixth column of the file contains the MAF information)
-4. Print any line with INFO above 0.8 ($11 because the sixth column of the file contains the INFO information)
+2. Print the header line (`NR==1`)
+3. Print any line with MAF above 0.05 and less than 0.95 (`$6` because the sixth column of the file contains the MAF information)
+4. Print any line with INFO above 0.8 (`$10` because the sixth column of the file contains the INFO information)
 5. Compress and write the result to **Height.QC.gz**
 
 The **Height.QC.gz** file can then be used for downstream analyses
