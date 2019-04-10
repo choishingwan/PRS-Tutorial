@@ -14,12 +14,17 @@ A common problem is that the downloaded file can be corrupted, which can generat
 down-stream analyses. To avoid un-necessary waste of time, it is generally a good practice to check if the file is
 intact. This can be done by performing the `md5sum` check:
 
-```bash
+```bash tab="Linux"
 md5sum GIANT.height.gz
+```
+
+```bash tab="Mac"
+md5 GIANT.height.gz
 ```
 
 if the file is intact, `md5sum` should generate a string of characters: `c79734b099cea663d2808bfde2e9a422`. 
 If a different string is generated, the file is likely corrupted 
+
 
 !!! note
     In most scenarios, a different `md5sum` is generated for different files. Therefore it is a nice simple way of 
@@ -29,7 +34,7 @@ If a different string is generated, the file is likely corrupted
 **GIANT.height.gz** is compressed. To read its content, you can type:
 
 ```bash
-zcat GIANT.height.gz | head
+gunzip -c GIANT.height.gz | head
 ```
 
 which will shows the first 10 lines of the file
@@ -66,7 +71,7 @@ As most PRS software do not allow duplicated SNPs in the base input, and to avoi
 it might be beneficial to remove the duplicated SNPs from the base file. 
 
 ```bash
-zcat GIANT.height.gz |\
+gunzip -c GIANT.height.gz |\
 awk '{ print $1}' |\
 sort |\
 uniq -d > duplicated.snp
@@ -85,7 +90,7 @@ Briefly, the above command does the following:
 
 Duplicated SNPs can then be removed using the `grep` command:
 ```bash
-zcat GIANT.height.gz  |\
+gunzip -c GIANT.height.gz  |\
 grep -vf duplicated.snp |\
 gzip - > Height.gz
 ```
@@ -100,7 +105,7 @@ It is therefore beneficial to remove SNPs with low MAF and INFO.
 This is acheived by the following:
 
 ```bash
-zcat Height.gz |\
+gunzip -c Height.gz |\
 awk 'NR==1 || ($6 > 0.05 && $6 < 0.95) && ($10 > 0.8) {print}' |\
 gzip - > Height.QC.gz
 ```
@@ -108,7 +113,7 @@ gzip - > Height.QC.gz
 1. Decompress and read the **Height.gz** file
 2. Print the header line (`NR==1`)
 3. Print any line with MAF above 0.05 and less than 0.95 (`$6` because the sixth column of the file contains the MAF information)
-4. Print any line with INFO above 0.8 (`$10` because the sixth column of the file contains the INFO information)
+4. Print any line with INFO above 0.8 (`$10` because the tenth column of the file contains the INFO information)
 5. Compress and write the result to **Height.QC.gz**
 
 The **Height.QC.gz** file can then be used for downstream analyses

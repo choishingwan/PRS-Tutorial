@@ -79,14 +79,12 @@ plink \
     --rel-cutoff 0.125 \
     --out EUR.QC
 ```
-The IDs of the un-related samples are located in **EUR.QC.rel.id**, which can then be extracted using
-```bash
-plink \
-    --bfile EUR.QC \
-    --keep EUR.QC.rel.id \
-    --make-bed \
-    --out EUR.QC.unrel
-```
+
+!!! note
+    Normally, we can generate a new genotype file using the new sample list. However, 
+    this will use up a lot of storage space. Using `plink`'s `--extract`, `--exclude`, `--keep`,
+    `--remove` functions, we can work solely on the list of samples and SNPs without duplicating the 
+    genotype file, therefore reducing the storage space usage.  
 
 # Remove samples with abnormal heterozygosity rate
 Individual with high or low heterozygosity rate can be contaminated or are inbreed.
@@ -94,8 +92,9 @@ It is therefore a good idea to remove these samples from our dataset before cont
 Heterozygosity rate can be calculated using `plink` after performing prunning. 
 ```bash
 plink \
-    --bfile EUR.QC.unrel \
+    --bfile EUR.QC \
     --extract EUR.QC.prune.in \
+    --keep EUR.QC.rel.id \
     --het \
     --out EUR
 ```
@@ -106,16 +105,8 @@ Open a `R` section by tying `R` in your terminal
 dat <- read.table("EUR.het", header=T) # Read in the EUR.het file, specify it has header
 m <- mean(dat$F) # Calculate the mean  
 s <- sd(dat$F) # Calculate the SD
-problem <- subset(dat, F> m+3*s | F< m-3*s) # Get any samples with F coefficient 3 sd away from population mean
-write.table(problem[,c(1,2)], "EUR.prob.sample", quote=F, row.names=F) # print FID and IID for problematic samples
-```
-With **EUR.prob.sample**, we can then remove the problematic samples from our genotype file using `plink`
-```bash
-plink \
-    --bfile EUR.QC.unrel \
-    --remove EUR.prob.sample \
-    --make-bed \
-    --out EUR.QC.unrel.het
+valid <- subset(dat, F <= m+3*s & F >= m-3*s) # Get any samples with F coefficient within 3 SD from the population mean
+write.table(valid[,c(1,2)], "EUR.valid.sample", quote=F, row.names=F) # print FID and IID for valid samples
 ```
 
 # Check for mis-matched Sex information
@@ -134,8 +125,9 @@ Before performing sex check, prunning should be performed (see [here](target.md#
 Sex check can then easily be carried out using `plink`
 ```bash
 plink \
-    --bfile EUR.QC.unrel.het \
+    --bfile EUR.QC \
     --extract EUR.QC.prune.in \
+    --keep EUR.valid.sample \
     --check-sex \
     --out EUR
 ```
@@ -147,7 +139,7 @@ For male, the F-statistic should be > 0.8 and Female should have a value < 0.2.
 awk 'NR==FNR{a[$1]=$5} \
     NR!=FNR && a[$1]==1 && $6 > 0.8 {print $1,$2} \
     NR!=FNR && a[$1]==2 && $6 < 0.2 {print $1,$2} ' \
-    EUR.QC.unrel.het.fam EUR.sexcheck > EUR.valid.sex 
+    EUR.QC.fam EUR.sexcheck > EUR.valid.sex 
 ```
 Here is a breakdown of the above script
 1. Read in the first file (`NR==FNR`) and store the sex (`$5`) into a dictionary using the FID (`$1`) as the key
