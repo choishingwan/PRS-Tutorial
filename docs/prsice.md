@@ -4,7 +4,7 @@ Assuming we have the following files
 
 |File Name | Description|
 |:-:|:-:|
-|**Height.QC.gz**| The post-QCed summary statistic |
+|**GIANT.height.gz**| The original summary statistic. PRSice-2 can directly apply INFO and MAF filtering on the summary statistic |
 |**EUR.QC.bed**| The genotype file after performing some basic filtering |
 |**EUR.QC.bim**| This file contains the SNPs that passed the basic filtering |
 |**EUR.QC.fam**| This file contains the samples that passed the basic filtering |

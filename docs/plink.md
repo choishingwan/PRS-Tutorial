@@ -26,10 +26,79 @@ awk '!( ($5=="A" && $6=="T") || \
 ??? note "How many ambiguous SNPs were there?"
     There are `17,260` ambiguous SNPs
 
-??? note  "Strand Flipping"
-    Alternatively, when there is a non-ambiguous mismatch in allele coding between the data sets, such as A/C in the base
-    and G/T in the target data, then this can be resolved by ‘flipping’ the alleles in the target data to their complementary alleles. 
-    This can be done using `R`
+# Strand Flipping
+Alternatively, when there is a non-ambiguous mismatch in allele coding between the data sets, such as A/C in the base
+and G/T in the target data, then this can be resolved by ‘flipping’ the alleles in the target data to their complementary alleles. 
+This has to be done with mulitpe steps
+
+1. Get the correct A1 alleles for the bim file
+```R
+bim <- read.table("EUR.QC.bim", header=F)
+colnames(bim) <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
+height <- read.table(gzfile("Height.QC.gz"), header=T)
+# Avoid complicated factor problem
+height$A1 <- toupper(as.character(height$A1))
+height$A2 <- toupper(as.character(height$A2))
+bim$B.A1 <- toupper(as.character(bim$B.A1))
+bim$B.A2 <- toupper(as.character(bim$B.A2))
+info <- merge(bim, height, by=c("SNP", "CHR", "BP"))
+
+# Function for calculating the complementary allele
+complement <- function(x){
+    switch (x,
+        "A" = "T",
+        "C" = "G",
+        "T" = "A",
+        "G" = "C",
+        return(NA)
+    )
+}
+# Now get SNPs that has exact match between base and target
+info.match <- subset(info, A1==B.A1 & A2==B.A2)
+# Check for complementary matchs
+info$C.A1 <- sapply(info$B.A1, complement)
+info$C.A2 <- sapply(info$B.A2, complement)
+info.complement <- subset(info, A1==C.A1 & A2==C.A2)
+# Update these allele coding in the bim file 
+bim[bim$SNP %in% info.complement$SNP, ]$B.A1 <- sapply(bim[bim$SNP %in% info.complement$SNP, ]$B.A1, complement)
+bim[bim$SNP %in% info.complement$SNP, ]$B.A2 <- sapply(bim[bim$SNP %in% info.complement$SNP, ]$B.A2, complement)
+# identify SNPs that need flipping 
+info.flip <- subset(info, A1==B.A2 & A2==B.A1)
+# identify SNPs that need flipping & complement
+info.cflip <- subset(info, A1==C.A2 & A2==C.A1)
+# Update these allele coding in the bim file 
+bim[bim$SNP %in% info.cflip$SNP, ]$B.A1 <- sapply(bim[bim$SNP %in% info.cflip$SNP, ]$B.A1, complement)
+bim[bim$SNP %in% info.cflip$SNP, ]$B.A2 <- sapply(bim[bim$SNP %in% info.cflip$SNP, ]$B.A2, complement)
+# Get list of SNPs that need to change the A1 encoding
+flip <- rbind(info.flip, info.cflip)
+flip.snp <- data.frame(SNP=flip$SNP, A1=flip$A1)
+write.table(flip.snp, "EUR.update.a1", quote=F, row.names=F)
+write.table(bim, "EUR.QC.adj.bim", quote=F, row.names=F, col.names=F)
+# And we want to remove any SNPs that do not match with the base data
+mismatch <- bim$SNP[!(bim$SNP %in% info.match$SNP | bim$SNP %in% info.complement$SNP | bim$SNP %in% flip$SNP)]
+write.table(mismatch, "EUR.mismatch", quote=F, row.names=F, col.names=F)
+```
+
+The above script will generate three files: **EUR.QC.adj.bim**, **EUR.update.a1** and **EUR.mismatch**. We want to replace
+**EUR.QC.bim** with **EUR.QC.adj.bim**:
+
+```bash
+# Make a back up
+mv EUR.QC.bim EUR.QC.bim.bk
+ln -s EUR.QC.adj.bim EUR.QC.bim
+```
+
+We can then generate a new genotype file with the correct genetic encodings
+```bash
+plink \
+    --bfile EUR.QC \
+    --a1-allele EUR.update.a1 \
+    --make-bed \
+    --keep EUR.valid.sample \
+    --extract EUR.unambig.snp \
+    --exclude EUR.mismatch \
+    --out EUR.QC.flipped
+```
 
 # Update Effect Size
 When odd ratios (OR) instead of BETA are provided, the PRS might have to calculated using a multiplicative model.
@@ -55,13 +124,11 @@ associated with the trait under study when removing SNPs in LD.
 
 ```bash
 plink \
-    --bfile EUR.QC \
+    --bfile EUR.QC.flipped \
     --clump-p1 1 \
     --clump-r2 0.1 \
     --clump-kb 250 \
     --clump Height.QC.transformed \
-    --keep EUR.valid.sample \
-    --extract EUR.unambig.snp \
     --clump-snp-field SNP \
     --clump-field P \
     --out EUR
@@ -74,8 +141,6 @@ Each of the new parameters corresponds to the following
 | clump-r2 | 0.1 | SNPs having $r^2$ higher than 0.1 with the index SNPs will be removed |
 | clump-kb | 250 | SNPs within 250k of the index SNP are considered for clumping|
 | clump | Height.QC.transformed | Summary statistic file containing the p-value information|
-| keep | EUR.valid.sample | Samples for LD calculation |
-| extract | EUR.unambig.snp | Only consider these SNPs for clumping |
 | clump-snp-field | SNP | Specify that the column `SNP` contains the SNP IDs |
 | clump-field | P | Specify that the column `P` contains the P-value information |
 
@@ -132,9 +197,8 @@ We can then calculate the PRS with the following `plink` command:
 
 ```bash
 plink \
-    --bfile EUR.QC \
+    --bfile EUR.QC.flipped \
     --extract EUR.valid.snp \
-    --keep EUR.valid.sample \
     --score Height.QC.Transformed 1 4 11 header \
     --q-score-range range_list SNP.pvalue \
     --out EUR
@@ -174,15 +238,13 @@ Again, we can calculate the PCs using `plink`
 ```bash
 # First, we need to perform prunning
 plink \
-    --bfile EUR.QC \
-    --keep EUR.valid.sample \
+    --bfile EUR.QC.flipped \
     --extract EUR.valid.snp \
     --indep-pairwise 200 50 0.25 \
     --out EUR
 # Then we calculate the first 6 PCs
 plink \
-    --bfile EUR.QC \
-    --keep EUR.valid.sample \
+    --bfile EUR.QC.flipped \
     --extract EUR.prune.in \
     --pca 6 \
     --out EUR
@@ -282,7 +344,7 @@ print(prs.result[which.max(prs.result$R2),])
     0.2
 
 ??? note "How much phenotypic variation does the "best" PRS explains?"
-    0.03985344
+    0.04128065
 
 # Plotting the Results
 We can also visualize our results using `R`
@@ -313,7 +375,7 @@ ggplot(data = prs.result, aes(x = factor(Threshold), y = R2)) +
         parse = T
     )  +
     # Specify the range of the plot, *1.25 to provide enough space for the p-values
-    scale_y_continuous(limits = c(0, max(output$R2) * 1.25)) +
+    scale_y_continuous(limits = c(0, max(prs.result$R2) * 1.25)) +
     # Specify the axis labels
     xlab(expression(italic(P) - value ~ threshold ~ (italic(P)[T]))) +
     ylab(expression(paste("PRS model fit:  ", R ^ 2))) +
