@@ -7,6 +7,8 @@ In previous sections, we have generated the following files
 |**EUR.QC.bim**| This file contains the SNPs that passed the basic filtering |
 |**EUR.QC.fam**| This file contains the samples that passed the basic filtering |
 |**EUR.valid.sample**| This file contains the samples that passed all the QC |
+|**EUR.height**| This file contains the phenotype of the samples |
+|**EUR.covariate**| This file contains the covariates of the samples |
 
 Here, we will try to calculate polygenic risk score using `plink`. 
 # Remove Ambiguous SNPs
@@ -156,12 +158,12 @@ The above command and range_list will generate 7 files:
 
 !!! Note
     The default formular for PRS calculation in PLINK is:
-    (Assuming the effect size of SNP $i$ is $S_i$;  the number of effective allele observed in sample $j$ is $G_j$; the ploidy of the sample is $P$ (It should be 2 for human); and the number of samples and SNPs included in the PRS be $N$ and $M$ respectively)
+    (Assuming the effect size of SNP $i$ is $S_i$;  the number of effective allele observed in sample $j$ is $G_{ij}$; the ploidy of the sample is $P$ (It should be 2 for human); the number of samples included in the PRS be $N$; and the number of non-missing SNPs observed in sample $j$ be $M_j$)
     $$
-    PRS_j = \sum_i^N\frac{S_i*G_{ij}}{P*M}
+    PRS_j =\frac{ \sum_i^NS_i*G_{ij}}{P*M_j}
     $$
 
-    If sample has a missing genotype for SNP $i$, the population minor allele frequency times ploidy ($MAF_i*P$)is then used inplace of $G_{ij}$
+    If sample has a missing genotype for SNP $i$, the population minor allele frequency times ploidy ($MAF_i*P$) is used inplace of $G_{ij}$
 
 # Accounting for Population Stratification
 
@@ -177,19 +179,226 @@ plink \
     --extract EUR.valid.snp \
     --indep-pairwise 200 50 0.25 \
     --out EUR
-# Then we calculate the first 20 PCs
+# Then we calculate the first 6 PCs
 plink \
     --bfile EUR.QC \
     --keep EUR.valid.sample \
     --extract EUR.prune.in \
-    --pca 20 \
+    --pca 6 \
     --out EUR
 ```
+
+!!! note
+    One way to select the appropriate number of PCs is to perform GWAS on the trait of interest with different number of PCs.
+    [LDSC](https://github.com/bulik/ldsc) analysis can then be performed on each of the resulted GWAS summary statistics. 
+    By observing the estimated intercept, one can select the number of PCs that provide an intercept estimate closer to 1, which might
+    suggest a smaller influence of population stratification.
+
+The eigen-vector (PCs) are stored in **EUR.eigenvec** and can be used as a covariate in the regression model to account for population stratification.
 
 !!! important
     If the base and target samples are collected from different population (e.g. Caucasian vs African ), the results from PRS analysis will be biased (see [Martin et al](https://www.ncbi.nlm.nih.gov/pubmed/28366442)).
 
 
 # Finding the "Best" P-value threshold
+The "best" p-value threshold for PRS construction are usually not known. 
+To identify the "best" PRS, we can perform a regression between the calculated PRS and the 
+sample phenotype and select the PRS that explains most of the phenotypic variation. 
+This can be achieved using `R`.
+
+```R tab="detail"
+p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
+# Read in the phenotype file 
+phenotype <- read.table("EUR.height", header=T)
+# Read in the PCs
+pcs <- read.table("EUR.eigenvec", header=F)
+# The default output from plink does not include a header
+# To make things simple, we will add the appropriate headers
+# (1:6 because there are 6 PCs)
+colnames(pcs) <- c("FID", "IID", paste0("PC",1:6)) 
+# Read in the covariates (here, it is sex)
+covariate <- read.table("EUR.covariate", header=T)
+# Now merge the files
+pheno <- merge(merge(phenotype, covariate, by=c("FID", "IID")), pcs, by=c("FID","IID"))
+# We can then calculate the null model (model with PRS) using a linear regression 
+# (as height is quantitative)
+null.model <- lm(Height~., data=pheno[,!colnames(pheno)%in%c("FID","IID")])
+# And the R2 of the null model is 
+null.r2 <- summary(null.model)$r.squared
+prs.result <- NULL
+for(i in p.threshold){
+    # Go through each p-value threshold
+    prs <- read.table(paste0("EUR.",i,".profile"), header=T)
+    # Merge the prs with the phenotype matrix
+    # We only want the FID, IID and PRS from the PRS file, therefore we only select the 
+    # relevant columns
+    pheno.prs <- merge(pheno, prs[,c("FID","IID", "SCORE")], by=c("FID", "IID"))
+    # Now perform a linear regression on Height with PRS and the covariates
+    # ignoring the FID and IID from our model
+    model <- lm(Height~., data=pheno.prs[,!colnames(pheno.prs)%in%c("FID","IID")])
+    # model R2 is obtained as 
+    model.r2 <- summary(model)$r.squared
+    # R2 of PRS is simply calculated as the model R2 minus the null R2
+    prs.r2 <- model.r2-null.r2
+    # We can also obtain the coeffcient and p-value of association of PRS as follow
+    prs.coef <- summary(model)$coeff["SCORE",]
+    prs.beta <- as.numeric(prs.coef[1])
+    prs.se <- as.numeric(prs.coef[2])
+    prs.p <- as.numeric(prs.coef[4])
+    # We can then store the results
+    prs.result <- rbind(prs.result, data.frame(Threshold=i, R2=prs.r2, P=prs.p, BETA=prs.beta,SE=prs.se))
+}
+# Best result is:
+prs.result[which.max(prs.result$R2),]
+```
+
+```R tab="quick"
+p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
+phenotype <- read.table("EUR.height", header=T)
+pcs <- read.table("EUR.eigenvec", header=F)
+colnames(pcs) <- c("FID", "IID", paste0("PC",1:6)) 
+covariate <- read.table("EUR.covariate", header=T)
+pheno <- merge(merge(phenotype, covariate, by=c("FID", "IID")), pcs, by=c("FID","IID"))
+null.r2 <- summary(lm(Height~., data=pheno[,!colnames(pheno)%in%c("FID","IID")]))$r.squared
+prs.result <- NULL
+for(i in p.threshold){
+    pheno.prs <- merge(pheno, 
+                        read.table(paste0("EUR.",i,".profile"), header=T)[,c("FID","IID", "SCORE")],
+                        by=c("FID", "IID"))
+    model <- summary(lm(Height~., data=pheno.prs[,!colnames(pheno.prs)%in%c("FID","IID")]))
+    model.r2 <- model$r.squared
+    prs.r2 <- model.r2-null.r2
+    prs.coef <- model$coeff["SCORE",]
+    prs.result <- rbind(prs.result, 
+        data.frame(Threshold=i, R2=prs.r2, 
+                    P=as.numeric(prs.coef[4]), 
+                    BETA=as.numeric(prs.coef[1]),
+                    SE=as.numeric(prs.coef[2])))
+}
+print(prs.result[which.max(prs.result$R2),])
+```
+
+??? note "Which p-value threshold generate the "best" PRS?"
+    0.2
+
+??? note "How much phenotypic variation does the "best" PRS explains?"
+    0.03985344
 
 # Plotting the Results
+We can also visualize our results using `R`
+
+!!! note
+    We will be using `prs.result` generated in [previous section](#finding-the-best-p-value-threshold)
+
+
+```R tab="ggplot2"
+# ggplot2 is a handy package for plotting
+library(ggplot2)
+# generate a pretty format for p-value output
+prs.result$print.p <- round(prs.result$P, digits = 3)
+prs.result$print.p[!is.na(prs.result$print.p) &
+                       prs.result$print.p == 0] <-
+    format(prs.result$P[!is.na(prs.result$print.p) &
+                            prs.result$print.p == 0], digits = 2)
+prs.result$print.p <- sub("e", "*x*10^", prs.result$print.p)
+# Initialize ggplot, requiring the threshold as the x-axis (use factor so that it is uniformly distributed)
+ggplot(data = prs.result, aes(x = factor(Threshold), y = R2)) +
+    # Specify that we want to print p-value on top of the bars
+    geom_text(
+        aes(label = paste(print.p)),
+        vjust = -1.5,
+        hjust = 0,
+        angle = 45,
+        cex = 4,
+        parse = T
+    )  +
+    # Specify the range of the plot, *1.25 to provide enough space for the p-values
+    scale_y_continuous(limits = c(0, max(output$R2) * 1.25)) +
+    # Specify the axis labels
+    xlab(expression(italic(P) - value ~ threshold ~ (italic(P)[T]))) +
+    ylab(expression(paste("PRS model fit:  ", R ^ 2))) +
+    # Draw a bar plot
+    geom_bar(aes(fill = -log10(P)), stat = "identity") +
+    # Specify the colors
+    scale_fill_gradient2(
+        low = "dodgerblue",
+        high = "firebrick",
+        mid = "dodgerblue",
+        midpoint = 1e-4,
+        name = bquote(atop(-log[10] ~ model, italic(P) - value),)
+    ) +
+    # Some beautification of the plot
+    theme_classic() + theme(
+        axis.title = element_text(face = "bold", size = 18),
+        axis.text = element_text(size = 14),
+        legend.title = element_text(face = "bold", size =
+                                        18),
+        legend.text = element_text(size = 14),
+        axis.text.x = element_text(angle = 45, hjust =
+                                       1)
+    )
+# save the plot
+ggsave("EUR.height.bar.png", height = 7, width = 7)
+```
+
+```R tab="base plot"
+# We strongly recommend the use of ggplot2. Only follow this code if you
+# are desperate.
+# Specify that we want to generate plot in EUR.height.bar.png
+png("EUR.height.bar.png",
+      height=10, width=10, res=300, unit="in")
+# First, obtain the colorings based on the p-value
+col <- suppressWarnings(colorRampPalette(c("dodgerblue", "firebrick")))
+# We want the color gradient to match the ranking of p-values
+prs.result <- prs.result[order(-log10(prs.result$P)),]
+prs.result$color <-  col(nrow(prs.result))
+prs.result <- prs.result[order(prs.result$Threshold),]
+# generate a pretty format for p-value output
+prs.result$print.p <- round(prs.result$P, digits = 3)
+prs.result$print.p[!is.na(prs.result$print.p) & prs.result$print.p == 0 ] <-
+    format(prs.result$P[!is.na(prs.result$print.p) & prs.result$print.p == 0 ], digits = 2)
+prs.result$print.p <- sub("e", "*x*10^", prs.result$print.p)
+# Generate the axis labels
+xlab <- expression(italic(P) - value ~ threshold ~ (italic(P)[T]))
+ylab <- expression(paste("PRS model fit:  ", R ^ 2))
+# Setup the drawing area
+layout(t(1:2), widths=c(8.8,1.2))
+par( cex.lab=1.5, cex.axis=1.25, font.lab=2, 
+    oma=c(0,0.5,0,0),
+    mar=c(4,6,0.5,0.5))
+# Plotting the bars
+b<- barplot(height=prs.result$R2, 
+            col=prs.result$color, 
+            border=NA, 
+            ylim=c(0, max(prs.result$R2)*1.25), 
+            axes = F, ann=F)
+# Plot the axis labels and axis ticks
+odd <- seq(0,nrow(prs.result)+1,2)
+even <- seq(1,nrow(prs.result),2)
+axis(side=1, at=b[odd], labels=prs.result$Threshold[odd], lwd=2)
+axis(side=1, at=b[even], labels=prs.result$Threshold[even],lwd=2)
+axis(side=1, at=c(0,b[1],2*b[length(b)]-b[length(b)-1]), labels=c("","",""), lwd=2, lwd.tick=0)
+# Write the p-value on top of each bar
+text( parse(text=paste(
+    prs.result$print.p)), 
+    x = b+0.1, 
+    y =  prs.result$R2+ (max(prs.result$R2)*1.05-max(prs.result$R2)), 
+    srt = 45)
+# Now plot the axis lines
+box(bty='L', lwd=2)
+axis(2,las=2, lwd=2)
+# Plot the axis titles
+title(ylab=ylab, line=4, cex.lab=1.5, font=2 )
+title(xlab=xlab, line=2.5, cex.lab=1.5, font=2 )
+# Generate plot area for the legend
+par(cex.lab=1.5, cex.axis=1.25, font.lab=2, 
+      mar=c(20,0,20,4))
+prs.result <- prs.result[order(-log10(prs.result$P)),]
+image(1, -log10(prs.result$P), t(seq_along(-log10(prs.result$P))), col=prs.result$color, axes=F,ann=F)
+axis(4,las=2,xaxs='r',yaxs='r', tck=0.2, col="white")
+# plot legend title
+title(bquote(atop(-log[10] ~ model, italic(P) - value), ), 
+          line=2, cex=1.5, font=2, adj=0)
+# write the plot to file
+dev.off()
+```
