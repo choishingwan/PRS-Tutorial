@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Shing Wan CHOI">
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>2. Target Genotype QC - Basic Tutorial for Polygenic Risk Score Analyses</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link href="../css/extra.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "2. Target Genotype QC";
+    var mkdocs_page_input_path = "target.md";
+    var mkdocs_page_url = "/target/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Basic Tutorial for Polygenic Risk Score Analyses</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../base/">1. QC of Summary Statistics</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">2. Target Genotype QC</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#genotype-file-format">Genotype file format</a></li>
+    
+
+    <li class="toctree-l2"><a href="#basic-filterings">Basic filterings</a></li>
+    
+
+    <li class="toctree-l2"><a href="#filter-related-samples">Filter related samples</a></li>
+    
+
+    <li class="toctree-l2"><a href="#remove-samples-with-abnormal-heterozygosity-rate">Remove samples with abnormal heterozygosity rate</a></li>
+    
+
+    <li class="toctree-l2"><a href="#check-for-mis-matched-sex-information">Check for mis-matched Sex information</a></li>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">3. Running PRS</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../plink/">PLINK</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../prsice/">PRSice-2</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../ldpred/">LDpred</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../lassosum/">lassosum</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Basic Tutorial for Polygenic Risk Score Analyses</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>2. Target Genotype QC</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/choishingwan/PRS-Tutorial/edit/master/docs/target.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>Next, we'd like to perform basic quality controls (QC) on the target genotype data. </p>
+<p>In this tutorial, we've simulated some samples using the 1000 genome european genotypes. 
+You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip">here</a>. </p>
+<p>Unzip the data as follow:</p>
+<div class="codehilite"><pre><span></span>unzip EUR.zip
+</pre></div>
+
+<details class="note"><summary>What's the md5sum of the genotype files?</summary><table>
+<thead>
+<tr>
+<th align="center">File</th>
+<th align="center">md5sum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><strong>EUR.bed</strong></td>
+<td align="center">96ce8f494a57114eaee6ef9741676f58</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.bim</strong></td>
+<td align="center">852d54c9b6d1159f89d4aa758869e72a</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.covariate</strong></td>
+<td align="center">afff13f8f9e15815f2237a62b8bec00b</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.fam</strong></td>
+<td align="center">8c6463c0d8f32f975cdc423b1b80a951</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.height</strong></td>
+<td align="center">052beb4cae32ac7673f1d6b9e854c85b</td>
+</tr>
+</tbody>
+</table>
+</details>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We assume PLINK is installed in your PATH directory, which allow us to use <code>plink</code> instead of <code>./plink</code>.
+If PLINK is not in your PATH directory, replace all instance of <code>plink</code> in the tutorial to <code>./plink</code> assuming
+the PLINK executable is located within your working directory</p>
+</div>
+<h1 id="genotype-file-format">Genotype file format<a class="headerlink" href="#genotype-file-format" title="Permanent link">&para;</a></h1>
+<h1 id="basic-filterings">Basic filterings<a class="headerlink" href="#basic-filterings" title="Permanent link">&para;</a></h1>
+<p>The power and validity of PRS analyses are highly dependent on the quality of the base and target data, therefore 
+both data sets must be quality controlled to the high standards implemented in GWAS studies, e.g. removing SNPs according to low genotyping rate, minor allele frequency and individuals with low genotyping rate (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a>).</p>
+<p>The following <code>plink</code> command perform some basic filterings</p>
+<p><div class="codehilite"><pre><span></span>plink --bfile EUR <span class="se">\</span>
+    --maf <span class="m">0</span>.05 <span class="se">\</span>
+    --hwe 1e-6 <span class="se">\</span>
+    --geno <span class="m">0</span>.01 <span class="se">\</span>
+    --mind <span class="m">0</span>.01 <span class="se">\</span>
+    --make-bed <span class="se">\</span>
+    --out EUR.QC
+</pre></div>
+Each of the parameters corresponds to the following</p>
+<table>
+<thead>
+<tr>
+<th align="center">Paramter</th>
+<th align="center">Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">bfile</td>
+<td align="center">EUR</td>
+<td align="left">Inform <code>plink</code> that the input genotype files should have a prefix of <code>EUR</code></td>
+</tr>
+<tr>
+<td align="center">maf</td>
+<td align="center">0.05</td>
+<td align="left">Try to filter out any SNPs with minor allele frequency less than 0.05. Genotype error are more likely to influence SNPs with low MAF. Large sample size can adapt a lower MAF threshold</td>
+</tr>
+<tr>
+<td align="center">hwe</td>
+<td align="center">1e-6</td>
+<td align="left">Filtering SNPs with low p-value from the Hardy-Weinberg exact test. SNPs with significant p-value from the HWE test are more likely to harbor genotyping error or are under selection. Filtering should be performed on the control samples to avoid filtering SNPs that are causal (under selection in cases)</td>
+</tr>
+<tr>
+<td align="center">geno</td>
+<td align="center">0.01</td>
+<td align="left">Exclude SNPs that are missing in large proportion of subjects. A two pass filtering is usually performed (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a>).</td>
+</tr>
+<tr>
+<td align="center">mind</td>
+<td align="center">0.01</td>
+<td align="left">Exclude individual who have a high rate of genotype missingness. This might indicate problems in the DNA sample. (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a> for more details).</td>
+</tr>
+<tr>
+<td align="center">make-bed</td>
+<td align="center">-</td>
+<td align="left">Inform <code>plink</code> to generate a binary genotype file</td>
+</tr>
+<tr>
+<td align="center">out</td>
+<td align="center">EUR</td>
+<td align="left">Inform <code>plink</code> that all output should have a prefix of <code>EUR</code></td>
+</tr>
+</tbody>
+</table>
+<details class="note"><summary>How many SNPs were filtered?</summary><p>A total of <code>266</code> SNPs were removed due to Hardy-Weinberg exact test results</p>
+</details>
+<h1 id="filter-related-samples">Filter related samples<a class="headerlink" href="#filter-related-samples" title="Permanent link">&para;</a></h1>
+<p>Related samples in the target data might lead to overfitted results, hampering the generalizability of the results. </p>
+<p>To remove related samples, we first need to perform prunning to remove highly correlated SNPs:
+<div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
+    --indep-pairwise <span class="m">200</span> <span class="m">50</span> <span class="m">0</span>.25 <span class="se">\</span>
+    --out EUR.QC
+</pre></div></p>
+<p>This will generate two files 1) <strong>EUR.QC.prune.in</strong> and 2) <strong>EUR.QC.prune.out</strong>
+The <strong>EUR.QC.prune.in</strong> file contains SNPs that has r2 less than 0.25 between them. </p>
+<p>Samples with more than third-degree relatedness (pi-hat &gt; 0.125) can then be removed with </p>
+<div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
+    --extract EUR.QC.prune.in <span class="se">\</span>
+    --rel-cutoff <span class="m">0</span>.125 <span class="se">\</span>
+    --out EUR.QC
+</pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Normally, we can generate a new genotype file using the new sample list. However, 
+this will use up a lot of storage space. Using <code>plink</code>'s <code>--extract</code>, <code>--exclude</code>, <code>--keep</code>,
+<code>--remove</code> functions, we can work solely on the list of samples and SNPs without duplicating the 
+genotype file, therefore reducing the storage space usage.  </p>
+</div>
+<h1 id="remove-samples-with-abnormal-heterozygosity-rate">Remove samples with abnormal heterozygosity rate<a class="headerlink" href="#remove-samples-with-abnormal-heterozygosity-rate" title="Permanent link">&para;</a></h1>
+<p>Individual with high or low heterozygosity rate can be contaminated or are inbreed.
+It is therefore a good idea to remove these samples from our dataset before continuing the analyse.
+Heterozygosity rate can be calculated using <code>plink</code> after performing prunning. 
+<div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
+    --extract EUR.QC.prune.in <span class="se">\</span>
+    --keep EUR.QC.rel.id <span class="se">\</span>
+    --het <span class="se">\</span>
+    --out EUR
+</pre></div>
+This will generate the <strong>EUR.het</strong> file which contains the F coefficient estimates.
+It will be easier to filter the samples using <code>R</code> instead of <code>awk</code>:
+Open a <code>R</code> section by tying <code>R</code> in your terminal
+<div class="codehilite"><pre><span></span>dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.het&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span> <span class="c1"># Read in the EUR.het file, specify it has header</span>
+m <span class="o">&lt;-</span> <span class="kp">mean</span><span class="p">(</span>dat<span class="o">$</span><span class="bp">F</span><span class="p">)</span> <span class="c1"># Calculate the mean  </span>
+s <span class="o">&lt;-</span> sd<span class="p">(</span>dat<span class="o">$</span><span class="bp">F</span><span class="p">)</span> <span class="c1"># Calculate the SD</span>
+valid <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> <span class="bp">F</span> <span class="o">&lt;=</span> m<span class="m">+3</span><span class="o">*</span>s <span class="o">&amp;</span> <span class="bp">F</span> <span class="o">&gt;=</span> m<span class="m">-3</span><span class="o">*</span>s<span class="p">)</span> <span class="c1"># Get any samples with F coefficient within 3 SD from the population mean</span>
+write.table<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">)],</span> <span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span> <span class="c1"># print FID and IID for valid samples</span>
+</pre></div></p>
+<h1 id="check-for-mis-matched-sex-information">Check for mis-matched Sex information<a class="headerlink" href="#check-for-mis-matched-sex-information" title="Permanent link">&para;</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As sex chromosome information are missing from our simulated samples. 
+It is not possible to perform the mis-match sex check. (And we used simulated sex)
+Thus, this section is only served as a reference in case your samples contain the 
+sex chromosome and sex information which permits checking if there are mis-matched sex information</p>
+</div>
+<p>Sometimes, sample mislabeling can occur, which can lead to invalid results. 
+A good indication of mislabeled sample is a mismatch between the biological sex and the reported sex. 
+If the biological sex does not match up with the reported sex, it is likely that the sample has been mislabeled.</p>
+<p>Before performing sex check, prunning should be performed (see <a href="./#filter-related-samples">here</a>).
+Sex check can then easily be carried out using <code>plink</code>
+<div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
+    --extract EUR.QC.prune.in <span class="se">\</span>
+    --keep EUR.valid.sample <span class="se">\</span>
+    --check-sex <span class="se">\</span>
+    --out EUR
+</pre></div></p>
+<p>This will generate a file called <strong>EUR.sexcheck</strong> containing the F-statistics for each individual.
+For male, the F-statistic should be &gt; 0.8 and Female should have a value &lt; 0.2.</p>
+<p><div class="codehilite"><pre><span></span>awk <span class="s1">&#39;NR==FNR{a[$1]=$5} \</span>
+<span class="s1">    NR!=FNR &amp;&amp; a[$1]==1 &amp;&amp; $6 &gt; 0.8 {print $1,$2} \</span>
+<span class="s1">    NR!=FNR &amp;&amp; a[$1]==2 &amp;&amp; $6 &lt; 0.2 {print $1,$2} &#39;</span> <span class="se">\</span>
+    EUR.QC.fam EUR.sexcheck &gt; EUR.valid.sex 
+</pre></div>
+Here is a breakdown of the above script
+1. Read in the first file (<code>NR==FNR</code>) and store the sex (<code>$5</code>) into a dictionary using the FID (<code>$1</code>) as the key
+2. Read in the second file (<code>NR!=FNR</code>), if the individual is a male (<code>a[$1]==1</code>) and the F-statistic (<code>$6</code>) is larger than 0.8, print its FID and IID
+3. Read in the second file (<code>NR!=FNR</code>), if the individual is a female (<code>a[$1]==2</code>) and the F-statistic (<code>$6</code>) is less than 0.2, print its FID and IID</p>
+<p>The samples can then be extracted using the <code>--keep</code> command.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../plink/" class="btn btn-neutral float-right" title="PLINK">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../base/" class="btn btn-neutral" title="1. QC of Summary Statistics"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/choishingwan/PRS-Tutorial/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../base/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../plink/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      <script src="../search/require.js"></script>
+      <script src="../search/search.js"></script>
+
+</body>
+</html>

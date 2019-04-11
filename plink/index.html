@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Shing Wan CHOI">
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>PLINK - Basic Tutorial for Polygenic Risk Score Analyses</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link href="../css/extra.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "PLINK";
+    var mkdocs_page_input_path = "plink.md";
+    var mkdocs_page_url = "/plink/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Basic Tutorial for Polygenic Risk Score Analyses</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../base/">1. QC of Summary Statistics</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../target/">2. Target Genotype QC</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">3. Running PRS</span>
+    <ul class="subnav">
+                <li class=" current">
+                    
+    <a class="current" href="./">PLINK</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#remove-ambiguous-snps">Remove Ambiguous SNPs</a></li>
+    
+
+    <li class="toctree-l3"><a href="#update-effect-size">Update Effect Size</a></li>
+    
+
+    <li class="toctree-l3"><a href="#clumping">Clumping</a></li>
+    
+
+    <li class="toctree-l3"><a href="#generate-prs">Generate PRS</a></li>
+    
+
+    <li class="toctree-l3"><a href="#accounting-for-population-stratification">Accounting for Population Stratification</a></li>
+    
+
+    <li class="toctree-l3"><a href="#finding-the-best-p-value-threshold">Finding the "Best" P-value threshold</a></li>
+    
+
+    <li class="toctree-l3"><a href="#plotting-the-results">Plotting the Results</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../prsice/">PRSice-2</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../ldpred/">LDpred</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../lassosum/">lassosum</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Basic Tutorial for Polygenic Risk Score Analyses</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>3. Running PRS &raquo;</li>
+        
+      
+    
+    <li>PLINK</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/choishingwan/PRS-Tutorial/edit/master/docs/plink.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>In previous sections, we have generated the following files</p>
+<table>
+<thead>
+<tr>
+<th align="center">File Name</th>
+<th align="center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><strong>Height.QC.gz</strong></td>
+<td align="center">The post-QCed summary statistic</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.QC.bed</strong></td>
+<td align="center">The genotype file after performing some basic filtering</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.QC.bim</strong></td>
+<td align="center">This file contains the SNPs that passed the basic filtering</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.QC.fam</strong></td>
+<td align="center">This file contains the samples that passed the basic filtering</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.valid.sample</strong></td>
+<td align="center">This file contains the samples that passed all the QC</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.height</strong></td>
+<td align="center">This file contains the phenotype of the samples</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.covariate</strong></td>
+<td align="center">This file contains the covariates of the samples</td>
+</tr>
+</tbody>
+</table>
+<p>Here, we will try to calculate polygenic risk score using <code>plink</code>. </p>
+<h1 id="remove-ambiguous-snps">Remove Ambiguous SNPs<a class="headerlink" href="#remove-ambiguous-snps" title="Permanent link">&para;</a></h1>
+<p>If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. </p>
+<p>Ambiguous SNPs can be obtained by examining the bim file:
+<div class="codehilite"><pre><span></span>awk <span class="s1">&#39;!( ($5==&quot;A&quot; &amp;&amp; $6==&quot;T&quot;) || \</span>
+<span class="s1">        ($5==&quot;T&quot; &amp;&amp; $6==&quot;A&quot;) || \</span>
+<span class="s1">        ($5==&quot;G&quot; &amp;&amp; $6==&quot;C&quot;) || \</span>
+<span class="s1">        ($5==&quot;C&quot; &amp;&amp; $6==&quot;G&quot;)) {print}&#39;</span> <span class="se">\</span>
+        EUR.QC.bim &gt; EUR.unambig.snp 
+</pre></div></p>
+<details class="note"><summary>How many ambiguous SNPs were there?</summary><p>There are <code>17,260</code> ambiguous SNPs</p>
+</details>
+<details class="note"><summary>Strand Flipping</summary><p>Alternatively, when there is a non-ambiguous mismatch in allele coding between the data sets, such as A/C in the base
+and G/T in the target data, then this can be resolved by ‘flipping’ the alleles in the target data to their complementary alleles. 
+This can be done using <code>R</code></p>
+</details>
+<h1 id="update-effect-size">Update Effect Size<a class="headerlink" href="#update-effect-size" title="Permanent link">&para;</a></h1>
+<p>When odd ratios (OR) instead of BETA are provided, the PRS might have to calculated using a multiplicative model.
+To simplify the calculation, we usually take the natural logarithm of the OR such that an additive model can be applied. 
+We can obtain the transformed summary statistics with <code>R</code>:</p>
+<div class="codehilite"><pre><span></span>dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="kp">gzfile</span><span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">),</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+dat<span class="o">$</span>OR <span class="o">&lt;-</span> <span class="kp">log</span><span class="p">(</span>dat<span class="o">$</span>OR<span class="p">)</span>
+write.table<span class="p">(</span>dat<span class="p">,</span> <span class="s">&quot;Height.QC.Transformed&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+</pre></div>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>While you can also do the log transformation using <code>awk</code>, the resulting transformation will only have precision upto 7th digit. 
+The imprecision can accumulate and lead to slightly less accurate results. 
+Therefore it is best to do the transformation in <code>R</code> or allow the PRS software to do the transformation for you. </p>
+</div>
+<h1 id="clumping">Clumping<a class="headerlink" href="#clumping" title="Permanent link">&para;</a></h1>
+<p>Linkage disequilibrium introduce a strong correlation structure across the genome, makes identifying the independent
+genetic effects extremely challenging. 
+One simple method is to perform clumping, which preferentially selects SNPs most
+associated with the trait under study when removing SNPs in LD. </p>
+<p><div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
+    --clump-p1 <span class="m">1</span> <span class="se">\</span>
+    --clump-r2 <span class="m">0</span>.1 <span class="se">\</span>
+    --clump-kb <span class="m">250</span> <span class="se">\</span>
+    --clump Height.QC.transformed <span class="se">\</span>
+    --keep EUR.valid.sample <span class="se">\</span>
+    --extract EUR.unambig.snp <span class="se">\</span>
+    --clump-snp-field SNP <span class="se">\</span>
+    --clump-field P <span class="se">\</span>
+    --out EUR
+</pre></div>
+Each of the new parameters corresponds to the following</p>
+<table>
+<thead>
+<tr>
+<th align="center">Paramter</th>
+<th align="center">Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">clump-p1</td>
+<td align="center">1</td>
+<td align="left">P-value threshold for a SNP to be included as an index SNP. 1 is selected such that all SNPs are include for clumping</td>
+</tr>
+<tr>
+<td align="center">clump-r2</td>
+<td align="center">0.1</td>
+<td align="left">SNPs having <span class="arithmatex">\(r^2\)</span> higher than 0.1 with the index SNPs will be removed</td>
+</tr>
+<tr>
+<td align="center">clump-kb</td>
+<td align="center">250</td>
+<td align="left">SNPs within 250k of the index SNP are considered for clumping</td>
+</tr>
+<tr>
+<td align="center">clump</td>
+<td align="center">Height.QC.transformed</td>
+<td align="left">Summary statistic file containing the p-value information</td>
+</tr>
+<tr>
+<td align="center">keep</td>
+<td align="center">EUR.valid.sample</td>
+<td align="left">Samples for LD calculation</td>
+</tr>
+<tr>
+<td align="center">extract</td>
+<td align="center">EUR.unambig.snp</td>
+<td align="left">Only consider these SNPs for clumping</td>
+</tr>
+<tr>
+<td align="center">clump-snp-field</td>
+<td align="center">SNP</td>
+<td align="left">Specify that the column <code>SNP</code> contains the SNP IDs</td>
+</tr>
+<tr>
+<td align="center">clump-field</td>
+<td align="center">P</td>
+<td align="left">Specify that the column <code>P</code> contains the P-value information</td>
+</tr>
+</tbody>
+</table>
+<p>A more detailed document can be found <a href="https://www.cog-genomics.org/plink/1.9/postproc#clump">here</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <span class="arithmatex">\(r^2\)</span> values computed by <code>--clump</code> are based on maximum likelihood haplotype frequency estimates</p>
+</div>
+<p>This will generate <strong>EUR.clumped</strong>, containing the index SNPs after clumping is performed.
+We can extract the index SNP ID by doing</p>
+<div class="codehilite"><pre><span></span>awk <span class="s1">&#39;NR!=1{print $3}&#39;</span> EUR.clumped &gt;  EUR.valid.snp
+</pre></div>
+
+<blockquote>
+<p><code>$3</code> because the third column contains the SNP ID</p>
+</blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If your target sample is small (e.g. &lt;500), you can try using the 1000 Genome samples for the LD calculation.
+Make sure you use the population that best represents your sample.</p>
+</div>
+<h1 id="generate-prs">Generate PRS<a class="headerlink" href="#generate-prs" title="Permanent link">&para;</a></h1>
+<p><code>plink</code> provide a handy function <code>--score</code> and <code>--q-score-range</code> for calculating polygenic score.</p>
+<p>We will need three files</p>
+<ol>
+<li>The summary statistic file: <strong>Height.QC.Transformed</strong></li>
+<li>A file containing SNP ID and their corresponding p-value (<code>$1</code> because SNP ID is located at the first column; <code>$8</code> because P-value is located at the eigth column)
+<div class="codehilite"><pre><span></span>awk <span class="s1">&#39;{print $1,$8}&#39;</span> Height.QC.Transformed &gt; SNP.pvalue
+</pre></div></li>
+<li>A file containing the P-value thresholds we are testing. Here we will only test a few for illustration purposes
+<div class="codehilite"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;0.001 0 0.001&quot;</span> &gt; range_list
+<span class="nb">echo</span> <span class="s2">&quot;0.05 0 0.05&quot;</span> &gt;&gt; range_list
+<span class="nb">echo</span> <span class="s2">&quot;0.1 0 0.1&quot;</span> &gt;&gt; range_list
+<span class="nb">echo</span> <span class="s2">&quot;0.2 0 0.2&quot;</span> &gt;&gt; range_list
+<span class="nb">echo</span> <span class="s2">&quot;0.3 0 0.3&quot;</span> &gt;&gt; range_list
+<span class="nb">echo</span> <span class="s2">&quot;0.4 0 0.4&quot;</span> &gt;&gt; range_list
+<span class="nb">echo</span> <span class="s2">&quot;0.5 0 0.5&quot;</span> &gt;&gt; range_list
+</pre></div>
+The format of the <strong>range_list</strong> file should be as follow</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="center">Name of Threshold</th>
+<th align="center">Lower bound</th>
+<th align="center">Upper Bound</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The boundary are inclusive. For example, for the <code>0.05</code> threshold, we include all SNPs with P-value from 
+<code>0</code> to <code>0.05</code>, <strong>including</strong> any SNPs with P-value equal to <code>0.05</code></p>
+</div>
+<p>We can then calculate the PRS with the following <code>plink</code> command:</p>
+<p><div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
+    --extract EUR.valid.snp <span class="se">\</span>
+    --keep EUR.valid.sample <span class="se">\</span>
+    --score Height.QC.Transformed <span class="m">1</span> <span class="m">4</span> <span class="m">11</span> header <span class="se">\</span>
+    --q-score-range range_list SNP.pvalue <span class="se">\</span>
+    --out EUR
+</pre></div>
+Meaning of the new parameters are as follow</p>
+<table>
+<thead>
+<tr>
+<th align="center">Paramter</th>
+<th align="center">Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">score</td>
+<td align="center">Height.QC.Transformed 1 4 11 header</td>
+<td align="left">We read from the <strong>Height.QC.Transformed</strong> file, assuming the <code>1</code>st column to be the SNP ID; <code>4</code>th column to be the effective allele information; <code>11</code>th column to be the effect size estimate; and the file contains a <code>header</code></td>
+</tr>
+<tr>
+<td align="center">q-score-range</td>
+<td align="center">range_test SNP.pvalue</td>
+<td align="left">We want to calculate PRS based on the thresholds defined in <strong>range_test</strong>, where the threshold values (p-values) were stored in <strong>SNP.pvalue</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The above command and range_list will generate 7 files:</p>
+<ol>
+<li>EUR.0.5.profile</li>
+<li>EUR.0.4.profile</li>
+<li>EUR.0.3.profile</li>
+<li>EUR.0.2.profile</li>
+<li>EUR.0.1.profile</li>
+<li>EUR.0.05.profile</li>
+<li>EUR.0.001.profile</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The default formular for PRS calculation in PLINK is:
+(Assuming the effect size of SNP <span class="arithmatex">\(i\)</span> is <span class="arithmatex">\(S_i\)</span>;  the number of effective allele observed in sample <span class="arithmatex">\(j\)</span> is <span class="arithmatex">\(G_{ij}\)</span>; the ploidy of the sample is <span class="arithmatex">\(P\)</span> (It should be 2 for human); the number of samples included in the PRS be <span class="arithmatex">\(N\)</span>; and the number of non-missing SNPs observed in sample <span class="arithmatex">\(j\)</span> be <span class="arithmatex">\(M_j\)</span>)
+$$
+PRS_j =\frac{ \sum_i^NS_i*G_{ij}}{P*M_j}
+$$</p>
+<p>If sample has a missing genotype for SNP <span class="arithmatex">\(i\)</span>, the population minor allele frequency times ploidy (<span class="arithmatex">\(MAF_i*P\)</span>) is used inplace of <span class="arithmatex">\(G_{ij}\)</span></p>
+</div>
+<h1 id="accounting-for-population-stratification">Accounting for Population Stratification<a class="headerlink" href="#accounting-for-population-stratification" title="Permanent link">&para;</a></h1>
+<p>Population structure is the principal source of confounding in GWAS and are usually accounted for by incorporating the principal components (PCs) as a covariate. 
+Similarly, we can incorporate PCs in our PRS analysis to account for population stratification.</p>
+<p>Again, we can calculate the PCs using <code>plink</code> 
+<div class="codehilite"><pre><span></span><span class="c1"># First, we need to perform prunning</span>
+plink <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
+    --keep EUR.valid.sample <span class="se">\</span>
+    --extract EUR.valid.snp <span class="se">\</span>
+    --indep-pairwise <span class="m">200</span> <span class="m">50</span> <span class="m">0</span>.25 <span class="se">\</span>
+    --out EUR
+<span class="c1"># Then we calculate the first 6 PCs</span>
+plink <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
+    --keep EUR.valid.sample <span class="se">\</span>
+    --extract EUR.prune.in <span class="se">\</span>
+    --pca <span class="m">6</span> <span class="se">\</span>
+    --out EUR
+</pre></div></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>One way to select the appropriate number of PCs is to perform GWAS on the trait of interest with different number of PCs.
+<a href="https://github.com/bulik/ldsc">LDSC</a> analysis can then be performed on each of the resulted GWAS summary statistics. 
+By observing the estimated intercept, one can select the number of PCs that provide an intercept estimate closer to 1, which might
+suggest a smaller influence of population stratification.</p>
+</div>
+<p>The eigen-vector (PCs) are stored in <strong>EUR.eigenvec</strong> and can be used as a covariate in the regression model to account for population stratification.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If the base and target samples are collected from different population (e.g. Caucasian vs African ), the results from PRS analysis will be biased (see <a href="https://www.ncbi.nlm.nih.gov/pubmed/28366442">Martin et al</a>).</p>
+</div>
+<h1 id="finding-the-best-p-value-threshold">Finding the "Best" P-value threshold<a class="headerlink" href="#finding-the-best-p-value-threshold" title="Permanent link">&para;</a></h1>
+<p>The "best" p-value threshold for PRS construction are usually not known. 
+To identify the "best" PRS, we can perform a regression between the calculated PRS and the 
+sample phenotype and select the PRS that explains most of the phenotypic variation. 
+This can be achieved using <code>R</code>.</p>
+<div class="superfences-tabs">
+<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
+<label for="__tab_1_0">detail</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>p.threshold <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">0.001</span><span class="p">,</span><span class="m">0.05</span><span class="p">,</span><span class="m">0.1</span><span class="p">,</span><span class="m">0.2</span><span class="p">,</span><span class="m">0.3</span><span class="p">,</span><span class="m">0.4</span><span class="p">,</span><span class="m">0.5</span><span class="p">)</span>
+<span class="c1"># Read in the phenotype file </span>
+phenotype <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+<span class="c1"># Read in the PCs</span>
+pcs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+<span class="c1"># The default output from plink does not include a header</span>
+<span class="c1"># To make things simple, we will add the appropriate headers</span>
+<span class="c1"># (1:6 because there are 6 PCs)</span>
+<span class="kp">colnames</span><span class="p">(</span>pcs<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span> 
+<span class="c1"># Read in the covariates (here, it is sex)</span>
+covariate <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+<span class="c1"># Now merge the files</span>
+pheno <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span><span class="kp">merge</span><span class="p">(</span>phenotype<span class="p">,</span> covariate<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)),</span> pcs<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">))</span>
+<span class="c1"># We can then calculate the null model (model with PRS) using a linear regression </span>
+<span class="c1"># (as height is quantitative)</span>
+null.model <span class="o">&lt;-</span> lm<span class="p">(</span>Height<span class="o">~</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>pheno<span class="p">[,</span><span class="o">!</span><span class="kp">colnames</span><span class="p">(</span>pheno<span class="p">)</span><span class="o">%in%</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)])</span>
+<span class="c1"># And the R2 of the null model is </span>
+null.r2 <span class="o">&lt;-</span> <span class="kp">summary</span><span class="p">(</span>null.model<span class="p">)</span><span class="o">$</span>r.squared
+prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
+<span class="kr">for</span><span class="p">(</span>i <span class="kr">in</span> p.threshold<span class="p">){</span>
+    <span class="c1"># Go through each p-value threshold</span>
+    prs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;EUR.&quot;</span><span class="p">,</span>i<span class="p">,</span><span class="s">&quot;.profile&quot;</span><span class="p">),</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+    <span class="c1"># Merge the prs with the phenotype matrix</span>
+    <span class="c1"># We only want the FID, IID and PRS from the PRS file, therefore we only select the </span>
+    <span class="c1"># relevant columns</span>
+    pheno.prs <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>pheno<span class="p">,</span> prs<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="s">&quot;SCORE&quot;</span><span class="p">)],</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">))</span>
+    <span class="c1"># Now perform a linear regression on Height with PRS and the covariates</span>
+    <span class="c1"># ignoring the FID and IID from our model</span>
+    model <span class="o">&lt;-</span> lm<span class="p">(</span>Height<span class="o">~</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>pheno.prs<span class="p">[,</span><span class="o">!</span><span class="kp">colnames</span><span class="p">(</span>pheno.prs<span class="p">)</span><span class="o">%in%</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)])</span>
+    <span class="c1"># model R2 is obtained as </span>
+    model.r2 <span class="o">&lt;-</span> <span class="kp">summary</span><span class="p">(</span>model<span class="p">)</span><span class="o">$</span>r.squared
+    <span class="c1"># R2 of PRS is simply calculated as the model R2 minus the null R2</span>
+    prs.r2 <span class="o">&lt;-</span> model.r2<span class="o">-</span>null.r2
+    <span class="c1"># We can also obtain the coeffcient and p-value of association of PRS as follow</span>
+    prs.coef <span class="o">&lt;-</span> <span class="kp">summary</span><span class="p">(</span>model<span class="p">)</span><span class="o">$</span>coeff<span class="p">[</span><span class="s">&quot;SCORE&quot;</span><span class="p">,]</span>
+    prs.beta <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span>prs.coef<span class="p">[</span><span class="m">1</span><span class="p">])</span>
+    prs.se <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span>prs.coef<span class="p">[</span><span class="m">2</span><span class="p">])</span>
+    prs.p <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span>prs.coef<span class="p">[</span><span class="m">4</span><span class="p">])</span>
+    <span class="c1"># We can then store the results</span>
+    prs.result <span class="o">&lt;-</span> <span class="kp">rbind</span><span class="p">(</span>prs.result<span class="p">,</span> <span class="kt">data.frame</span><span class="p">(</span>Threshold<span class="o">=</span>i<span class="p">,</span> R2<span class="o">=</span>prs.r2<span class="p">,</span> P<span class="o">=</span>prs.p<span class="p">,</span> BETA<span class="o">=</span>prs.beta<span class="p">,</span>SE<span class="o">=</span>prs.se<span class="p">))</span>
+<span class="p">}</span>
+<span class="c1"># Best result is:</span>
+prs.result<span class="p">[</span><span class="kp">which.max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">),]</span>
+</pre></div></div>
+<input name="__tabs_1" type="radio" id="__tab_1_1" />
+<label for="__tab_1_1">quick</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>p.threshold <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">0.001</span><span class="p">,</span><span class="m">0.05</span><span class="p">,</span><span class="m">0.1</span><span class="p">,</span><span class="m">0.2</span><span class="p">,</span><span class="m">0.3</span><span class="p">,</span><span class="m">0.4</span><span class="p">,</span><span class="m">0.5</span><span class="p">)</span>
+phenotype <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+pcs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+<span class="kp">colnames</span><span class="p">(</span>pcs<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span> 
+covariate <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+pheno <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span><span class="kp">merge</span><span class="p">(</span>phenotype<span class="p">,</span> covariate<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)),</span> pcs<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">))</span>
+null.r2 <span class="o">&lt;-</span> <span class="kp">summary</span><span class="p">(</span>lm<span class="p">(</span>Height<span class="o">~</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>pheno<span class="p">[,</span><span class="o">!</span><span class="kp">colnames</span><span class="p">(</span>pheno<span class="p">)</span><span class="o">%in%</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)]))</span><span class="o">$</span>r.squared
+prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
+<span class="kr">for</span><span class="p">(</span>i <span class="kr">in</span> p.threshold<span class="p">){</span>
+    pheno.prs <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>pheno<span class="p">,</span> 
+                        read.table<span class="p">(</span><span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;EUR.&quot;</span><span class="p">,</span>i<span class="p">,</span><span class="s">&quot;.profile&quot;</span><span class="p">),</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="s">&quot;SCORE&quot;</span><span class="p">)],</span>
+                        by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">))</span>
+    model <span class="o">&lt;-</span> <span class="kp">summary</span><span class="p">(</span>lm<span class="p">(</span>Height<span class="o">~</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>pheno.prs<span class="p">[,</span><span class="o">!</span><span class="kp">colnames</span><span class="p">(</span>pheno.prs<span class="p">)</span><span class="o">%in%</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)]))</span>
+    model.r2 <span class="o">&lt;-</span> model<span class="o">$</span>r.squared
+    prs.r2 <span class="o">&lt;-</span> model.r2<span class="o">-</span>null.r2
+    prs.coef <span class="o">&lt;-</span> model<span class="o">$</span>coeff<span class="p">[</span><span class="s">&quot;SCORE&quot;</span><span class="p">,]</span>
+    prs.result <span class="o">&lt;-</span> <span class="kp">rbind</span><span class="p">(</span>prs.result<span class="p">,</span> 
+        <span class="kt">data.frame</span><span class="p">(</span>Threshold<span class="o">=</span>i<span class="p">,</span> R2<span class="o">=</span>prs.r2<span class="p">,</span> 
+                    P<span class="o">=</span><span class="kp">as.numeric</span><span class="p">(</span>prs.coef<span class="p">[</span><span class="m">4</span><span class="p">]),</span> 
+                    BETA<span class="o">=</span><span class="kp">as.numeric</span><span class="p">(</span>prs.coef<span class="p">[</span><span class="m">1</span><span class="p">]),</span>
+                    SE<span class="o">=</span><span class="kp">as.numeric</span><span class="p">(</span>prs.coef<span class="p">[</span><span class="m">2</span><span class="p">])))</span>
+<span class="p">}</span>
+<span class="kp">print</span><span class="p">(</span>prs.result<span class="p">[</span><span class="kp">which.max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">),])</span>
+</pre></div></div>
+</div>
+<details class="note"><summary>Which p-value threshold generate the "best" PRS?</summary><p>0.2</p>
+</details>
+<details class="note"><summary>How much phenotypic variation does the "best" PRS explains?</summary><p>0.03985344</p>
+</details>
+<h1 id="plotting-the-results">Plotting the Results<a class="headerlink" href="#plotting-the-results" title="Permanent link">&para;</a></h1>
+<p>We can also visualize our results using <code>R</code></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We will be using <code>prs.result</code> generated in <a href="#finding-the-best-p-value-threshold">previous section</a></p>
+</div>
+<div class="superfences-tabs">
+<input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
+<label for="__tab_2_0">ggplot2</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># ggplot2 is a handy package for plotting</span>
+<span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
+<span class="c1"># generate a pretty format for p-value output</span>
+prs.result<span class="o">$</span>print.p <span class="o">&lt;-</span> <span class="kp">round</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">,</span> digits <span class="o">=</span> <span class="m">3</span><span class="p">)</span>
+prs.result<span class="o">$</span>print.p<span class="p">[</span><span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>prs.result<span class="o">$</span>print.p<span class="p">)</span> <span class="o">&amp;</span>
+                       prs.result<span class="o">$</span>print.p <span class="o">==</span> <span class="m">0</span><span class="p">]</span> <span class="o">&lt;-</span>
+    <span class="kp">format</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">[</span><span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>prs.result<span class="o">$</span>print.p<span class="p">)</span> <span class="o">&amp;</span>
+                            prs.result<span class="o">$</span>print.p <span class="o">==</span> <span class="m">0</span><span class="p">],</span> digits <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+prs.result<span class="o">$</span>print.p <span class="o">&lt;-</span> <span class="kp">sub</span><span class="p">(</span><span class="s">&quot;e&quot;</span><span class="p">,</span> <span class="s">&quot;*x*10^&quot;</span><span class="p">,</span> prs.result<span class="o">$</span>print.p<span class="p">)</span>
+<span class="c1"># Initialize ggplot, requiring the threshold as the x-axis (use factor so that it is uniformly distributed)</span>
+ggplot<span class="p">(</span>data <span class="o">=</span> prs.result<span class="p">,</span> aes<span class="p">(</span>x <span class="o">=</span> <span class="kp">factor</span><span class="p">(</span>Threshold<span class="p">),</span> y <span class="o">=</span> R2<span class="p">))</span> <span class="o">+</span>
+    <span class="c1"># Specify that we want to print p-value on top of the bars</span>
+    geom_text<span class="p">(</span>
+        aes<span class="p">(</span>label <span class="o">=</span> <span class="kp">paste</span><span class="p">(</span>print.p<span class="p">)),</span>
+        vjust <span class="o">=</span> <span class="m">-1.5</span><span class="p">,</span>
+        hjust <span class="o">=</span> <span class="m">0</span><span class="p">,</span>
+        angle <span class="o">=</span> <span class="m">45</span><span class="p">,</span>
+        cex <span class="o">=</span> <span class="m">4</span><span class="p">,</span>
+        parse <span class="o">=</span> <span class="bp">T</span>
+    <span class="p">)</span>  <span class="o">+</span>
+    <span class="c1"># Specify the range of the plot, *1.25 to provide enough space for the p-values</span>
+    scale_y_continuous<span class="p">(</span>limits <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="kp">max</span><span class="p">(</span>output<span class="o">$</span>R2<span class="p">)</span> <span class="o">*</span> <span class="m">1.25</span><span class="p">))</span> <span class="o">+</span>
+    <span class="c1"># Specify the axis labels</span>
+    xlab<span class="p">(</span><span class="kp">expression</span><span class="p">(</span>italic<span class="p">(</span>P<span class="p">)</span> <span class="o">-</span> value <span class="o">~</span> threshold <span class="o">~</span> <span class="p">(</span>italic<span class="p">(</span>P<span class="p">)[</span><span class="bp">T</span><span class="p">])))</span> <span class="o">+</span>
+    ylab<span class="p">(</span><span class="kp">expression</span><span class="p">(</span><span class="kp">paste</span><span class="p">(</span><span class="s">&quot;PRS model fit:  &quot;</span><span class="p">,</span> R <span class="o">^</span> <span class="m">2</span><span class="p">)))</span> <span class="o">+</span>
+    <span class="c1"># Draw a bar plot</span>
+    geom_bar<span class="p">(</span>aes<span class="p">(</span>fill <span class="o">=</span> <span class="o">-</span><span class="kp">log10</span><span class="p">(</span>P<span class="p">)),</span> stat <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
+    <span class="c1"># Specify the colors</span>
+    scale_fill_gradient2<span class="p">(</span>
+        low <span class="o">=</span> <span class="s">&quot;dodgerblue&quot;</span><span class="p">,</span>
+        high <span class="o">=</span> <span class="s">&quot;firebrick&quot;</span><span class="p">,</span>
+        mid <span class="o">=</span> <span class="s">&quot;dodgerblue&quot;</span><span class="p">,</span>
+        midpoint <span class="o">=</span> <span class="m">1e-4</span><span class="p">,</span>
+        name <span class="o">=</span> <span class="kp">bquote</span><span class="p">(</span>atop<span class="p">(</span><span class="o">-</span><span class="kp">log</span><span class="p">[</span><span class="m">10</span><span class="p">]</span> <span class="o">~</span> model<span class="p">,</span> italic<span class="p">(</span>P<span class="p">)</span> <span class="o">-</span> value<span class="p">),)</span>
+    <span class="p">)</span> <span class="o">+</span>
+    <span class="c1"># Some beautification of the plot</span>
+    theme_classic<span class="p">()</span> <span class="o">+</span> theme<span class="p">(</span>
+        axis.title <span class="o">=</span> element_text<span class="p">(</span>face <span class="o">=</span> <span class="s">&quot;bold&quot;</span><span class="p">,</span> size <span class="o">=</span> <span class="m">18</span><span class="p">),</span>
+        axis.text <span class="o">=</span> element_text<span class="p">(</span>size <span class="o">=</span> <span class="m">14</span><span class="p">),</span>
+        legend.title <span class="o">=</span> element_text<span class="p">(</span>face <span class="o">=</span> <span class="s">&quot;bold&quot;</span><span class="p">,</span> size <span class="o">=</span>
+                                        <span class="m">18</span><span class="p">),</span>
+        legend.text <span class="o">=</span> element_text<span class="p">(</span>size <span class="o">=</span> <span class="m">14</span><span class="p">),</span>
+        axis.text.x <span class="o">=</span> element_text<span class="p">(</span>angle <span class="o">=</span> <span class="m">45</span><span class="p">,</span> hjust <span class="o">=</span>
+                                       <span class="m">1</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="c1"># save the plot</span>
+ggsave<span class="p">(</span><span class="s">&quot;EUR.height.bar.png&quot;</span><span class="p">,</span> height <span class="o">=</span> <span class="m">7</span><span class="p">,</span> width <span class="o">=</span> <span class="m">7</span><span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_2" type="radio" id="__tab_2_1" />
+<label for="__tab_2_1">base plot</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># We strongly recommend the use of ggplot2. Only follow this code if you</span>
+<span class="c1"># are desperate.</span>
+<span class="c1"># Specify that we want to generate plot in EUR.height.bar.png</span>
+png<span class="p">(</span><span class="s">&quot;EUR.height.bar.png&quot;</span><span class="p">,</span>
+      height<span class="o">=</span><span class="m">10</span><span class="p">,</span> width<span class="o">=</span><span class="m">10</span><span class="p">,</span> res<span class="o">=</span><span class="m">300</span><span class="p">,</span> unit<span class="o">=</span><span class="s">&quot;in&quot;</span><span class="p">)</span>
+<span class="c1"># First, obtain the colorings based on the p-value</span>
+col <span class="o">&lt;-</span> <span class="kp">suppressWarnings</span><span class="p">(</span>colorRampPalette<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;dodgerblue&quot;</span><span class="p">,</span> <span class="s">&quot;firebrick&quot;</span><span class="p">)))</span>
+<span class="c1"># We want the color gradient to match the ranking of p-values</span>
+prs.result <span class="o">&lt;-</span> prs.result<span class="p">[</span><span class="kp">order</span><span class="p">(</span><span class="o">-</span><span class="kp">log10</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">)),]</span>
+prs.result<span class="o">$</span>color <span class="o">&lt;-</span>  <span class="kp">col</span><span class="p">(</span><span class="kp">nrow</span><span class="p">(</span>prs.result<span class="p">))</span>
+prs.result <span class="o">&lt;-</span> prs.result<span class="p">[</span><span class="kp">order</span><span class="p">(</span>prs.result<span class="o">$</span>Threshold<span class="p">),]</span>
+<span class="c1"># generate a pretty format for p-value output</span>
+prs.result<span class="o">$</span>print.p <span class="o">&lt;-</span> <span class="kp">round</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">,</span> digits <span class="o">=</span> <span class="m">3</span><span class="p">)</span>
+prs.result<span class="o">$</span>print.p<span class="p">[</span><span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>prs.result<span class="o">$</span>print.p<span class="p">)</span> <span class="o">&amp;</span> prs.result<span class="o">$</span>print.p <span class="o">==</span> <span class="m">0</span> <span class="p">]</span> <span class="o">&lt;-</span>
+    <span class="kp">format</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">[</span><span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>prs.result<span class="o">$</span>print.p<span class="p">)</span> <span class="o">&amp;</span> prs.result<span class="o">$</span>print.p <span class="o">==</span> <span class="m">0</span> <span class="p">],</span> digits <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+prs.result<span class="o">$</span>print.p <span class="o">&lt;-</span> <span class="kp">sub</span><span class="p">(</span><span class="s">&quot;e&quot;</span><span class="p">,</span> <span class="s">&quot;*x*10^&quot;</span><span class="p">,</span> prs.result<span class="o">$</span>print.p<span class="p">)</span>
+<span class="c1"># Generate the axis labels</span>
+xlab <span class="o">&lt;-</span> <span class="kp">expression</span><span class="p">(</span>italic<span class="p">(</span>P<span class="p">)</span> <span class="o">-</span> value <span class="o">~</span> threshold <span class="o">~</span> <span class="p">(</span>italic<span class="p">(</span>P<span class="p">)[</span><span class="bp">T</span><span class="p">]))</span>
+ylab <span class="o">&lt;-</span> <span class="kp">expression</span><span class="p">(</span><span class="kp">paste</span><span class="p">(</span><span class="s">&quot;PRS model fit:  &quot;</span><span class="p">,</span> R <span class="o">^</span> <span class="m">2</span><span class="p">))</span>
+<span class="c1"># Setup the drawing area</span>
+layout<span class="p">(</span><span class="kp">t</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">),</span> widths<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">8.8</span><span class="p">,</span><span class="m">1.2</span><span class="p">))</span>
+par<span class="p">(</span> cex.lab<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> cex.axis<span class="o">=</span><span class="m">1.25</span><span class="p">,</span> font.lab<span class="o">=</span><span class="m">2</span><span class="p">,</span> 
+    oma<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">0.5</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">),</span>
+    mar<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">0.5</span><span class="p">,</span><span class="m">0.5</span><span class="p">))</span>
+<span class="c1"># Plotting the bars</span>
+b<span class="o">&lt;-</span> barplot<span class="p">(</span>height<span class="o">=</span>prs.result<span class="o">$</span>R2<span class="p">,</span> 
+            col<span class="o">=</span>prs.result<span class="o">$</span>color<span class="p">,</span> 
+            border<span class="o">=</span><span class="kc">NA</span><span class="p">,</span> 
+            ylim<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="kp">max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">)</span><span class="o">*</span><span class="m">1.25</span><span class="p">),</span> 
+            axes <span class="o">=</span> <span class="bp">F</span><span class="p">,</span> ann<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+<span class="c1"># Plot the axis labels and axis ticks</span>
+odd <span class="o">&lt;-</span> <span class="kp">seq</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="kp">nrow</span><span class="p">(</span>prs.result<span class="p">)</span><span class="m">+1</span><span class="p">,</span><span class="m">2</span><span class="p">)</span>
+even <span class="o">&lt;-</span> <span class="kp">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="kp">nrow</span><span class="p">(</span>prs.result<span class="p">),</span><span class="m">2</span><span class="p">)</span>
+axis<span class="p">(</span>side<span class="o">=</span><span class="m">1</span><span class="p">,</span> at<span class="o">=</span>b<span class="p">[</span>odd<span class="p">],</span> labels<span class="o">=</span>prs.result<span class="o">$</span>Threshold<span class="p">[</span>odd<span class="p">],</span> lwd<span class="o">=</span><span class="m">2</span><span class="p">)</span>
+axis<span class="p">(</span>side<span class="o">=</span><span class="m">1</span><span class="p">,</span> at<span class="o">=</span>b<span class="p">[</span>even<span class="p">],</span> labels<span class="o">=</span>prs.result<span class="o">$</span>Threshold<span class="p">[</span>even<span class="p">],</span>lwd<span class="o">=</span><span class="m">2</span><span class="p">)</span>
+axis<span class="p">(</span>side<span class="o">=</span><span class="m">1</span><span class="p">,</span> at<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span>b<span class="p">[</span><span class="m">1</span><span class="p">],</span><span class="m">2</span><span class="o">*</span>b<span class="p">[</span><span class="kp">length</span><span class="p">(</span>b<span class="p">)]</span><span class="o">-</span>b<span class="p">[</span><span class="kp">length</span><span class="p">(</span>b<span class="p">)</span><span class="m">-1</span><span class="p">]),</span> labels<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">),</span> lwd<span class="o">=</span><span class="m">2</span><span class="p">,</span> lwd.tick<span class="o">=</span><span class="m">0</span><span class="p">)</span>
+<span class="c1"># Write the p-value on top of each bar</span>
+text<span class="p">(</span> <span class="kp">parse</span><span class="p">(</span>text<span class="o">=</span><span class="kp">paste</span><span class="p">(</span>
+    prs.result<span class="o">$</span>print.p<span class="p">)),</span> 
+    x <span class="o">=</span> b<span class="m">+0.1</span><span class="p">,</span> 
+    y <span class="o">=</span>  prs.result<span class="o">$</span>R2<span class="o">+</span> <span class="p">(</span><span class="kp">max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">)</span><span class="o">*</span><span class="m">1.05</span><span class="o">-</span><span class="kp">max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">)),</span> 
+    srt <span class="o">=</span> <span class="m">45</span><span class="p">)</span>
+<span class="c1"># Now plot the axis lines</span>
+box<span class="p">(</span>bty<span class="o">=</span><span class="s">&#39;L&#39;</span><span class="p">,</span> lwd<span class="o">=</span><span class="m">2</span><span class="p">)</span>
+axis<span class="p">(</span><span class="m">2</span><span class="p">,</span>las<span class="o">=</span><span class="m">2</span><span class="p">,</span> lwd<span class="o">=</span><span class="m">2</span><span class="p">)</span>
+<span class="c1"># Plot the axis titles</span>
+title<span class="p">(</span>ylab<span class="o">=</span>ylab<span class="p">,</span> line<span class="o">=</span><span class="m">4</span><span class="p">,</span> cex.lab<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> font<span class="o">=</span><span class="m">2</span> <span class="p">)</span>
+title<span class="p">(</span>xlab<span class="o">=</span>xlab<span class="p">,</span> line<span class="o">=</span><span class="m">2.5</span><span class="p">,</span> cex.lab<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> font<span class="o">=</span><span class="m">2</span> <span class="p">)</span>
+<span class="c1"># Generate plot area for the legend</span>
+par<span class="p">(</span>cex.lab<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> cex.axis<span class="o">=</span><span class="m">1.25</span><span class="p">,</span> font.lab<span class="o">=</span><span class="m">2</span><span class="p">,</span> 
+      mar<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">20</span><span class="p">,</span><span class="m">4</span><span class="p">))</span>
+prs.result <span class="o">&lt;-</span> prs.result<span class="p">[</span><span class="kp">order</span><span class="p">(</span><span class="o">-</span><span class="kp">log10</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">)),]</span>
+image<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="o">-</span><span class="kp">log10</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">),</span> <span class="kp">t</span><span class="p">(</span><span class="kp">seq_along</span><span class="p">(</span><span class="o">-</span><span class="kp">log10</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">))),</span> col<span class="o">=</span>prs.result<span class="o">$</span>color<span class="p">,</span> axes<span class="o">=</span><span class="bp">F</span><span class="p">,</span>ann<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+axis<span class="p">(</span><span class="m">4</span><span class="p">,</span>las<span class="o">=</span><span class="m">2</span><span class="p">,</span>xaxs<span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span>yaxs<span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> tck<span class="o">=</span><span class="m">0.2</span><span class="p">,</span> col<span class="o">=</span><span class="s">&quot;white&quot;</span><span class="p">)</span>
+<span class="c1"># plot legend title</span>
+title<span class="p">(</span><span class="kp">bquote</span><span class="p">(</span>atop<span class="p">(</span><span class="o">-</span><span class="kp">log</span><span class="p">[</span><span class="m">10</span><span class="p">]</span> <span class="o">~</span> model<span class="p">,</span> italic<span class="p">(</span>P<span class="p">)</span> <span class="o">-</span> value<span class="p">),</span> <span class="p">),</span> 
+          line<span class="o">=</span><span class="m">2</span><span class="p">,</span> cex<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> font<span class="o">=</span><span class="m">2</span><span class="p">,</span> adj<span class="o">=</span><span class="m">0</span><span class="p">)</span>
+<span class="c1"># write the plot to file</span>
+dev.off<span class="p">()</span>
+</pre></div></div>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../prsice/" class="btn btn-neutral float-right" title="PRSice-2">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../target/" class="btn btn-neutral" title="2. Target Genotype QC"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/choishingwan/PRS-Tutorial/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../target/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../prsice/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      <script src="../search/require.js"></script>
+      <script src="../search/search.js"></script>
+
+</body>
+</html>
