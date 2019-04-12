@@ -18,7 +18,7 @@ intact. This can be done by performing the `md5sum` check:
 md5sum GIANT.height.gz
 ```
 
-```bash tab="Mac"
+```bash tab="OS X"
 md5 GIANT.height.gz
 ```
 

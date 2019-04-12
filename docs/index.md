@@ -1,13 +1,34 @@
-This webpage provide a simple step by step tutorial on how to perform basic polygenic risk score analyses. 
-By following this tutorial, you should be able to perform basic quality control of the summary statistics and target genotype files,
-and will be able to carry out simple polygenic risk score analyses using only bash, R and plink. 
+# Overview 
+The aim of this tutorial is to provide a step by step guide as to how to perform basic polygenic risk score analyses, therefore
+allow for a better understanding of the inner mechanism implemented in most polygenic risk score software. 
+
+The tutorial is separated into three main sections
+
+1. [How to perform basic filtering on the summary statistic file (Base)](base.md)
+2. [How to perform quanilty controls on the target genotype file](target.md)
+3. [The details steps involved in calculating PRS (using `plink`)](plink.md)
+
+We also provided a brief example on how to perform PRS using the three polygenic risk score software: [PRSice-2](prsice.md), [LDpred](ldpred.md) and [lassosum](lassosum.md)
+
+If you are only interested in how to perform PRS, you can directly skipped to (step 3)[plink.md]. Links to download the required data are provided under each section.
 
 !!! note
 
-    This tutorial is based on linux operation system. Users who would like to perform polygenic risk score analyses
-    on their Mac or Windows machine will need to change some of the commands.
+    This tutorial is based on linux and OS X systems. Users who would like to perform polygenic risk score analyses
+    on their Windows machine will need to change some of the commands.
 
-    We might include tutorial for the other operation systems in the near future. 
+!!! note
+    Throughout the tutorial, you might see some codes with tab on top:
+
+    ```bash tab="A"
+    echo "Tab A"
+    ```
+
+    ```bash tab="B"
+    echo "Tab B"
+    ```
+
+    You can click on the tab to change to relevant codes (e.g. different operation system)
 
 # Requirements
 To follow the tutorial, you will need the following programs installed:
