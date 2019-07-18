@@ -13,19 +13,20 @@
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
   <link href="../css/extra.css" rel="stylesheet">
   
   <script>
     // Current page data
     var mkdocs_page_name = "1. QC of Summary Statistics";
     var mkdocs_page_input_path = "base.md";
-    var mkdocs_page_url = "/base/";
+    var mkdocs_page_url = null;
   </script>
   
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
   
 </head>
 
@@ -39,7 +40,7 @@
         <a href=".." class="icon icon-home"> Basic Tutorial for Polygenic Risk Score Analyses</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -101,6 +102,11 @@
     </ul>
 	    </li>
           
+            <li class="toctree-l1">
+		
+    <a class="" href="../plink_visual/">4. Visualizing PRS</a>
+	    </li>
+          
         </ul>
       </div>
       &nbsp;
@@ -143,9 +149,10 @@
 <div class="codehilite"><pre><span></span>curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/GIANT.height.gz -L -O
 </pre></div></p>
 <p>which will create a file call <strong>GIANT.height.gz</strong> in your current directory. </p>
-<p>A common problem is that the downloaded file can be corrupted, which can generate various error messages in the 
-down-stream analyses. To avoid un-necessary waste of time, it is generally a good practice to check if the file is
-intact. This can be done by performing the <code>md5sum</code> check:</p>
+<p>A common problem is that the downloaded file can be corrupted, 
+which can generate various error messages in the down-stream analyses. 
+To avoid un-necessary waste of time, it is generally a good practice to 
+check if the file is intact. This can be done by performing the <code>md5sum</code> check:</p>
 <div class="superfences-tabs">
 <input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
 <label for="__tab_1_0">Linux</label>
@@ -157,12 +164,7 @@ intact. This can be done by performing the <code>md5sum</code> check:</p>
 </pre></div></div>
 </div>
 <p>if the file is intact, <code>md5sum</code> should generate a string of characters: <code>c79734b099cea663d2808bfde2e9a422</code>. 
-If a different string is generated, the file is likely corrupted </p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In most scenarios, a different <code>md5sum</code> is generated for different files. Therefore it is a nice simple way of 
-checking whether the file is downloaded correctly. </p>
-</div>
+If a different string is generated, the file is corrupted </p>
 <h1 id="reading-the-summary-statistic-file">Reading the summary statistic file<a class="headerlink" href="#reading-the-summary-statistic-file" title="Permanent link">&para;</a></h1>
 <p><strong>GIANT.height.gz</strong> is compressed. To read its content, you can type:</p>
 <div class="codehilite"><pre><span></span>gunzip -c GIANT.height.gz <span class="p">|</span> head
@@ -171,7 +173,7 @@ checking whether the file is downloaded correctly. </p>
 <p>which will shows the first 10 lines of the file</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>In general, we like to work with compressed files to reduce storage space requirements</p>
+<p>Working with compressed files reduces the storage space requirements</p>
 </div>
 <p>The <strong>GIANT.height.gz</strong> file contains the following columns:</p>
 <table>
@@ -223,12 +225,13 @@ checking whether the file is downloaded correctly. </p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Some GWAS results files do not make clear which allele is the effect allele and which the non-effect allele. 
-If the incorrect assumption is made in computing the PRS, then the effect of the PRS in the target data will be in the wrong direction, and so to avoid misleading conclusions it is critical that the effect allele from the base (GWAS) data is known.</p>
+If the incorrect assumption is made in computing the PRS, then the effect of the PRS in the target data will be in the wrong direction.</p>
+<p>To avoid misleading conclusions it is critical that the effect allele from the base (GWAS) data is known.</p>
 </div>
 <h1 id="removing-duplicated-snps">Removing duplicated SNPs<a class="headerlink" href="#removing-duplicated-snps" title="Permanent link">&para;</a></h1>
-<p>While it is raw, duplciated SNPs can sometimes be found in your base file.
-As most PRS software do not allow duplicated SNPs in the base input, and to avoid confusion, 
-it might be beneficial to remove the duplicated SNPs from the base file. </p>
+<p>While it is rare, duplciated SNPs can sometimes be found in your base file.
+Most PRS software do not allow duplicated SNPs in the base input, therefore it
+is beneficial to remove the duplicated SNPs from the base file. </p>
 <div class="codehilite"><pre><span></span>gunzip -c GIANT.height.gz <span class="p">|</span><span class="se">\</span>
 awk <span class="s1">&#39;{ print $1}&#39;</span> <span class="p">|</span><span class="se">\</span>
 sort <span class="p">|</span><span class="se">\</span>
@@ -256,7 +259,7 @@ The above script does the following:
 <h1 id="filtering-snps-with-low-info-score-or-maf">Filtering SNPs with low INFO score or MAF<a class="headerlink" href="#filtering-snps-with-low-info-score-or-maf" title="Permanent link">&para;</a></h1>
 <p>SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to harbor false positives. 
 It is therefore beneficial to remove SNPs with low MAF and INFO.
-This is acheived by the following:</p>
+This can be acheived using the following code:</p>
 <div class="codehilite"><pre><span></span>gunzip -c Height.gz <span class="p">|</span><span class="se">\</span>
 awk <span class="s1">&#39;NR==1 || ($6 &gt; 0.05 &amp;&amp; $6 &lt; 0.95) &amp;&amp; ($10 &gt; 0.8) {print}&#39;</span> <span class="p">|</span><span class="se">\</span>
 gzip - &gt; Height.QC.gz
@@ -316,10 +319,9 @@ gzip - &gt; Height.QC.gz
     </span>
 </div>
     <script>var base_url = '..';</script>
-    <script src="../js/theme.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-      <script src="../search/require.js"></script>
-      <script src="../search/search.js"></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+      <script src="../search/main.js" defer></script>
 
 </body>
 </html>

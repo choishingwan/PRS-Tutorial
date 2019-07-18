@@ -13,19 +13,20 @@
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
   <link href="../css/extra.css" rel="stylesheet">
   
   <script>
     // Current page data
     var mkdocs_page_name = "2. Target Genotype QC";
     var mkdocs_page_input_path = "target.md";
-    var mkdocs_page_url = "/target/";
+    var mkdocs_page_url = null;
   </script>
   
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
   
 </head>
 
@@ -39,7 +40,7 @@
         <a href=".." class="icon icon-home"> Basic Tutorial for Polygenic Risk Score Analyses</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -102,6 +103,11 @@
     <a class="" href="../lassosum/">lassosum</a>
                 </li>
     </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../plink_visual/">4. Visualizing PRS</a>
 	    </li>
           
         </ul>
@@ -185,8 +191,13 @@ the PLINK executable is located within your working directory</p>
 </div>
 <h1 id="genotype-file-format">Genotype file format<a class="headerlink" href="#genotype-file-format" title="Permanent link">&para;</a></h1>
 <h1 id="basic-filterings">Basic filterings<a class="headerlink" href="#basic-filterings" title="Permanent link">&para;</a></h1>
-<p>The power and validity of PRS analyses are highly dependent on the quality of the base and target data, therefore 
-both data sets must be quality controlled to the high standards implemented in GWAS studies, e.g. removing SNPs according to low genotyping rate, minor allele frequency and individuals with low genotyping rate (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a>).</p>
+<p>The power and validity of PRS analyses are highly dependent on 
+the quality of the base and target data, therefore 
+both data sets must be quality controlled to the high standards 
+implemented in GWAS studies, e.g. removing SNPs with low genotyping rate, 
+low minor allele frequency, violates the Hardy-Weinberg Equilibrium and
+individuals with low genotyping rate 
+(see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a>).</p>
 <p>The following <code>plink</code> command perform some basic filterings</p>
 <p><div class="codehilite"><pre><span></span>plink --bfile EUR <span class="se">\</span>
     --maf <span class="m">0</span>.05 <span class="se">\</span>
@@ -214,7 +225,7 @@ Each of the parameters corresponds to the following</p>
 <tr>
 <td align="center">maf</td>
 <td align="center">0.05</td>
-<td align="left">Try to filter out any SNPs with minor allele frequency less than 0.05. Genotype error are more likely to influence SNPs with low MAF. Large sample size can adapt a lower MAF threshold</td>
+<td align="left">Filter out any SNPs with minor allele frequency less than 0.05. Genotype error are more likely to influence SNPs with low MAF. Large sample size can adapt a lower MAF threshold</td>
 </tr>
 <tr>
 <td align="center">hwe</td>
@@ -246,7 +257,8 @@ Each of the parameters corresponds to the following</p>
 <details class="note"><summary>How many SNPs were filtered?</summary><p>A total of <code>266</code> SNPs were removed due to Hardy-Weinberg exact test results</p>
 </details>
 <h1 id="filter-related-samples">Filter related samples<a class="headerlink" href="#filter-related-samples" title="Permanent link">&para;</a></h1>
-<p>Related samples in the target data might lead to overfitted results, hampering the generalizability of the results. </p>
+<p>Related samples in the target data might lead to overfitted results, 
+hampering the generalizability of the results. </p>
 <p>To remove related samples, we first need to perform prunning to remove highly correlated SNPs:
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR.QC <span class="se">\</span>
@@ -254,8 +266,8 @@ Each of the parameters corresponds to the following</p>
     --out EUR.QC
 </pre></div></p>
 <p>This will generate two files 1) <strong>EUR.QC.prune.in</strong> and 2) <strong>EUR.QC.prune.out</strong>
-The <strong>EUR.QC.prune.in</strong> file contains SNPs that has r2 less than 0.25 between them. </p>
-<p>Samples with more than third-degree relatedness (pi-hat &gt; 0.125) can then be removed with </p>
+All SNPs within <strong>EUR.QC.prune.in</strong> has a pairwise <span class="arithmatex">\(r^2 &lt; 0.25\)</span></p>
+<p>Samples with more than third-degree relatedness (<span class="arithmatex">\(\text{pi-hat} &gt; 0.125\)</span>) can then be removed with </p>
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR.QC <span class="se">\</span>
     --extract EUR.QC.prune.in <span class="se">\</span>
@@ -265,10 +277,21 @@ The <strong>EUR.QC.prune.in</strong> file contains SNPs that has r2 less than 0.
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Normally, we can generate a new genotype file using the new sample list. However, 
-this will use up a lot of storage space. Using <code>plink</code>'s <code>--extract</code>, <code>--exclude</code>, <code>--keep</code>,
-<code>--remove</code> functions, we can work solely on the list of samples and SNPs without duplicating the 
+<p>Normally, we can generate a new genotype file using the new sample list.
+However,  this will use up a lot of storage space. Using <code>plink</code>'s
+<code>--extract</code>, <code>--exclude</code>, <code>--keep</code>, <code>--remove</code> functions, we can work 
+solely on the list of samples and SNPs without duplicating the 
 genotype file, therefore reducing the storage space usage.  </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A greedy algorithm is used to remove the related samples. Which depending
+on the random seed used, might generate different results. To reproduce
+the same result, you might need to specify the random seed usage. </p>
+<p>PLINK's related sample removal does not take into account of the sample 
+phenotype. If one would like to minimize lost of cases for example, 
+a software called
+<a href="https://github.com/choishingwan/GreedyRelated">GreedyRelated</a> can be used.</p>
 </div>
 <h1 id="remove-samples-with-abnormal-heterozygosity-rate">Remove samples with abnormal heterozygosity rate<a class="headerlink" href="#remove-samples-with-abnormal-heterozygosity-rate" title="Permanent link">&para;</a></h1>
 <p>Individual with high or low heterozygosity rate can be contaminated or are inbreed.
@@ -368,10 +391,9 @@ Here is a breakdown of the above script
     </span>
 </div>
     <script>var base_url = '..';</script>
-    <script src="../js/theme.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-      <script src="../search/require.js"></script>
-      <script src="../search/search.js"></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+      <script src="../search/main.js" defer></script>
 
 </body>
 </html>

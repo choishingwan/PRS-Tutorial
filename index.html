@@ -7,25 +7,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="None">
   <meta name="author" content="Shing Wan CHOI">
-  <link rel="shortcut icon" href="./img/favicon.ico">
+  <link rel="shortcut icon" href="img/favicon.ico">
   <title>Overview - Basic Tutorial for Polygenic Risk Score Analyses</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
-  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="./css/highlight.css">
-  <link href="./css/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="css/extra.css" rel="stylesheet">
   
   <script>
     // Current page data
     var mkdocs_page_name = "Overview";
     var mkdocs_page_input_path = "index.md";
-    var mkdocs_page_url = "/";
+    var mkdocs_page_url = null;
   </script>
   
-  <script src="./js/jquery-2.1.1.min.js"></script>
-  <script src="./js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="./js/highlight.pack.js"></script> 
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
   
 </head>
 
@@ -39,7 +40,7 @@
         <a href="." class="icon icon-home"> Basic Tutorial for Polygenic Risk Score Analyses</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -101,6 +102,11 @@
     </ul>
 	    </li>
           
+            <li class="toctree-l1">
+		
+    <a class="" href="plink_visual/">4. Visualizing PRS</a>
+	    </li>
+          
         </ul>
       </div>
       &nbsp;
@@ -139,14 +145,15 @@
                 <h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
 <p>The aim of this tutorial is to provide a step by step guide as to how to perform basic polygenic risk score analyses, therefore
 allow for a better understanding of the inner mechanism implemented in most polygenic risk score software. </p>
-<p>The tutorial is separated into three main sections</p>
+<p>The tutorial is separated into four main sections</p>
 <ol>
 <li><a href="base/">How to perform basic filtering on the summary statistic file (Base)</a></li>
 <li><a href="target/">How to perform quanilty controls on the target genotype file</a></li>
 <li><a href="plink/">The details steps involved in calculating PRS (using <code>plink</code>)</a></li>
+<li><a href="plink_visual/">Visualizing PRS results</a></li>
 </ol>
 <p>We also provided a brief example on how to perform PRS using the three polygenic risk score software: <a href="prsice/">PRSice-2</a>, <a href="ldpred/">LDpred</a> and <a href="lassosum/">lassosum</a></p>
-<p>If you are only interested in how to perform PRS, you can directly skipped to (step 3)[plink.md]. Links to download the required data are provided under each section.</p>
+<p>If you are only interested in how to perform PRS, you can directly skipped to <a href="plink/">step 3</a>. Links to download the required data are provided under each section.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This tutorial is based on linux and OS X systems. Users who would like to perform polygenic risk score analyses
@@ -223,15 +230,14 @@ on their Windows machine will need to change some of the commands.</p>
     </span>
 </div>
     <script>var base_url = '.';</script>
-    <script src="./js/theme.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-      <script src="./search/require.js"></script>
-      <script src="./search/search.js"></script>
+    <script src="js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+      <script src="search/main.js" defer></script>
 
 </body>
 </html>
 
 <!--
-MkDocs version : 0.17.2
-Build Date UTC : 2019-04-12 20:42:21
+MkDocs version : 1.0.4
+Build Date UTC : 2019-07-18 16:00:22
 -->
