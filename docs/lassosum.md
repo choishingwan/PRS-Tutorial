@@ -37,28 +37,26 @@ sum.stat <- "Height.QC.gz"
 ref.bfile <- "EUR.QC"
 bfile <- "EUR.QC"
 # Read in and process the covariates
-covariate <- read.table("EUR.covariate", header=T)
-pcs <- read.table("EUR.eigenvec", header=F)
+covariate <- fread("EUR.covariate")
+pcs <- fread("EUR.eigenvec")
 colnames(pcs) <- c("FID","IID", paste0("PC",1:6))
 cov <- merge(covariate, pcs, by=c("FID", "IID"))
 
 # We will need the EUR.hg19 file provided by lassosum 
 # which are LD regions defined in Berisa and Pickrell (2015) for the European population and the hg19 genome.
 ld.file <-  "EUR.hg19" 
-# Number of sample in base
-size <- 253288
 # output prefix
 prefix <- "EUR"
 # Read in the target phenotype file
-fread("EUR.height", data.table = F) %>%
-    select(FID, IID, Pheno) -> target.pheno
+target.pheno <- fread("EUR.height")[,c("FID", "IID", "Pheno")]
 # Read in samples to include in the analysis
-fread("EUR.valid.sample", data.table=F)%>%
-    select(FID, IID) -> target.keep
+target.keep <- fread("EUR.valid.sample")[,c("FID", "IID")]
 # Read in the summary statistics
 ss <- fread(sum.stat)
+# Number of sample in base
+size <- 253288
 # Remove P-value = 0, which causes problem in the transformation
-ss <- ss[!P == 0, ]
+ss <- ss[!P == 0]
 # Read in the LD blocks
 ld <- fread(ld.file)
 # Transform the P-values into correlation

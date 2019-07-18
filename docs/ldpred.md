@@ -7,7 +7,7 @@ thus allow for a better $R^2$.
     to the github for instructions of installation
 
 !!! note
-    Current script is based on version 1.0.0
+    Current script is based on version 1.0.6
 
 Assuming we have the following files
 

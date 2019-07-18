@@ -17,10 +17,10 @@ And `PRSice-2`, which can be downloaded from
 
 | Operating System | Link |
 | -----------------|:----:|
-| Linux 64-bit | [v2.1.11](https://github.com/choishingwan/PRSice/releases/download/2.1.11/PRSice_linux.zip) |
-| OS X 64-bit | [v2.1.11](https://github.com/choishingwan/PRSice/releases/download/2.1.11/PRSice_mac.zip) |
-| Windows 32-bit | [v2.1.11](https://github.com/choishingwan/PRSice/releases/download/2.1.11/PRSice_win32.zip) |
-| Windows 64-bit | [v2.1.11](https://github.com/choishingwan/PRSice/releases/download/2.1.11/PRSice_win64.zip) |
+| Linux 64-bit | [v2.2.3](https://github.com/choishingwan/PRSice/releases/download/2.2.3/PRSice_linux.zip) |
+| OS X 64-bit | [v2.2.3](https://github.com/choishingwan/PRSice/releases/download/2.2.3/PRSice_mac.zip) |
+| Windows 32-bit | [v2.2.3](https://github.com/choishingwan/PRSice/releases/download/2.2.3/PRSice_win32.zip) |
+| Windows 64-bit | [v2.2.3](https://github.com/choishingwan/PRSice/releases/download/2.2.3/PRSice_win64.zip) |
 
 In this tutorial, you will only need `PRSice.R` and `PRSice_XXX` where XXX is the operation system
 
@@ -64,6 +64,20 @@ Rscript PRSice.R \
     --cov-file EUR.cov \
     --maf-base MAF,0.05 \
     --info-base INFO,0.8 \
+    --out EUR
+```
+
+```bash tab="Windows"
+Rscript PRSice.R ^
+    --prsice PRSice_win64.exe ^
+    --base Height.QC.gz ^
+    --target EUR.QC ^
+    --keep EUR.valid.sample ^
+    --binary-target F ^
+    --pheno-file EUR.height ^
+    --cov-file EUR.cov ^
+    --maf-base MAF,0.05 ^
+    --info-base INFO,0.8 ^
     --out EUR
 ```
 

@@ -1,7 +1,7 @@
 site_name: Basic Tutorial for Polygenic Risk Score Analyses
 repo_url: https://github.com/choishingwan/PRS-Tutorial
 site_author: Shing Wan CHOI
-pages:
+nav:
     - index.md
     - 1. QC of Summary Statistics: base.md
     - 2. Target Genotype QC: target.md
@@ -10,6 +10,8 @@ pages:
         - PRSice-2: prsice.md
         - LDpred: ldpred.md
         - lassosum: lassosum.md
+    - 4. Visualizing PRS: plink_visual.md
+    
 theme: readthedocs
 markdown_extensions:
     - admonition

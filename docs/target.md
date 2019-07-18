@@ -27,8 +27,13 @@ unzip EUR.zip
 # Genotype file format
 
 # Basic filterings
-The power and validity of PRS analyses are highly dependent on the quality of the base and target data, therefore 
-both data sets must be quality controlled to the high standards implemented in GWAS studies, e.g. removing SNPs according to low genotyping rate, minor allele frequency and individuals with low genotyping rate (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/)).
+The power and validity of PRS analyses are highly dependent on 
+the quality of the base and target data, therefore 
+both data sets must be quality controlled to the high standards 
+implemented in GWAS studies, e.g. removing SNPs with low genotyping rate, 
+low minor allele frequency, violates the Hardy-Weinberg Equilibrium and
+individuals with low genotyping rate 
+(see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/)).
 
 The following `plink` command perform some basic filterings
 
@@ -46,7 +51,7 @@ Each of the parameters corresponds to the following
 | Paramter | Value | Description|
 |:-:|:-:|:-|
 | bfile | EUR | Inform `plink` that the input genotype files should have a prefix of `EUR` |
-| maf | 0.05 | Try to filter out any SNPs with minor allele frequency less than 0.05. Genotype error are more likely to influence SNPs with low MAF. Large sample size can adapt a lower MAF threshold|
+| maf | 0.05 | Filter out any SNPs with minor allele frequency less than 0.05. Genotype error are more likely to influence SNPs with low MAF. Large sample size can adapt a lower MAF threshold|
 | hwe | 1e-6 | Filtering SNPs with low p-value from the Hardy-Weinberg exact test. SNPs with significant p-value from the HWE test are more likely to harbor genotyping error or are under selection. Filtering should be performed on the control samples to avoid filtering SNPs that are causal (under selection in cases)|
 | geno | 0.01 | Exclude SNPs that are missing in large proportion of subjects. A two pass filtering is usually performed (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/)).|
 | mind | 0.01 | Exclude individual who have a high rate of genotype missingness. This might indicate problems in the DNA sample. (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/) for more details).|
@@ -57,7 +62,8 @@ Each of the parameters corresponds to the following
     A total of `266` SNPs were removed due to Hardy-Weinberg exact test results
 
 # Filter related samples
-Related samples in the target data might lead to overfitted results, hampering the generalizability of the results. 
+Related samples in the target data might lead to overfitted results, 
+hampering the generalizability of the results. 
 
 To remove related samples, we first need to perform prunning to remove highly correlated SNPs:
 ```bash
@@ -68,9 +74,9 @@ plink \
 ```
 
 This will generate two files 1) **EUR.QC.prune.in** and 2) **EUR.QC.prune.out**
-The **EUR.QC.prune.in** file contains SNPs that has r2 less than 0.25 between them. 
+All SNPs within **EUR.QC.prune.in** has a pairwise $r^2 < 0.25$
 
-Samples with more than third-degree relatedness (pi-hat > 0.125) can then be removed with 
+Samples with more than third-degree relatedness ($\text{pi-hat} > 0.125$) can then be removed with 
 
 ```bash
 plink \
@@ -81,11 +87,22 @@ plink \
 ```
 
 !!! note
-    Normally, we can generate a new genotype file using the new sample list. However, 
-    this will use up a lot of storage space. Using `plink`'s `--extract`, `--exclude`, `--keep`,
-    `--remove` functions, we can work solely on the list of samples and SNPs without duplicating the 
+    Normally, we can generate a new genotype file using the new sample list.
+    However,  this will use up a lot of storage space. Using `plink`'s
+    `--extract`, `--exclude`, `--keep`, `--remove` functions, we can work 
+    solely on the list of samples and SNPs without duplicating the 
     genotype file, therefore reducing the storage space usage.  
 
+!!! note
+    A greedy algorithm is used to remove the related samples. Which depending
+    on the random seed used, might generate different results. To reproduce
+    the same result, you might need to specify the random seed usage. 
+    
+    PLINK's related sample removal does not take into account of the sample 
+    phenotype. If one would like to minimize lost of cases for example, 
+    a software called
+    [GreedyRelated](https://github.com/choishingwan/GreedyRelated) can be used.
+    
 # Remove samples with abnormal heterozygosity rate
 Individual with high or low heterozygosity rate can be contaminated or are inbreed.
 It is therefore a good idea to remove these samples from our dataset before continuing the analyse.

@@ -5,14 +5,17 @@ In this example, we will use a modified version of the Height GWAS summary stati
 # Obtaining the summary statistic file
 You can download the summary statistic file using the following script:
 ``` bash
+
 curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/GIANT.height.gz -L -O
+
 ```
 
 which will create a file call **GIANT.height.gz** in your current directory. 
 
-A common problem is that the downloaded file can be corrupted, which can generate various error messages in the 
-down-stream analyses. To avoid un-necessary waste of time, it is generally a good practice to check if the file is
-intact. This can be done by performing the `md5sum` check:
+A common problem is that the downloaded file can be corrupted, 
+which can generate various error messages in the down-stream analyses. 
+To avoid un-necessary waste of time, it is generally a good practice to 
+check if the file is intact. This can be done by performing the `md5sum` check:
 
 ```bash tab="Linux"
 md5sum GIANT.height.gz
@@ -23,12 +26,7 @@ md5 GIANT.height.gz
 ```
 
 if the file is intact, `md5sum` should generate a string of characters: `c79734b099cea663d2808bfde2e9a422`. 
-If a different string is generated, the file is likely corrupted 
-
-
-!!! note
-    In most scenarios, a different `md5sum` is generated for different files. Therefore it is a nice simple way of 
-    checking whether the file is downloaded correctly. 
+If a different string is generated, the file is corrupted 
 
 # Reading the summary statistic file
 **GIANT.height.gz** is compressed. To read its content, you can type:
@@ -40,7 +38,7 @@ gunzip -c GIANT.height.gz | head
 which will shows the first 10 lines of the file
 
 !!! note
-    In general, we like to work with compressed files to reduce storage space requirements
+    Working with compressed files reduces the storage space requirements
 
 The **GIANT.height.gz** file contains the following columns:
 
@@ -63,12 +61,14 @@ With each column corresponds to the following
 
 !!! Important
     Some GWAS results files do not make clear which allele is the effect allele and which the non-effect allele. 
-    If the incorrect assumption is made in computing the PRS, then the effect of the PRS in the target data will be in the wrong direction, and so to avoid misleading conclusions it is critical that the effect allele from the base (GWAS) data is known.
+    If the incorrect assumption is made in computing the PRS, then the effect of the PRS in the target data will be in the wrong direction.
+    
+    To avoid misleading conclusions it is critical that the effect allele from the base (GWAS) data is known.
 
 # Removing duplicated SNPs
-While it is raw, duplciated SNPs can sometimes be found in your base file.
-As most PRS software do not allow duplicated SNPs in the base input, and to avoid confusion, 
-it might be beneficial to remove the duplicated SNPs from the base file. 
+While it is rare, duplciated SNPs can sometimes be found in your base file.
+Most PRS software do not allow duplicated SNPs in the base input, therefore it
+is beneficial to remove the duplicated SNPs from the base file. 
 
 ```bash
 gunzip -c GIANT.height.gz |\
@@ -102,7 +102,7 @@ The above script does the following:
 # Filtering SNPs with low INFO score or MAF 
 SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to harbor false positives. 
 It is therefore beneficial to remove SNPs with low MAF and INFO.
-This is acheived by the following:
+This can be acheived using the following code:
 
 ```bash
 gunzip -c Height.gz |\
