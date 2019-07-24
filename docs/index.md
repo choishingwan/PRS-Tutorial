@@ -14,8 +14,7 @@ If you are only interested in how to perform PRS on previously QC'ed data then y
 
 !!! note
 
-    This tutorial is based on linux and OS X systems. Users who would like to perform polygenic risk score analyses
-    on their Windows machine will need to change some of the commands.
+    This tutorial is written for Linux and OS X operating systems. Windows users will need change commands accordingly.
 
 !!! note
     Throughout the tutorial, you might see some codes with tab on top:
