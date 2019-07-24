@@ -14,10 +14,11 @@ If you are only interested in how to perform PRS on previously QC'ed data then y
 
 !!! note
 
-    This tutorial is written for Linux and OS X operating systems. Windows users will need change commands accordingly.
+    This tutorial is written for Linux and OS X operating systems. 
+    Windows users will need to change some commands accordingly.
 
 !!! note
-    Throughout the tutorial, you might see some codes with tab on top:
+    Throughout the tutorial you will see tabs above some of the code:
 
     ```bash tab="A"
     echo "Tab A"
@@ -27,7 +28,7 @@ If you are only interested in how to perform PRS on previously QC'ed data then y
     echo "Tab B"
     ```
 
-    You can click on the tab to change to relevant codes (e.g. different operation system)
+    You can click on the tab to change to an alternative code (e.g to a different operation system)
 
 # Requirements
 To follow the tutorial, you will need the following programs installed:
@@ -36,7 +37,7 @@ To follow the tutorial, you will need the following programs installed:
 2. [PLINK 1.9](https://www.cog-genomics.org/plink2)
 
 ## Citation
-If you find this tutorial helpful, then please cite:
+If you find this tutorial helpful for a publication, then please consider citing:
 
 !!! important "Citation"
 
