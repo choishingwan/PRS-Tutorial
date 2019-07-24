@@ -245,17 +245,19 @@ uniq -d &gt; duplicated.snp
 <li>Sort the SNP IDs. This will put duplicated SNP IDs next to eachother</li>
 <li>Print out any duplicated SNP IDs using the uniq command and print it to the <em>duplicated.snp</em> file</li>
 </ol>
-<details class="note"><summary>How many duplicated SNPs are there?</summary><p>There are a total of <code>100</code> duplicated SNPs</p>
+<details class="note"><summary>How many duplicated SNPs are there?</summary><p>There are a total of <code>13</code> duplicated SNPs</p>
 </details>
 <p>Duplicated SNPs can then be removed using the <code>grep</code> command:
 <div class="codehilite"><pre><span></span>gunzip -c GIANT.height.gz  <span class="p">|</span><span class="se">\</span>
 grep -vf duplicated.snp <span class="p">|</span><span class="se">\</span>
 gzip - &gt; Height.gz
-</pre></div>
-The above script does the following:
-1. Decompress and read the <strong>GIANT.height.gz</strong> file 
-2. Find if any row contains entries observed in <code>duplicated.snp</code> and remove them
-3. Compress and write the results to <strong>Height.gz</strong></p>
+</pre></div></p>
+<p>The above script does the following:</p>
+<ol>
+<li>Decompress and read the <strong>GIANT.height.gz</strong> file </li>
+<li>Find if any row contains entries observed in <code>duplicated.snp</code> and remove them</li>
+<li>Compress and write the results to <strong>Height.gz</strong></li>
+</ol>
 <h1 id="filtering-snps-with-low-info-score-or-maf">Filtering SNPs with low INFO score or MAF<a class="headerlink" href="#filtering-snps-with-low-info-score-or-maf" title="Permanent link">&para;</a></h1>
 <p>SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to harbor false positives. 
 It is therefore beneficial to remove SNPs with low MAF and INFO.

@@ -148,6 +148,9 @@
                 <p>Next, we'd like to perform basic quality controls (QC) on the target genotype data. </p>
 <p>In this tutorial, we've simulated some samples using the 1000 genome european genotypes. 
 You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip">here</a>. </p>
+<p>Or you can download using the following script:
+<div class="codehilite"><pre><span></span>curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip -L -O
+</pre></div></p>
 <p>Unzip the data as follow:</p>
 <div class="codehilite"><pre><span></span>unzip EUR.zip
 </pre></div>
@@ -306,13 +309,27 @@ Heterozygosity rate can be calculated using <code>plink</code> after performing 
 </pre></div>
 This will generate the <strong>EUR.het</strong> file which contains the F coefficient estimates.
 It will be easier to filter the samples using <code>R</code> instead of <code>awk</code>:
-Open a <code>R</code> section by tying <code>R</code> in your terminal
-<div class="codehilite"><pre><span></span>dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.het&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span> <span class="c1"># Read in the EUR.het file, specify it has header</span>
+Open a <code>R</code> section by tying <code>R</code> in your terminal</p>
+<div class="superfences-tabs">
+<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
+<label for="__tab_1_0">Without library</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.het&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span> <span class="c1"># Read in the EUR.het file, specify it has header</span>
 m <span class="o">&lt;-</span> <span class="kp">mean</span><span class="p">(</span>dat<span class="o">$</span><span class="bp">F</span><span class="p">)</span> <span class="c1"># Calculate the mean  </span>
 s <span class="o">&lt;-</span> sd<span class="p">(</span>dat<span class="o">$</span><span class="bp">F</span><span class="p">)</span> <span class="c1"># Calculate the SD</span>
-valid <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> <span class="bp">F</span> <span class="o">&lt;=</span> m<span class="m">+3</span><span class="o">*</span>s <span class="o">&amp;</span> <span class="bp">F</span> <span class="o">&gt;=</span> m<span class="m">-3</span><span class="o">*</span>s<span class="p">)</span> <span class="c1"># Get any samples with F coefficient within 3 SD from the population mean</span>
+valid <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> <span class="bp">F</span> <span class="o">&lt;=</span> m<span class="m">+3</span><span class="o">*</span>s <span class="o">&amp;</span> <span class="bp">F</span> <span class="o">&gt;=</span> m<span class="m">-3</span><span class="o">*</span>s<span class="p">)</span> <span class="c1"># Get any samples with F coefficient within 3 SD of the population mean</span>
 write.table<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">)],</span> <span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span> <span class="c1"># print FID and IID for valid samples</span>
-</pre></div></p>
+</pre></div></div>
+<input name="__tabs_1" type="radio" id="__tab_1_1" />
+<label for="__tab_1_1">With data.table</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
+<span class="c1"># Read in file</span>
+dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.het&quot;</span><span class="p">)</span>
+<span class="c1"># Get samples with F coefficient within 3 SD of the population mean</span>
+valid <span class="o">&lt;-</span> dat<span class="p">[</span><span class="bp">F</span><span class="o">&lt;=</span><span class="kp">mean</span><span class="p">(</span><span class="bp">F</span><span class="p">)</span><span class="m">+3</span><span class="o">*</span>sd<span class="p">(</span><span class="bp">F</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">F</span><span class="o">&gt;=</span><span class="kp">mean</span><span class="p">(</span><span class="bp">F</span><span class="p">)</span><span class="m">-3</span><span class="o">*</span>sd<span class="p">(</span><span class="bp">F</span><span class="p">)]</span> 
+<span class="c1"># print FID and IID for valid samples</span>
+fwrite<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span> 
+</pre></div></div>
+</div>
 <h1 id="check-for-mis-matched-sex-information">Check for mis-matched Sex information<a class="headerlink" href="#check-for-mis-matched-sex-information" title="Permanent link">&para;</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
