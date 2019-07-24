@@ -6,6 +6,7 @@ You can install `lassosum` and its dependencies in `R` with the following
 
 ```R
 install.packages(c("devtools","RcppArmadillo", "data.table", "Matrix"), dependencies=TRUE)
+library(devtools)
 install_github("tshmak/lassosum")
 ```
 
@@ -34,21 +35,22 @@ library(methods)
 # We like to use dplyr for it makes codes much more readable
 library(dplyr)
 sum.stat <- "Height.QC.gz"
-ref.bfile <- "EUR.QC"
 bfile <- "EUR.QC"
 # Read in and process the covariates
 covariate <- fread("EUR.covariate")
 pcs <- fread("EUR.eigenvec")
 colnames(pcs) <- c("FID","IID", paste0("PC",1:6))
-cov <- merge(covariate, pcs, by=c("FID", "IID"))
+# Need as.data.frame here as lassosum doesn't handle data.table 
+# covariates very well
+cov <- as.data.frame(merge(covariate, pcs, by=c("FID", "IID")))
 
 # We will need the EUR.hg19 file provided by lassosum 
 # which are LD regions defined in Berisa and Pickrell (2015) for the European population and the hg19 genome.
-ld.file <-  "EUR.hg19" 
+ld.file <- system.file("data", "Berisa.EUR.hg19.bed",package="lassosum")
 # output prefix
 prefix <- "EUR"
 # Read in the target phenotype file
-target.pheno <- fread("EUR.height")[,c("FID", "IID", "Pheno")]
+target.pheno <- as.data.frame(fread("EUR.height")[,c("FID", "IID", "Height")])
 # Read in samples to include in the analysis
 target.keep <- fread("EUR.valid.sample")[,c("FID", "IID")]
 # Read in the summary statistics
@@ -64,6 +66,13 @@ cor <- p2cor(p = ss$P,
         n = size,
         sign = log(ss$OR)
         )
+# Because FID of our samples are all 0, we might encounter problem with lassosum
+# we need to provide a T/F vector instead of the target.keep file
+target.keep[, ID:=do.call(paste, c(.SD, sep=":")),.SDcols=c(1:2)]
+fam <- fread(paste0(bfile, ".fam"))
+fam[,ID:=do.call(paste, c(.SD, sep=":")),.SDcols=c(1:2)]
+
+keep <- fam$ID %in% target.keep$ID
 # Run the lassosum pipeline
 out <- lassosum.pipeline(
     cor = cor,
@@ -71,10 +80,10 @@ out <- lassosum.pipeline(
     pos = ss$BP,
     A1 = ss$A1,
     A2 = ss$A2,
-    ref.bfile = ref.bfile,
-    keep.ref = target.keep,
+    ref.bfile = bfile,
+    keep.ref = keep,
     test.bfile = bfile,
-    keep.test = target.keep,
+    keep.test = keep,
     LDblocks = ld,
     trace = 2
 )

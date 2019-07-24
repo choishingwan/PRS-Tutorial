@@ -27,22 +27,96 @@ awk '!( ($5=="A" && $6=="T") || \
     There are `17,260` ambiguous SNPs
 
 # Strand Flipping
-Alternatively, when there is a non-ambiguous mismatch in allele coding between the data sets, such as A/C in the base
-and G/T in the target data, then this can be resolved by ‘flipping’ the alleles in the target data to their complementary alleles. 
+In addition, when there are non-ambiguous mismatch in allele 
+coding between the data sets, such as A/C in the base
+and G/T in the target data, then this can be resolved by 
+‘flipping’ the alleles in the target data to their complementary alleles. 
 This has to be done with mulitpe steps
 
 1. Get the correct A1 alleles for the bim file
-```R
-bim <- read.table("EUR.QC.bim", header=F)
-colnames(bim) <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
-height <- read.table(gzfile("Height.QC.gz"), header=T)
-# Avoid complicated factor problem
-height$A1 <- toupper(as.character(height$A1))
-height$A2 <- toupper(as.character(height$A2))
-bim$B.A1 <- toupper(as.character(bim$B.A1))
-bim$B.A2 <- toupper(as.character(bim$B.A2))
-info <- merge(bim, height, by=c("SNP", "CHR", "BP"))
 
+```R tab="Without data.table"
+bim <- read.table("EUR.QC.bim", header = F, stringsAsFactors = F)
+colnames(bim) <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
+height <-
+    read.table(gzfile("Height.QC.gz"),
+               header = T,
+               stringsAsFactors = F)
+# Change all alleles to upper case for easy comparison
+height$A1 <- toupper(height$A1)
+height$A2 <- toupper(height$A2)
+bim$B.A1 <- toupper(bim$B.A1)
+bim$B.A2 <- toupper(bim$B.A2)
+info <- merge(bim, height, by = c("SNP", "CHR", "BP"))
+
+# Function for finding the complementary allele
+complement <- function(x) {
+    switch (
+        x,
+        "A" = "T",
+        "C" = "G",
+        "T" = "A",
+        "G" = "C",
+        return(NA)
+    )
+}
+# Get SNPs that has the same alleles across base and target
+info.match <- subset(info, A1 == B.A1 & A2 == B.A2)
+# Identify SNPs that are complementary between base and target
+info$C.A1 <- sapply(info$B.A1, complement)
+info$C.A2 <- sapply(info$B.A2, complement)
+info.complement <- subset(info, A1 == C.A1 & A2 == C.A2)
+# Update these allele coding in the bim file
+bim[bim$SNP %in% info.complement$SNP,]$B.A1 <-
+    sapply(bim[bim$SNP %in% info.complement$SNP,]$B.A1, complement)
+bim[bim$SNP %in% info.complement$SNP,]$B.A2 <-
+    sapply(bim[bim$SNP %in% info.complement$SNP,]$B.A2, complement)
+# identify SNPs that need flipping
+info.flip <- subset(info, A1 == B.A2 & A2 == B.A1)
+# identify SNPs that need flipping & complement
+info.cflip <- subset(info, A1 == C.A2 & A2 == C.A1)
+# Update these allele coding in the bim file
+com.snps <- bim$SNP %in% info.cflip$SNP
+bim[com.snps,]$B.A1 <- sapply(bim[com.snps,]$B.A1, complement)
+bim[com.snps,]$B.A2 <- sapply(bim[com.snps,]$B.A2, complement)
+# Get list of SNPs that need to change the A1 encoding
+flip <- rbind(info.flip, info.cflip)
+flip.snp <- data.frame(SNP = flip$SNP, A1 = flip$A1)
+write.table(flip.snp,
+            "EUR.update.a1",
+            quote = F,
+            row.names = F)
+write.table(
+    bim,
+    "EUR.QC.adj.bim",
+    quote = F,
+    row.names = F,
+    col.names = F
+)
+# And we want to remove any SNPs that do not match with the base data
+mismatch <-
+    bim$SNP[!(bim$SNP %in% info.match$SNP |
+                  bim$SNP %in% info.complement$SNP | 
+                  bim$SNP %in% flip$SNP)]
+write.table(
+    mismatch,
+    "EUR.mismatch",
+    quote = F,
+    row.names = F,
+    col.names = F
+)
+```
+
+```R tab="With data.table"
+library(data.table)
+bim <- fread("EUR.QC.bim")
+bim.col <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
+setnames(bim, colnames(bim), bim.col)
+height <- fread("Height.QC.gz")
+# Change all alleles to upper case for easy comparison
+height[,c("A1","A2"):=list(toupper(A1), toupper(A2))]
+bim[,c("B.A1","B.A2"):=list(toupper(B.A1), toupper(B.A2))]
+info <- merge(bim, height, by=c("SNP", "CHR", "BP"))
 # Function for calculating the complementary allele
 complement <- function(x){
     switch (x,
@@ -53,29 +127,34 @@ complement <- function(x){
         return(NA)
     )
 }
-# Now get SNPs that has exact match between base and target
-info.match <- subset(info, A1==B.A1 & A2==B.A2)
-# Check for complementary matchs
-info$C.A1 <- sapply(info$B.A1, complement)
-info$C.A2 <- sapply(info$B.A2, complement)
-info.complement <- subset(info, A1==C.A1 & A2==C.A2)
-# Update these allele coding in the bim file 
-bim[bim$SNP %in% info.complement$SNP, ]$B.A1 <- sapply(bim[bim$SNP %in% info.complement$SNP, ]$B.A1, complement)
-bim[bim$SNP %in% info.complement$SNP, ]$B.A2 <- sapply(bim[bim$SNP %in% info.complement$SNP, ]$B.A2, complement)
-# identify SNPs that need flipping 
-info.flip <- subset(info, A1==B.A2 & A2==B.A1)
+# Identify SNPs that are complementary between base and target
+com.snps <- info[sapply(B.A1, complement) == A1 &
+                     sapply(B.A2, complement) == A2, SNP]
+# Now update the bim file
+bim[SNP %in% com.snps, c("B.A1", "B.A2") :=
+        list(sapply(B.A1, complement),
+             sapply(B.A2, complement))]
 # identify SNPs that need flipping & complement
-info.cflip <- subset(info, A1==C.A2 & A2==C.A1)
-# Update these allele coding in the bim file 
-bim[bim$SNP %in% info.cflip$SNP, ]$B.A1 <- sapply(bim[bim$SNP %in% info.cflip$SNP, ]$B.A1, complement)
-bim[bim$SNP %in% info.cflip$SNP, ]$B.A2 <- sapply(bim[bim$SNP %in% info.cflip$SNP, ]$B.A2, complement)
-# Get list of SNPs that need to change the A1 encoding
-flip <- rbind(info.flip, info.cflip)
-flip.snp <- data.frame(SNP=flip$SNP, A1=flip$A1)
-write.table(flip.snp, "EUR.update.a1", quote=F, row.names=F)
-write.table(bim, "EUR.QC.adj.bim", quote=F, row.names=F, col.names=F)
-# And we want to remove any SNPs that do not match with the base data
-mismatch <- bim$SNP[!(bim$SNP %in% info.match$SNP | bim$SNP %in% info.complement$SNP | bim$SNP %in% flip$SNP)]
+com.flip <- info[sapply(B.A1, complement) == A2 &
+                     sapply(B.A2, complement) == A1, SNP]
+# Now update the bim file
+bim[SNP %in% com.flip, c("B.A1", "B.A2") :=
+        list(sapply(B.A1, complement),
+             sapply(B.A2, complement))]
+# Obtain list of SNPs that require flipping
+flip <- info[B.A1==A2 & B.A2==A1]
+# Now generate file for PLINK 
+fwrite(flip[,c("SNP", "A1")], "EUR.update.a1", sep="\t")
+# Write the updated bim file
+fwrite(bim, "EUR.QC.adj.bim", col.names=F, sep="\t")
+# We can then remove all mismatch SNPs
+matched <- info[(A1 == B.A1 & A2 == B.A2) |
+                    (A1 == B.A2 & A2 == B.A1) |
+                    (A1 == sapply(B.A1, complement) &
+                         A2 == sapply(B.A2, complement)) |
+                    (A1 == sapply(B.A2, complement) &
+                         A2 == sapply(B.A1, complement))]
+mismatch <- bim[!SNP%in%matched$SNP, SNP]
 write.table(mismatch, "EUR.mismatch", quote=F, row.names=F, col.names=F)
 ```
 
@@ -105,16 +184,24 @@ When odd ratios (OR) instead of BETA are provided, the PRS might have to calcula
 To simplify the calculation, we usually take the natural logarithm of the OR such that an additive model can be applied. 
 We can obtain the transformed summary statistics with `R`:
 
-```R
+```R tab="Without data.table"
 dat <- read.table(gzfile("Height.QC.gz"), header=T)
 dat$OR <- log(dat$OR)
 write.table(dat, "Height.QC.Transformed", quote=F, row.names=F)
 ```
 
+```R tab="With data.table"
+library(data.table)
+dat <- fread("Height.QC.gz")
+fwrite(dat[,OR:=log(OR)], "Height.QC.Transformed", sep="\t")
+```
+
+
 !!! warning
-    While you can also do the log transformation using `awk`, the resulting transformation will only have precision upto 7th digit. 
-    The imprecision can accumulate and lead to slightly less accurate results. 
-    Therefore it is best to do the transformation in `R` or allow the PRS software to do the transformation for you. 
+    It might be tempting to perform the log transofrmation using `awk`.
+    However, due to a lower arithmetic precision of `awk`, less accurate results
+    might be obtained. 
+    Therefore it is best to do the transformation in `R` or allow the PRS software to perform the transformation directly. 
 
 # Clumping
 Linkage disequilibrium introduce a strong correlation structure across the genome, makes identifying the independent

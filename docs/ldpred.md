@@ -3,8 +3,13 @@ infers the posterior mean effect size of each marker by using a prior on effect 
 thus allow for a better $R^2$.
 
 !!! note
-    Python 3 and other packages need to be installed before running LDpred. Please refer
-    to the github for instructions of installation
+    Python 3 and other packages need to be installed before running LDpred. 
+    Please refer to their website for instructions of installation.
+    
+    If you have Python installed, you might be able to install LDpred with
+    ```
+    pip install ldpred
+    ```
 
 !!! note
     Current script is based on version 1.0.6
@@ -64,7 +69,7 @@ python LDpred.py coord \
     --ldr 183 \
     --ldf EUR.ld \
     --out EUR.weight \
-    --N 253288;
+    --N 253288
 ```
 
 3. Calculate the PRS

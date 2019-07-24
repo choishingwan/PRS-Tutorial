@@ -3,6 +3,11 @@ Next, we'd like to perform basic quality controls (QC) on the target genotype da
 In this tutorial, we've simulated some samples using the 1000 genome european genotypes. 
 You can download the data [here](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip). 
 
+Or you can download using the following script:
+```bash
+curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip -L -O
+```
+
 Unzip the data as follow:
 
 ```bash
@@ -118,12 +123,23 @@ plink \
 This will generate the **EUR.het** file which contains the F coefficient estimates.
 It will be easier to filter the samples using `R` instead of `awk`:
 Open a `R` section by tying `R` in your terminal
-```R
+
+```R tab="Without library"
 dat <- read.table("EUR.het", header=T) # Read in the EUR.het file, specify it has header
 m <- mean(dat$F) # Calculate the mean  
 s <- sd(dat$F) # Calculate the SD
-valid <- subset(dat, F <= m+3*s & F >= m-3*s) # Get any samples with F coefficient within 3 SD from the population mean
+valid <- subset(dat, F <= m+3*s & F >= m-3*s) # Get any samples with F coefficient within 3 SD of the population mean
 write.table(valid[,c(1,2)], "EUR.valid.sample", quote=F, row.names=F) # print FID and IID for valid samples
+```
+
+```R tab="With data.table"
+library(data.table)
+# Read in file
+dat <- fread("EUR.het")
+# Get samples with F coefficient within 3 SD of the population mean
+valid <- dat[F<=mean(F)+3*sd(F) & F>=mean(F)-3*sd(F)] 
+# print FID and IID for valid samples
+fwrite(valid[,c("FID","IID")], "EUR.valid.sample", sep="\t") 
 ```
 
 # Check for mis-matched Sex information

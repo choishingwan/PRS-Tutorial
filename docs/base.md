@@ -86,7 +86,7 @@ Briefly, the above command does the following:
 
 
 ??? note "How many duplicated SNPs are there?"
-    There are a total of `100` duplicated SNPs
+    There are a total of `13` duplicated SNPs
 
 Duplicated SNPs can then be removed using the `grep` command:
 ```bash
@@ -94,7 +94,9 @@ gunzip -c GIANT.height.gz  |\
 grep -vf duplicated.snp |\
 gzip - > Height.gz
 ```
+
 The above script does the following:
+
 1. Decompress and read the **GIANT.height.gz** file 
 2. Find if any row contains entries observed in `duplicated.snp` and remove them
 3. Compress and write the results to **Height.gz**
