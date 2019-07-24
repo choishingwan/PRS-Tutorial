@@ -1,17 +1,16 @@
 # Overview 
-The aim of this tutorial is to provide a step-by-step guide as to how to perform basic polygenic risk score analyses, therefore
-allow for a better understanding of the inner mechanism implemented in most polygenic risk score software. 
+This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our paper on the topic (https://doi.org/10.1101/416545). Our hope is that this tutorial will allow new users to get started on PRS analyses and provide existing users with a better understanding of the processes and implemention underlying popular PRS software.
 
 The tutorial is separated into four main sections
 
-1. [How to perform basic filtering on the summary statistic file (Base)](base.md)
-2. [How to perform quanilty controls on the target genotype file](target.md)
-3. [The details steps involved in calculating PRS (using `plink`)](plink.md)
-4. [Visualizing PRS results](plink_visual.md)
+1. [QC of Base GWAS Summary Data](base.md)
+2. [QC of Target Individual-Level Data](target.md)
+3. [Running PRS Analyses (using `plink`)](plink.md)
+4. [Visualizing PRS Results](plink_visual.md)
 
-We also provided a brief example on how to perform PRS using the three polygenic risk score software: [PRSice-2](prsice.md), [LDpred](ldpred.md) and [lassosum](lassosum.md)
+We provide brief examples of performing PRS analyses using four software for polygenic risk score analyses: [PLINK](plink.md), [PRSice-2](prsice.md), [LDpred](ldpred.md) and [lassosum](lassosum.md)
 
-If you are only interested in how to perform PRS, you can directly skipped to [step 3](plink.md). Links to download the required data are provided under each section.
+If you are only interested in how to perform PRS on previously QC'ed data then you can directly skip to [step 3](plink.md). Links to download the required data are provided under each section.
 
 !!! note
 
@@ -42,8 +41,4 @@ If you find this tutorial helpful, then please cite:
 
 !!! important "Citation"
 
-    A guide to performing Polygenic Risk Score analyses, 
-    
-    Shing Wan Choi, Timothy Shin Heng Mak, Paul O'Reilly 
-    
-    bioRxiv 416545 (2018). doi:10.1101/416545
+    Choi SW, Mak TSH, O'Reilly PF.  A guide to performing Polygenic Risk Score analyses. bioRxiv 416545 (2018). https://doi.org/10.1101/416545
