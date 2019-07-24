@@ -41,4 +41,5 @@ If you find this tutorial helpful for a publication, then please consider citing
 
 !!! important "Citation"
 
-    Choi SW, Mak TSH, O'Reilly PF.  A guide to performing Polygenic Risk Score analyses. bioRxiv 416545 (2018). https://doi.org/10.1101/416545
+    Choi SW, Mak TSH, O'Reilly PF.  A guide to performing Polygenic Risk Score analyses. 
+    bioRxiv 416545 (2018). https://doi.org/10.1101/416545
