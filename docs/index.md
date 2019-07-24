@@ -1,7 +1,7 @@
 # Overview 
 This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our paper on the topic (https://doi.org/10.1101/416545). Our hope is that this tutorial will allow new users to get started on PRS analyses and provide existing users with a better understanding of the processes and implemention underlying popular PRS software.
 
-The tutorial is separated into four main sections
+The tutorial is separated into four main sections:
 
 1. [QC of Base GWAS Summary Data](base.md)
 2. [QC of Target Individual-Level Data](target.md)
