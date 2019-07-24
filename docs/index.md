@@ -1,5 +1,5 @@
 # Overview 
-The aim of this tutorial is to provide a step by step guide as to how to perform basic polygenic risk score analyses, therefore
+The aim of this tutorial is to provide a step-by-step guide as to how to perform basic polygenic risk score analyses, therefore
 allow for a better understanding of the inner mechanism implemented in most polygenic risk score software. 
 
 The tutorial is separated into four main sections
