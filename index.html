@@ -143,25 +143,24 @@
             <div class="section">
               
                 <h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
-<p>The aim of this tutorial is to provide a step by step guide as to how to perform basic polygenic risk score analyses, therefore
-allow for a better understanding of the inner mechanism implemented in most polygenic risk score software. </p>
-<p>The tutorial is separated into four main sections</p>
+<p>This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our paper on the topic (https://doi.org/10.1101/416545). Our hope is that this tutorial will allow new users to get started on PRS analyses and provide existing users with a better understanding of the processes and implemention underlying popular PRS software.</p>
+<p>The tutorial is separated into four main sections:</p>
 <ol>
-<li><a href="base/">How to perform basic filtering on the summary statistic file (Base)</a></li>
-<li><a href="target/">How to perform quanilty controls on the target genotype file</a></li>
-<li><a href="plink/">The details steps involved in calculating PRS (using <code>plink</code>)</a></li>
-<li><a href="plink_visual/">Visualizing PRS results</a></li>
+<li><a href="base/">QC of Base GWAS Summary Data</a></li>
+<li><a href="target/">QC of Target Individual-Level Data</a></li>
+<li><a href="plink/">Running PRS Analyses (using <code>plink</code>)</a></li>
+<li><a href="plink_visual/">Visualizing PRS Results</a></li>
 </ol>
-<p>We also provided a brief example on how to perform PRS using the three polygenic risk score software: <a href="prsice/">PRSice-2</a>, <a href="ldpred/">LDpred</a> and <a href="lassosum/">lassosum</a></p>
-<p>If you are only interested in how to perform PRS, you can directly skipped to <a href="plink/">step 3</a>. Links to download the required data are provided under each section.</p>
+<p>We provide brief examples of performing PRS analyses using four software for polygenic risk score analyses: <a href="plink/">PLINK</a>, <a href="prsice/">PRSice-2</a>, <a href="ldpred/">LDpred</a> and <a href="lassosum/">lassosum</a></p>
+<p>If you are only interested in how to perform PRS on previously QC'ed data then you can directly skip to <a href="plink/">step 3</a>. Links to download the required data are provided under each section.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This tutorial is based on linux and OS X systems. Users who would like to perform polygenic risk score analyses
-on their Windows machine will need to change some of the commands.</p>
+<p>This tutorial is written for Linux and OS X operating systems. 
+Windows users will need to change some commands accordingly.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Throughout the tutorial, you might see some codes with tab on top:</p>
+<p>Throughout the tutorial you will see tabs above some of the code:</p>
 <div class="superfences-tabs">
 <input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
 <label for="__tab_1_0">A</label>
@@ -172,7 +171,7 @@ on their Windows machine will need to change some of the commands.</p>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;Tab B&quot;</span>
 </pre></div></div>
 </div>
-<p>You can click on the tab to change to relevant codes (e.g. different operation system)</p>
+<p>You can click on the tab to change to an alternative code (e.g to a different operation system)</p>
 </div>
 <h1 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h1>
 <p>To follow the tutorial, you will need the following programs installed:</p>
@@ -181,12 +180,11 @@ on their Windows machine will need to change some of the commands.</p>
 <li><a href="https://www.cog-genomics.org/plink2">PLINK 1.9</a></li>
 </ol>
 <h2 id="citation">Citation<a class="headerlink" href="#citation" title="Permanent link">&para;</a></h2>
-<p>If you find this tutorial helpful, then please cite:</p>
+<p>If you find this tutorial helpful for a publication, then please consider citing:</p>
 <div class="admonition important">
 <p class="admonition-title">Citation</p>
-<p>A guide to performing Polygenic Risk Score analyses, </p>
-<p>Shing Wan Choi, Timothy Shin Heng Mak, Paul O'Reilly </p>
-<p>bioRxiv 416545 (2018). doi:10.1101/416545</p>
+<p>Choi SW, Mak TSH, O'Reilly PF.  A guide to performing Polygenic Risk Score analyses. 
+bioRxiv 416545 (2018). https://doi.org/10.1101/416545</p>
 </div>
               
             </div>
@@ -239,5 +237,5 @@ on their Windows machine will need to change some of the commands.</p>
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-07-24 15:29:29
+Build Date UTC : 2019-07-25 14:38:19
 -->

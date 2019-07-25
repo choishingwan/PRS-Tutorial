@@ -152,7 +152,9 @@
 <p>A common problem is that the downloaded file can be corrupted, 
 which can generate various error messages in the down-stream analyses. 
 To avoid un-necessary waste of time, it is generally a good practice to 
-check if the file is intact. This can be done by performing the <code>md5sum</code> check:</p>
+check if the file is intact. If the <code>md5sum</code> hash is provided for the 
+original file, you can check the file integrity by performing the 
+<code>md5sum</code> check:</p>
 <div class="superfences-tabs">
 <input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
 <label for="__tab_1_0">Linux</label>
@@ -264,7 +266,7 @@ It is therefore beneficial to remove SNPs with low MAF and INFO.
 This can be acheived using the following code:</p>
 <div class="codehilite"><pre><span></span>gunzip -c Height.gz <span class="p">|</span><span class="se">\</span>
 awk <span class="s1">&#39;NR==1 || ($6 &gt; 0.05 &amp;&amp; $6 &lt; 0.95) &amp;&amp; ($10 &gt; 0.8) {print}&#39;</span> <span class="p">|</span><span class="se">\</span>
-gzip - &gt; Height.QC.gz
+gzip  &gt; Height.QC.gz
 </pre></div>
 
 <ol>
