@@ -57,6 +57,9 @@
     <li class="toctree-l2"><a href="#overview">Overview</a></li>
     
 
+    <li class="toctree-l2"><a href="#datasets">Datasets</a></li>
+    
+
     <li class="toctree-l2"><a href="#requirements">Requirements</a></li>
     
         <ul>
@@ -143,12 +146,12 @@
             <div class="section">
               
                 <h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
-<p>This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our paper on the topic (https://doi.org/10.1101/416545). Our hope is that this tutorial will allow new users to get started on PRS analyses and provide existing users with a better understanding of the processes and implemention underlying popular PRS software.</p>
+<p>This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our <a href="https://doi.org/10.1101/416545">PRS Guide paper</a>. Our hope is that this tutorial will allow new users to get started on PRS analyses and provide existing users with a better understanding of the processes and implemention underlying popular PRS software.</p>
 <p>The tutorial is separated into four main sections:</p>
 <ol>
 <li><a href="base/">QC of Base GWAS Summary Data</a></li>
 <li><a href="target/">QC of Target Individual-Level Data</a></li>
-<li><a href="plink/">Running PRS Analyses (using <code>plink</code>)</a></li>
+<li><a href="plink/">Running PRS Analyses</a></li>
 <li><a href="plink_visual/">Visualizing PRS Results</a></li>
 </ol>
 <p>We provide brief examples of performing PRS analyses using four software for polygenic risk score analyses: <a href="plink/">PLINK</a>, <a href="prsice/">PRSice-2</a>, <a href="ldpred/">LDpred</a> and <a href="lassosum/">lassosum</a></p>
@@ -171,8 +174,13 @@ Windows users will need to change some commands accordingly.</p>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;Tab B&quot;</span>
 </pre></div></div>
 </div>
-<p>You can click on the tab to change to an alternative code (e.g to a different operation system)</p>
+<p>You can click on the tab to change to an alternative code (eg. to a different operation system)</p>
 </div>
+<h1 id="datasets">Datasets<a class="headerlink" href="#datasets" title="Permanent link">&para;</a></h1>
+<ol>
+<li><a href="https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/GIANT.height.gz">Base data</a>: Modified summary statistic file from GIANT</li>
+<li><a href="https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip">Target data</a>: Simulated data based on 1000 genome European samples</li>
+</ol>
 <h1 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h1>
 <p>To follow the tutorial, you will need the following programs installed:</p>
 <ol>
@@ -237,5 +245,5 @@ bioRxiv 416545 (2018). https://doi.org/10.1101/416545</p>
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-07-25 14:38:19
+Build Date UTC : 2019-07-25 16:40:49
 -->
