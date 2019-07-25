@@ -29,6 +29,9 @@ If you are only interested in how to perform PRS on previously QC'ed data then y
     ```
 
     You can click on the tab to change to an alternative code (eg. to a different operation system)
+# Datasets
+1. [Base data](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/GIANT.height.gz): Modified summary statistic file from GIANT
+2. [Target data](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip): Simulated data based on 1000 genome European samples
 
 # Requirements
 To follow the tutorial, you will need the following programs installed:
