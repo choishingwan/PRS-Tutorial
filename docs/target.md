@@ -18,10 +18,10 @@ unzip EUR.zip
 
     |File|md5sum|
     |:-:|:-:|
-    |**EUR.bed**           |96ce8f494a57114eaee6ef9741676f58|
-    |**EUR.bim**           |852d54c9b6d1159f89d4aa758869e72a|
+    |**EUR.bed**           |7d163129c79277ec9858008f10cac0e5|
+    |**EUR.bim**           |62b278b3338fc86b89ecc8d622731701|
     |**EUR.covariate**     |afff13f8f9e15815f2237a62b8bec00b|
-    |**EUR.fam**           |8c6463c0d8f32f975cdc423b1b80a951|
+    |**EUR.fam**           |0189b2f82b5d20f63ab8f667e2feb100|
     |**EUR.height**        |052beb4cae32ac7673f1d6b9e854c85b|
 
 !!! note
@@ -43,12 +43,14 @@ individuals with low genotyping rate
 The following `plink` command perform some basic filterings
 
 ```bash
-plink --bfile EUR \
+plink \
+    --bfile EUR \
     --maf 0.05 \
     --hwe 1e-6 \
     --geno 0.01 \
     --mind 0.01 \
-    --make-bed \
+    --write-snplist \
+    --make-just-fam \
     --out EUR.QC
 ```
 Each of the parameters corresponds to the following
@@ -60,11 +62,21 @@ Each of the parameters corresponds to the following
 | hwe | 1e-6 | Filtering SNPs with low p-value from the Hardy-Weinberg exact test. SNPs with significant p-value from the HWE test are more likely to harbor genotyping error or are under selection. Filtering should be performed on the control samples to avoid filtering SNPs that are causal (under selection in cases)|
 | geno | 0.01 | Exclude SNPs that are missing in large proportion of subjects. A two pass filtering is usually performed (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/)).|
 | mind | 0.01 | Exclude individual who have a high rate of genotype missingness. This might indicate problems in the DNA sample. (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/) for more details).|
-| make-bed | - | Inform `plink` to generate a binary genotype file |
+| make-just-fam | - | Inform `plink` to only generate the QCed sample name to avoid generating the .bed file.  |
+| write-snplist | - | Inform `plink` to only generate the QCed SNP list to avoid generating the .bed file. |
 | out | EUR | Inform `plink` that all output should have a prefix of `EUR` |
 
 ??? note "How many SNPs were filtered?"
-    A total of `266` SNPs were removed due to Hardy-Weinberg exact test results
+    A total of `5359` SNPs were removed due to Hardy-Weinberg exact test results
+    and `241,485` SNPs were removed due to minor allele frequency
+
+
+!!! note
+    Normally, we can generate a new genotype file using the new sample list.
+    However,  this will use up a lot of storage space. Using `plink`'s
+    `--extract`, `--exclude`, `--keep`, `--remove`, `--make-just-fam` and `--write-snplist` functions, we can work 
+    solely on the list of samples and SNPs without duplicating the 
+    genotype file, therefore reducing the storage space usage.  
 
 # Filter related samples
 Related samples in the target data might lead to overfitted results, 
@@ -73,7 +85,9 @@ hampering the generalizability of the results.
 To remove related samples, we first need to perform prunning to remove highly correlated SNPs:
 ```bash
 plink \
-    --bfile EUR.QC \
+    --bfile EUR \
+    --keep EUR.QC.fam \
+    --extract EUR.QC.snplist \
     --indep-pairwise 200 50 0.25 \
     --out EUR.QC
 ```
@@ -85,18 +99,12 @@ Samples with more than third-degree relatedness ($\text{pi-hat} > 0.125$) can th
 
 ```bash
 plink \
-    --bfile EUR.QC \
+    --bfile EUR \
     --extract EUR.QC.prune.in \
+    --keep EUR.QC.fam \
     --rel-cutoff 0.125 \
     --out EUR.QC
 ```
-
-!!! note
-    Normally, we can generate a new genotype file using the new sample list.
-    However,  this will use up a lot of storage space. Using `plink`'s
-    `--extract`, `--exclude`, `--keep`, `--remove` functions, we can work 
-    solely on the list of samples and SNPs without duplicating the 
-    genotype file, therefore reducing the storage space usage.  
 
 !!! note
     A greedy algorithm is used to remove the related samples. Which depending
@@ -118,14 +126,14 @@ plink \
     --extract EUR.QC.prune.in \
     --keep EUR.QC.rel.id \
     --het \
-    --out EUR
+    --out EUR.QC
 ```
-This will generate the **EUR.het** file which contains the F coefficient estimates.
+This will generate the **EUR.QC.het** file which contains the F coefficient estimates.
 It will be easier to filter the samples using `R` instead of `awk`:
 Open a `R` section by tying `R` in your terminal
 
 ```R tab="Without library"
-dat <- read.table("EUR.het", header=T) # Read in the EUR.het file, specify it has header
+dat <- read.table("EUR.QC.het", header=T) # Read in the EUR.het file, specify it has header
 m <- mean(dat$F) # Calculate the mean  
 s <- sd(dat$F) # Calculate the SD
 valid <- subset(dat, F <= m+3*s & F >= m-3*s) # Get any samples with F coefficient within 3 SD of the population mean
@@ -135,7 +143,7 @@ write.table(valid[,c(1,2)], "EUR.valid.sample", quote=F, row.names=F) # print FI
 ```R tab="With data.table"
 library(data.table)
 # Read in file
-dat <- fread("EUR.het")
+dat <- fread("EUR.QC.het")
 # Get samples with F coefficient within 3 SD of the population mean
 valid <- dat[F<=mean(F)+3*sd(F) & F>=mean(F)-3*sd(F)] 
 # print FID and IID for valid samples
@@ -143,14 +151,7 @@ fwrite(valid[,c("FID","IID")], "EUR.valid.sample", sep="\t")
 ```
 
 # Check for mis-matched Sex information
-
-!!! note
-    As sex chromosome information are missing from our simulated samples. 
-    It is not possible to perform the mis-match sex check. (And we used simulated sex)
-    Thus, this section is only served as a reference in case your samples contain the 
-    sex chromosome and sex information which permits checking if there are mis-matched sex information
-
-Sometimes, sample mislabeling can occur, which can lead to invalid results. 
+Sometimes, sample mislabeling can occur and will lead to invalid results. 
 A good indication of mislabeled sample is a mismatch between the biological sex and the reported sex. 
 If the biological sex does not match up with the reported sex, it is likely that the sample has been mislabeled.
 
@@ -158,25 +159,42 @@ Before performing sex check, prunning should be performed (see [here](target.md#
 Sex check can then easily be carried out using `plink`
 ```bash
 plink \
-    --bfile EUR.QC \
+    --bfile EUR \
     --extract EUR.QC.prune.in \
     --keep EUR.valid.sample \
     --check-sex \
-    --out EUR
+    --out EUR.QC
 ```
 
 This will generate a file called **EUR.sexcheck** containing the F-statistics for each individual.
 For male, the F-statistic should be > 0.8 and Female should have a value < 0.2.
 
-```bash
-awk 'NR==FNR{a[$1]=$5} \
-    NR!=FNR && a[$1]==1 && $6 > 0.8 {print $1,$2} \
-    NR!=FNR && a[$1]==2 && $6 < 0.2 {print $1,$2} ' \
-    EUR.QC.fam EUR.sexcheck > EUR.valid.sex 
+```R tab="Without library"
+# Read in file
+valid <- read.table("EUR.valid.sample", header=T)
+dat <- read.table("EUR.QC.sexcheck", header=T)
+valid <- subset(dat, STATUS=="OK" & FID %in% valid$FID)
+write.table(valid[,c("FID", "IID")], "EUR.QC.valid", row.names=F, col.names=F, sep="\t") 
 ```
-Here is a breakdown of the above script
-1. Read in the first file (`NR==FNR`) and store the sex (`$5`) into a dictionary using the FID (`$1`) as the key
-2. Read in the second file (`NR!=FNR`), if the individual is a male (`a[$1]==1`) and the F-statistic (`$6`) is larger than 0.8, print its FID and IID
-3. Read in the second file (`NR!=FNR`), if the individual is a female (`a[$1]==2`) and the F-statistic (`$6`) is less than 0.2, print its FID and IID
 
-The samples can then be extracted using the `--keep` command.
+```R tab="With data.table"
+library(data.table)
+# Read in file
+valid <- fread("EUR.valid.sample")
+dat <- fread("EUR.QC.sexcheck")[FID%in%valid$FID]
+fwrite(dat[STATUS=="OK",c("FID","IID")], "EUR.QC.valid", sep="\t") 
+```
+
+# Generate final QCed sample
+After performing the full analysis, you can generate a QCed data set with the following command
+```bash
+plink \
+    --make-bed \
+    --out EUR.QC \
+    --keep EUR.QC.valid \
+    --extract EUR.QC.snplist
+```
+
+!!! note
+    For some software, the **EUR.QC.valid** and **EUR.QC.snplist** can be passed as a parameter to perform the 
+    extraction directly. For those software (e.g. PRSice-2, lassosum, etc), this step is not required

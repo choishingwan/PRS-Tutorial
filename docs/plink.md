@@ -1,3 +1,9 @@
+# Background
+In this section, we will try to calculate polygenic risk score using `plink` to illustrate some common procedure
+performed by PRS software.
+
+# Required Data
+
 In previous sections, we have generated the following files
 
 |File Name | Description|
@@ -10,7 +16,7 @@ In previous sections, we have generated the following files
 |**EUR.height**| This file contains the phenotype of the samples |
 |**EUR.covariate**| This file contains the covariates of the samples |
 
-Here, we will try to calculate polygenic risk score using `plink`. 
+
 # Remove Ambiguous SNPs
 If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. 
 
