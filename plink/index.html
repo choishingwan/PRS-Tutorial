@@ -73,6 +73,12 @@
     <a class="current" href="./">PLINK</a>
     <ul class="subnav">
             
+    <li class="toctree-l3"><a href="#background">Background</a></li>
+    
+
+    <li class="toctree-l3"><a href="#required-data">Required Data</a></li>
+    
+
     <li class="toctree-l3"><a href="#remove-ambiguous-snps">Remove Ambiguous SNPs</a></li>
     
 
@@ -155,7 +161,11 @@
           <div role="main">
             <div class="section">
               
-                <p>In previous sections, we have generated the following files</p>
+                <h1 id="background">Background<a class="headerlink" href="#background" title="Permanent link">&para;</a></h1>
+<p>In this section, we will try to calculate polygenic risk score using <code>plink</code> to illustrate some common procedure
+performed by PRS software.</p>
+<h1 id="required-data">Required Data<a class="headerlink" href="#required-data" title="Permanent link">&para;</a></h1>
+<p>In previous sections, we have generated the following files</p>
 <table>
 <thead>
 <tr>
@@ -194,7 +204,6 @@
 </tr>
 </tbody>
 </table>
-<p>Here, we will try to calculate polygenic risk score using <code>plink</code>. </p>
 <h1 id="remove-ambiguous-snps">Remove Ambiguous SNPs<a class="headerlink" href="#remove-ambiguous-snps" title="Permanent link">&para;</a></h1>
 <p>If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. </p>
 <p>Ambiguous SNPs can be obtained by examining the bim file:

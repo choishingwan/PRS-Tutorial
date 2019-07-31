@@ -79,6 +79,9 @@
     <li class="toctree-l2"><a href="#check-for-mis-matched-sex-information">Check for mis-matched Sex information</a></li>
     
 
+    <li class="toctree-l2"><a href="#generate-final-qced-sample">Generate final QCed sample</a></li>
+    
+
     </ul>
 	    </li>
           
@@ -165,11 +168,11 @@ You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/
 <tbody>
 <tr>
 <td align="center"><strong>EUR.bed</strong></td>
-<td align="center">96ce8f494a57114eaee6ef9741676f58</td>
+<td align="center">7d163129c79277ec9858008f10cac0e5</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.bim</strong></td>
-<td align="center">852d54c9b6d1159f89d4aa758869e72a</td>
+<td align="center">62b278b3338fc86b89ecc8d622731701</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.covariate</strong></td>
@@ -177,7 +180,7 @@ You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/
 </tr>
 <tr>
 <td align="center"><strong>EUR.fam</strong></td>
-<td align="center">8c6463c0d8f32f975cdc423b1b80a951</td>
+<td align="center">0189b2f82b5d20f63ab8f667e2feb100</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.height</strong></td>
@@ -202,12 +205,14 @@ low minor allele frequency, violates the Hardy-Weinberg Equilibrium and
 individuals with low genotyping rate 
 (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a>).</p>
 <p>The following <code>plink</code> command perform some basic filterings</p>
-<p><div class="codehilite"><pre><span></span>plink --bfile EUR <span class="se">\</span>
+<p><div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --bfile EUR <span class="se">\</span>
     --maf <span class="m">0</span>.05 <span class="se">\</span>
     --hwe 1e-6 <span class="se">\</span>
     --geno <span class="m">0</span>.01 <span class="se">\</span>
     --mind <span class="m">0</span>.01 <span class="se">\</span>
-    --make-bed <span class="se">\</span>
+    --write-snplist <span class="se">\</span>
+    --make-just-fam <span class="se">\</span>
     --out EUR.QC
 </pre></div>
 Each of the parameters corresponds to the following</p>
@@ -246,9 +251,14 @@ Each of the parameters corresponds to the following</p>
 <td align="left">Exclude individual who have a high rate of genotype missingness. This might indicate problems in the DNA sample. (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a> for more details).</td>
 </tr>
 <tr>
-<td align="center">make-bed</td>
+<td align="center">make-just-fam</td>
 <td align="center">-</td>
-<td align="left">Inform <code>plink</code> to generate a binary genotype file</td>
+<td align="left">Inform <code>plink</code> to only generate the QCed sample name to avoid generating the .bed file.</td>
+</tr>
+<tr>
+<td align="center">write-snplist</td>
+<td align="center">-</td>
+<td align="left">Inform <code>plink</code> to only generate the QCed SNP list to avoid generating the .bed file.</td>
 </tr>
 <tr>
 <td align="center">out</td>
@@ -257,14 +267,25 @@ Each of the parameters corresponds to the following</p>
 </tr>
 </tbody>
 </table>
-<details class="note"><summary>How many SNPs were filtered?</summary><p>A total of <code>266</code> SNPs were removed due to Hardy-Weinberg exact test results</p>
+<details class="note"><summary>How many SNPs were filtered?</summary><p>A total of <code>5359</code> SNPs were removed due to Hardy-Weinberg exact test results
+and <code>241,485</code> SNPs were removed due to minor allele frequency</p>
 </details>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Normally, we can generate a new genotype file using the new sample list.
+However,  this will use up a lot of storage space. Using <code>plink</code>'s
+<code>--extract</code>, <code>--exclude</code>, <code>--keep</code>, <code>--remove</code>, <code>--make-just-fam</code> and <code>--write-snplist</code> functions, we can work 
+solely on the list of samples and SNPs without duplicating the 
+genotype file, therefore reducing the storage space usage.  </p>
+</div>
 <h1 id="filter-related-samples">Filter related samples<a class="headerlink" href="#filter-related-samples" title="Permanent link">&para;</a></h1>
 <p>Related samples in the target data might lead to overfitted results, 
 hampering the generalizability of the results. </p>
 <p>To remove related samples, we first need to perform prunning to remove highly correlated SNPs:
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
-    --bfile EUR.QC <span class="se">\</span>
+    --bfile EUR <span class="se">\</span>
+    --keep EUR.QC.fam <span class="se">\</span>
+    --extract EUR.QC.snplist <span class="se">\</span>
     --indep-pairwise <span class="m">200</span> <span class="m">50</span> <span class="m">0</span>.25 <span class="se">\</span>
     --out EUR.QC
 </pre></div></p>
@@ -272,20 +293,13 @@ hampering the generalizability of the results. </p>
 All SNPs within <strong>EUR.QC.prune.in</strong> has a pairwise <span class="arithmatex">\(r^2 &lt; 0.25\)</span></p>
 <p>Samples with more than third-degree relatedness (<span class="arithmatex">\(\text{pi-hat} &gt; 0.125\)</span>) can then be removed with </p>
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
-    --bfile EUR.QC <span class="se">\</span>
+    --bfile EUR <span class="se">\</span>
     --extract EUR.QC.prune.in <span class="se">\</span>
+    --keep EUR.QC.fam <span class="se">\</span>
     --rel-cutoff <span class="m">0</span>.125 <span class="se">\</span>
     --out EUR.QC
 </pre></div>
 
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Normally, we can generate a new genotype file using the new sample list.
-However,  this will use up a lot of storage space. Using <code>plink</code>'s
-<code>--extract</code>, <code>--exclude</code>, <code>--keep</code>, <code>--remove</code> functions, we can work 
-solely on the list of samples and SNPs without duplicating the 
-genotype file, therefore reducing the storage space usage.  </p>
-</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>A greedy algorithm is used to remove the related samples. Which depending
@@ -305,15 +319,15 @@ Heterozygosity rate can be calculated using <code>plink</code> after performing 
     --extract EUR.QC.prune.in <span class="se">\</span>
     --keep EUR.QC.rel.id <span class="se">\</span>
     --het <span class="se">\</span>
-    --out EUR
+    --out EUR.QC
 </pre></div>
-This will generate the <strong>EUR.het</strong> file which contains the F coefficient estimates.
+This will generate the <strong>EUR.QC.het</strong> file which contains the F coefficient estimates.
 It will be easier to filter the samples using <code>R</code> instead of <code>awk</code>:
 Open a <code>R</code> section by tying <code>R</code> in your terminal</p>
 <div class="superfences-tabs">
 <input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
 <label for="__tab_1_0">Without library</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.het&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span> <span class="c1"># Read in the EUR.het file, specify it has header</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.QC.het&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span> <span class="c1"># Read in the EUR.het file, specify it has header</span>
 m <span class="o">&lt;-</span> <span class="kp">mean</span><span class="p">(</span>dat<span class="o">$</span><span class="bp">F</span><span class="p">)</span> <span class="c1"># Calculate the mean  </span>
 s <span class="o">&lt;-</span> sd<span class="p">(</span>dat<span class="o">$</span><span class="bp">F</span><span class="p">)</span> <span class="c1"># Calculate the SD</span>
 valid <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> <span class="bp">F</span> <span class="o">&lt;=</span> m<span class="m">+3</span><span class="o">*</span>s <span class="o">&amp;</span> <span class="bp">F</span> <span class="o">&gt;=</span> m<span class="m">-3</span><span class="o">*</span>s<span class="p">)</span> <span class="c1"># Get any samples with F coefficient within 3 SD of the population mean</span>
@@ -323,7 +337,7 @@ write.table<span class="p">(</span>valid<span class="p">[,</span><span class="kt
 <label for="__tab_1_1">With data.table</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
 <span class="c1"># Read in file</span>
-dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.het&quot;</span><span class="p">)</span>
+dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.QC.het&quot;</span><span class="p">)</span>
 <span class="c1"># Get samples with F coefficient within 3 SD of the population mean</span>
 valid <span class="o">&lt;-</span> dat<span class="p">[</span><span class="bp">F</span><span class="o">&lt;=</span><span class="kp">mean</span><span class="p">(</span><span class="bp">F</span><span class="p">)</span><span class="m">+3</span><span class="o">*</span>sd<span class="p">(</span><span class="bp">F</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">F</span><span class="o">&gt;=</span><span class="kp">mean</span><span class="p">(</span><span class="bp">F</span><span class="p">)</span><span class="m">-3</span><span class="o">*</span>sd<span class="p">(</span><span class="bp">F</span><span class="p">)]</span> 
 <span class="c1"># print FID and IID for valid samples</span>
@@ -331,37 +345,51 @@ fwrite<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</
 </pre></div></div>
 </div>
 <h1 id="check-for-mis-matched-sex-information">Check for mis-matched Sex information<a class="headerlink" href="#check-for-mis-matched-sex-information" title="Permanent link">&para;</a></h1>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>As sex chromosome information are missing from our simulated samples. 
-It is not possible to perform the mis-match sex check. (And we used simulated sex)
-Thus, this section is only served as a reference in case your samples contain the 
-sex chromosome and sex information which permits checking if there are mis-matched sex information</p>
-</div>
-<p>Sometimes, sample mislabeling can occur, which can lead to invalid results. 
+<p>Sometimes, sample mislabeling can occur and will lead to invalid results. 
 A good indication of mislabeled sample is a mismatch between the biological sex and the reported sex. 
 If the biological sex does not match up with the reported sex, it is likely that the sample has been mislabeled.</p>
 <p>Before performing sex check, prunning should be performed (see <a href="./#filter-related-samples">here</a>).
 Sex check can then easily be carried out using <code>plink</code>
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
-    --bfile EUR.QC <span class="se">\</span>
+    --bfile EUR <span class="se">\</span>
     --extract EUR.QC.prune.in <span class="se">\</span>
     --keep EUR.valid.sample <span class="se">\</span>
     --check-sex <span class="se">\</span>
-    --out EUR
+    --out EUR.QC
 </pre></div></p>
 <p>This will generate a file called <strong>EUR.sexcheck</strong> containing the F-statistics for each individual.
 For male, the F-statistic should be &gt; 0.8 and Female should have a value &lt; 0.2.</p>
-<p><div class="codehilite"><pre><span></span>awk <span class="s1">&#39;NR==FNR{a[$1]=$5} \</span>
-<span class="s1">    NR!=FNR &amp;&amp; a[$1]==1 &amp;&amp; $6 &gt; 0.8 {print $1,$2} \</span>
-<span class="s1">    NR!=FNR &amp;&amp; a[$1]==2 &amp;&amp; $6 &lt; 0.2 {print $1,$2} &#39;</span> <span class="se">\</span>
-    EUR.QC.fam EUR.sexcheck &gt; EUR.valid.sex 
-</pre></div>
-Here is a breakdown of the above script
-1. Read in the first file (<code>NR==FNR</code>) and store the sex (<code>$5</code>) into a dictionary using the FID (<code>$1</code>) as the key
-2. Read in the second file (<code>NR!=FNR</code>), if the individual is a male (<code>a[$1]==1</code>) and the F-statistic (<code>$6</code>) is larger than 0.8, print its FID and IID
-3. Read in the second file (<code>NR!=FNR</code>), if the individual is a female (<code>a[$1]==2</code>) and the F-statistic (<code>$6</code>) is less than 0.2, print its FID and IID</p>
-<p>The samples can then be extracted using the <code>--keep</code> command.</p>
+<div class="superfences-tabs">
+<input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
+<label for="__tab_2_0">Without library</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># Read in file</span>
+valid <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.QC.sexcheck&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+valid <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> STATUS<span class="o">==</span><span class="s">&quot;OK&quot;</span> <span class="o">&amp;</span> FID <span class="o">%in%</span> valid<span class="o">$</span>FID<span class="p">)</span>
+write.table<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.QC.valid&quot;</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> col.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span> 
+</pre></div></div>
+<input name="__tabs_2" type="radio" id="__tab_2_1" />
+<label for="__tab_2_1">With data.table</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
+<span class="c1"># Read in file</span>
+valid <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">)</span>
+dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.QC.sexcheck&quot;</span><span class="p">)[</span>FID<span class="o">%in%</span>valid<span class="o">$</span>FID<span class="p">]</span>
+fwrite<span class="p">(</span>dat<span class="p">[</span>STATUS<span class="o">==</span><span class="s">&quot;OK&quot;</span><span class="p">,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.QC.valid&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span> 
+</pre></div></div>
+</div>
+<h1 id="generate-final-qced-sample">Generate final QCed sample<a class="headerlink" href="#generate-final-qced-sample" title="Permanent link">&para;</a></h1>
+<p>After performing the full analysis, you can generate a QCed data set with the following command
+<div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --make-bed <span class="se">\</span>
+    --out EUR.QC <span class="se">\</span>
+    --keep EUR.QC.valid <span class="se">\</span>
+    --extract EUR.QC.snplist
+</pre></div></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For some software, the <strong>EUR.QC.valid</strong> and <strong>EUR.QC.snplist</strong> can be passed as a parameter to perform the 
+extraction directly. For those software (e.g. PRSice-2, lassosum, etc), this step is not required</p>
+</div>
               
             </div>
           </div>
