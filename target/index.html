@@ -168,11 +168,11 @@ You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/
 <tbody>
 <tr>
 <td align="center"><strong>EUR.bed</strong></td>
-<td align="center">7d163129c79277ec9858008f10cac0e5</td>
+<td align="center">940f5a760b41270662eba6264b262a2d</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.bim</strong></td>
-<td align="center">62b278b3338fc86b89ecc8d622731701</td>
+<td align="center">a528020cc2448aa04a7499f13bf9f16a</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.covariate</strong></td>
@@ -180,7 +180,7 @@ You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/
 </tr>
 <tr>
 <td align="center"><strong>EUR.fam</strong></td>
-<td align="center">0189b2f82b5d20f63ab8f667e2feb100</td>
+<td align="center">17e8184fb03c690db6980bb7499d4982</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.height</strong></td>
@@ -267,8 +267,12 @@ Each of the parameters corresponds to the following</p>
 </tr>
 </tbody>
 </table>
-<details class="note"><summary>How many SNPs were filtered?</summary><p>A total of <code>5359</code> SNPs were removed due to Hardy-Weinberg exact test results
-and <code>241,485</code> SNPs were removed due to minor allele frequency</p>
+<details class="note"><summary>How many SNPs and samples were filtered?</summary><ul>
+<li><code>5</code> samples removed due to high rate of genotype missingness</li>
+<li><code>1</code> SNP removed due missing genotype data</li>
+<li><code>872</code> SNPs were removed due to Hardy-Weinberg exact test results</li>
+<li><code>242,459</code> SNPs were removed due to minor allele frequency</li>
+</ul>
 </details>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -300,6 +304,10 @@ All SNPs within <strong>EUR.QC.prune.in</strong> has a pairwise <span class="ari
     --out EUR.QC
 </pre></div>
 
+<details class="note"><summary>How many related samples were excluded?</summary><ul>
+<li><code>2</code> samples were excluded</li>
+</ul>
+</details>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>A greedy algorithm is used to remove the related samples. Which depending
@@ -315,13 +323,13 @@ a software called
 It is therefore a good idea to remove these samples from our dataset before continuing the analyse.
 Heterozygosity rate can be calculated using <code>plink</code> after performing prunning. 
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
-    --bfile EUR.QC <span class="se">\</span>
+    --bfile EUR <span class="se">\</span>
     --extract EUR.QC.prune.in <span class="se">\</span>
     --keep EUR.QC.rel.id <span class="se">\</span>
     --het <span class="se">\</span>
     --out EUR.QC
-</pre></div>
-This will generate the <strong>EUR.QC.het</strong> file which contains the F coefficient estimates.
+</pre></div></p>
+<p>This will generate the <strong>EUR.QC.het</strong> file which contains the F coefficient estimates.
 It will be easier to filter the samples using <code>R</code> instead of <code>awk</code>:
 Open a <code>R</code> section by tying <code>R</code> in your terminal</p>
 <div class="superfences-tabs">
@@ -344,6 +352,10 @@ valid <span class="o">&lt;-</span> dat<span class="p">[</span><span class="bp">F
 fwrite<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span> 
 </pre></div></div>
 </div>
+<details class="note"><summary>How many samples were excluded due to high heterozygosity rate?</summary><ul>
+<li><code>7</code> samples were excluded</li>
+</ul>
+</details>
 <h1 id="check-for-mis-matched-sex-information">Check for mis-matched Sex information<a class="headerlink" href="#check-for-mis-matched-sex-information" title="Permanent link">&para;</a></h1>
 <p>Sometimes, sample mislabeling can occur and will lead to invalid results. 
 A good indication of mislabeled sample is a mismatch between the biological sex and the reported sex. 
@@ -377,9 +389,14 @@ dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&q
 fwrite<span class="p">(</span>dat<span class="p">[</span>STATUS<span class="o">==</span><span class="s">&quot;OK&quot;</span><span class="p">,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.QC.valid&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span> 
 </pre></div></div>
 </div>
+<details class="note"><summary>How many samples were excluded due mismatched Sex information?</summary><ul>
+<li><code>2</code> samples were excluded</li>
+</ul>
+</details>
 <h1 id="generate-final-qced-sample">Generate final QCed sample<a class="headerlink" href="#generate-final-qced-sample" title="Permanent link">&para;</a></h1>
 <p>After performing the full analysis, you can generate a QCed data set with the following command
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --bfile EUR <span class="se">\</span>
     --make-bed <span class="se">\</span>
     --out EUR.QC <span class="se">\</span>
     --keep EUR.QC.valid <span class="se">\</span>
