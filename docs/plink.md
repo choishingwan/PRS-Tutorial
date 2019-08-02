@@ -30,7 +30,7 @@ awk '!( ($5=="A" && $6=="T") || \
 ```
 
 ??? note "How many ambiguous SNPs were there?"
-    There are `17,260` ambiguous SNPs
+    There are `330,818` ambiguous SNPs
 
 # Strand Flipping
 In addition, when there are non-ambiguous mismatch in allele 
@@ -434,7 +434,7 @@ print(prs.result[which.max(prs.result$R2),])
 ```
 
 ??? note "Which p-value threshold generate the "best" PRS?"
-    0.2
+    0.05
 
 ??? note "How much phenotypic variation does the "best" PRS explains?"
-    0.04128065
+    0.03921047

@@ -18,10 +18,10 @@ unzip EUR.zip
 
     |File|md5sum|
     |:-:|:-:|
-    |**EUR.bed**           |7d163129c79277ec9858008f10cac0e5|
-    |**EUR.bim**           |62b278b3338fc86b89ecc8d622731701|
+    |**EUR.bed**           |940f5a760b41270662eba6264b262a2d|
+    |**EUR.bim**           |a528020cc2448aa04a7499f13bf9f16a|
     |**EUR.covariate**     |afff13f8f9e15815f2237a62b8bec00b|
-    |**EUR.fam**           |0189b2f82b5d20f63ab8f667e2feb100|
+    |**EUR.fam**           |17e8184fb03c690db6980bb7499d4982|
     |**EUR.height**        |052beb4cae32ac7673f1d6b9e854c85b|
 
 !!! note
@@ -66,9 +66,11 @@ Each of the parameters corresponds to the following
 | write-snplist | - | Inform `plink` to only generate the QCed SNP list to avoid generating the .bed file. |
 | out | EUR | Inform `plink` that all output should have a prefix of `EUR` |
 
-??? note "How many SNPs were filtered?"
-    A total of `5359` SNPs were removed due to Hardy-Weinberg exact test results
-    and `241,485` SNPs were removed due to minor allele frequency
+??? note "How many SNPs and samples were filtered?"
+    - `5` samples removed due to high rate of genotype missingness
+    - `1` SNP removed due missing genotype data
+    -  `872` SNPs were removed due to Hardy-Weinberg exact test results
+    - `242,459` SNPs were removed due to minor allele frequency
 
 
 !!! note
@@ -106,6 +108,9 @@ plink \
     --out EUR.QC
 ```
 
+??? note "How many related samples were excluded?"
+    - `2` samples were excluded
+
 !!! note
     A greedy algorithm is used to remove the related samples. Which depending
     on the random seed used, might generate different results. To reproduce
@@ -122,12 +127,13 @@ It is therefore a good idea to remove these samples from our dataset before cont
 Heterozygosity rate can be calculated using `plink` after performing prunning. 
 ```bash
 plink \
-    --bfile EUR.QC \
+    --bfile EUR \
     --extract EUR.QC.prune.in \
     --keep EUR.QC.rel.id \
     --het \
     --out EUR.QC
 ```
+
 This will generate the **EUR.QC.het** file which contains the F coefficient estimates.
 It will be easier to filter the samples using `R` instead of `awk`:
 Open a `R` section by tying `R` in your terminal
@@ -149,6 +155,9 @@ valid <- dat[F<=mean(F)+3*sd(F) & F>=mean(F)-3*sd(F)]
 # print FID and IID for valid samples
 fwrite(valid[,c("FID","IID")], "EUR.valid.sample", sep="\t") 
 ```
+
+??? note "How many samples were excluded due to high heterozygosity rate?"
+    - `7` samples were excluded
 
 # Check for mis-matched Sex information
 Sometimes, sample mislabeling can occur and will lead to invalid results. 
@@ -185,10 +194,14 @@ dat <- fread("EUR.QC.sexcheck")[FID%in%valid$FID]
 fwrite(dat[STATUS=="OK",c("FID","IID")], "EUR.QC.valid", sep="\t") 
 ```
 
+??? note "How many samples were excluded due mismatched Sex information?"
+    - `2` samples were excluded
+
 # Generate final QCed sample
 After performing the full analysis, you can generate a QCed data set with the following command
 ```bash
 plink \
+    --bfile EUR \
     --make-bed \
     --out EUR.QC \
     --keep EUR.QC.valid \

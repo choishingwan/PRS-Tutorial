@@ -27,7 +27,7 @@ md5sum GIANT.height.gz
 md5 GIANT.height.gz
 ```
 
-if the file is intact, `md5sum` should generate a string of characters: `c79734b099cea663d2808bfde2e9a422`. 
+if the file is intact, `md5sum` should generate a string of characters: `88413472f72823ee294f0916a36505d9`. 
 If a different string is generated, the file is corrupted 
 
 # Reading the summary statistic file
