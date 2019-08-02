@@ -30,6 +30,9 @@ markdown_extensions:
 extra_css:
   - css/extra.css
 
+google_analytics:
+    - 'UA-145068952-1'
+    - auto
 
 extra_javascript:
   - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'
