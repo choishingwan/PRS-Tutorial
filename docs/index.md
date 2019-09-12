@@ -1,5 +1,5 @@
 # Overview 
-This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our [PRS Guide paper](https://doi.org/10.1101/416545). Our hope is that this tutorial will allow new users to get started on PRS analyses and provide existing users with a better understanding of the processes and implemention underlying popular PRS software.
+This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our [PRS Guide paper](https://doi.org/10.1101/416545). The aim of this tutorial is to help those new to PRS to get started on some simple PRS analyses and to provide existing users with a better understanding of the processes and implemention underlying popular PRS software.
 
 The tutorial is separated into four main sections:
 
