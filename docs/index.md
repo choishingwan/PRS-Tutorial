@@ -10,7 +10,7 @@ The tutorial is separated into four main sections:
 
 We provide examples of performing PRS analyses using four software for polygenic risk score analyses: [PLINK](plink.md), [PRSice-2](prsice.md), [LDpred](ldpred.md) and [lassosum](lassosum.md)
 
-If you are only interested in how to perform PRS on previously QC'ed data then you can directly skip to [Step 3](plink.md). Links to download the required data are provided under each section.
+If you are only interested in how to perform PRS on previously QC'ed data then you can skip to [Step 3](plink.md). Links to download the required data are provided under each section.
 
 !!! note
 
