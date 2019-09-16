@@ -1,43 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
     <url>
-     <loc>None</loc>
-     <lastmod>2019-08-02</lastmod>
+     <loc>/</loc>
+     <lastmod>2019-09-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
-     <lastmod>2019-08-02</lastmod>
+     <loc>/base/</loc>
+     <lastmod>2019-09-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
-     <lastmod>2019-08-02</lastmod>
+     <loc>/lassosum/</loc>
+     <lastmod>2019-09-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
-     <lastmod>2019-08-02</lastmod>
+     <loc>/ldpred/</loc>
+     <lastmod>2019-09-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
-     <lastmod>2019-08-02</lastmod>
+     <loc>/plink/</loc>
+     <lastmod>2019-09-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
-     <lastmod>2019-08-02</lastmod>
+     <loc>/plink_visual/</loc>
+     <lastmod>2019-09-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
-     <lastmod>2019-08-02</lastmod>
+     <loc>/prsice/</loc>
+     <lastmod>2019-09-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
+    
     <url>
-     <loc>None</loc>
-     <lastmod>2019-08-02</lastmod>
+     <loc>/target/</loc>
+     <lastmod>2019-09-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    
+
 </urlset>

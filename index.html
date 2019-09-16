@@ -7,32 +7,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="None">
   <meta name="author" content="Shing Wan CHOI">
-  <link rel="shortcut icon" href="img/favicon.ico">
+  <link rel="shortcut icon" href="./img/favicon.ico">
   <title>Overview - Basic Tutorial for Polygenic Risk Score Analyses</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
-  <link rel="stylesheet" href="css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="css/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="./css/highlight.css">
+  <link href="./css/extra.css" rel="stylesheet">
   
   <script>
     // Current page data
     var mkdocs_page_name = "Overview";
     var mkdocs_page_input_path = "index.md";
-    var mkdocs_page_url = null;
+    var mkdocs_page_url = "/";
   </script>
   
-  <script src="js/jquery-2.1.1.min.js" defer></script>
-  <script src="js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
+  <script src="./js/jquery-2.1.1.min.js"></script>
+  <script src="./js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="./js/highlight.pack.js"></script> 
   
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
       ga('create', 'UA-145068952-1', 'auto');
       ga('send', 'pageview');
@@ -50,7 +49,7 @@
         <a href="." class="icon icon-home"> Basic Tutorial for Polygenic Risk Score Analyses</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+    <input type="text" name="q" placeholder="Search docs" />
   </form>
 </div>
       </div>
@@ -84,40 +83,37 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="base/">1. QC of Summary Statistics</a>
+    <a class="" href="base/">Base</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="target/">2. Target Genotype QC</a>
+    <a class="" href="lassosum/">Lassosum</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <span class="caption-text">3. Running PRS</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="plink/">PLINK</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="prsice/">PRSice-2</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="ldpred/">LDpred</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="lassosum/">lassosum</a>
-                </li>
-    </ul>
+    <a class="" href="ldpred/">Ldpred</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="plink_visual/">4. Visualizing PRS</a>
+    <a class="" href="plink/">Plink</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="plink_visual/">Plink visual</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="prsice/">Prsice</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="target/">Target</a>
 	    </li>
           
         </ul>
@@ -156,7 +152,7 @@
             <div class="section">
               
                 <h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
-<p>This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our <a href="https://doi.org/10.1101/416545">PRS Guide paper</a>. Our hope is that this tutorial will allow new users to get started on PRS analyses and provide existing users with a better understanding of the processes and implemention underlying popular PRS software.</p>
+<p>This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our <a href="https://doi.org/10.1101/416545">PRS Guide paper</a>. The aim of this tutorial is to help those new to PRS to get started on PRS analyses and to provide existing users with a better understanding of the processes and implemention underlying popular PRS software.</p>
 <p>The tutorial is separated into four main sections:</p>
 <ol>
 <li><a href="base/">QC of Base GWAS Summary Data</a></li>
@@ -164,8 +160,8 @@
 <li><a href="plink/">Running PRS Analyses</a></li>
 <li><a href="plink_visual/">Visualizing PRS Results</a></li>
 </ol>
-<p>We provide brief examples of performing PRS analyses using four software for polygenic risk score analyses: <a href="plink/">PLINK</a>, <a href="prsice/">PRSice-2</a>, <a href="ldpred/">LDpred</a> and <a href="lassosum/">lassosum</a></p>
-<p>If you are only interested in how to perform PRS on previously QC'ed data then you can directly skip to <a href="plink/">step 3</a>. Links to download the required data are provided under each section.</p>
+<p>We provide examples of performing PRS analyses using four software for polygenic risk score analyses: <a href="plink/">PLINK</a>, <a href="prsice/">PRSice-2</a>, <a href="ldpred/">LDpred</a> and <a href="lassosum/">lassosum</a></p>
+<p>If you are only interested in how to perform PRS on previously QC'ed data then you can directly skip to <a href="plink/">Step 3</a>. Links to download the required data are provided under each section.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This tutorial is written for Linux and OS X operating systems. 
@@ -174,16 +170,11 @@ Windows users will need to change some commands accordingly.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Throughout the tutorial you will see tabs above some of the code:</p>
-<div class="superfences-tabs">
-<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
-<label for="__tab_1_0">A</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;Tab A&quot;</span>
-</pre></div></div>
-<input name="__tabs_1" type="radio" id="__tab_1_1" />
-<label for="__tab_1_1">B</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;Tab B&quot;</span>
-</pre></div></div>
-</div>
+<p>```bash tab="A"
+echo "Tab A"
+<div class="codehilite"><pre><span></span>```bash tab=&quot;B&quot;
+echo &quot;Tab B&quot;
+</pre></div></p>
 <p>You can click on the tab to change to an alternative code (eg. to a different operation system)</p>
 </div>
 <h1 id="datasets">Datasets<a class="headerlink" href="#datasets" title="Permanent link">&para;</a></h1>
@@ -211,7 +202,7 @@ bioRxiv 416545 (2018). https://doi.org/10.1101/416545</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="base/" class="btn btn-neutral float-right" title="1. QC of Summary Statistics">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="base/" class="btn btn-neutral float-right" title="Base">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
     </div>
@@ -246,14 +237,15 @@ bioRxiv 416545 (2018). https://doi.org/10.1101/416545</p>
     </span>
 </div>
     <script>var base_url = '.';</script>
-    <script src="js/theme.js" defer></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
-      <script src="search/main.js" defer></script>
+    <script src="./js/theme.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      <script src="./search/require.js"></script>
+      <script src="./search/search.js"></script>
 
 </body>
 </html>
 
 <!--
-MkDocs version : 1.0.4
-Build Date UTC : 2019-08-02 19:53:50
+MkDocs version : 0.17.2
+Build Date UTC : 2019-09-16 02:38:25
 -->
