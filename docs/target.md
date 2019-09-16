@@ -1,9 +1,8 @@
 In this section we will perform some quality control (QC) steps on the target data. 
 
 For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
-You can download the data [here](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip). 
+You can download the data [here](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip) or you can download the data using the following command:
 
-Or you can download the data using the following script:
 ```bash
 curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip -L -O
 ```
@@ -14,7 +13,7 @@ Unzip the data as follow:
 unzip EUR.zip
 ```
 
-??? note "What's the md5sum of the genotype files?"
+??? note "What is the md5sum code for each of the target files?"
 
     |File|md5sum|
     |:-:|:-:|
@@ -25,22 +24,20 @@ unzip EUR.zip
     |**EUR.height**        |052beb4cae32ac7673f1d6b9e854c85b|
 
 !!! note
-    We assume PLINK is installed in your PATH directory, which allow us to use `plink` instead of `./plink`.
-    If PLINK is not in your PATH directory, replace all instance of `plink` in the tutorial to `./plink` assuming
-    the PLINK executable is located within your working directory
+    Install the program PLINK and include its location in your PATH directory, which allows us to use `plink` instead of `./plink` in the commands below. If PLINK is not in your PATH directory and is instead in your working directory, then replace all instances of `plink` in the tutorial with `./plink`.
 
 # Genotype file format
 
 # Basic filterings
-The power and validity of PRS analyses are highly dependent on 
-the quality of the base and target data, therefore 
-both data sets must be quality controlled to the high standards 
+The power and validity of PRS analyses depend on 
+the quality of the base and target data. Therefore, 
+both data sets must be quality controlled to at least the standards 
 implemented in GWAS studies, e.g. removing SNPs with low genotyping rate, 
-low minor allele frequency, violates the Hardy-Weinberg Equilibrium and
+low minor allele frequency, out of Hardy-Weinberg Equilibrium and removing
 individuals with low genotyping rate 
 (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/)).
 
-The following `plink` command perform some basic filterings
+The following `plink` command applies some basic filtering:
 
 ```bash
 plink \
@@ -57,20 +54,20 @@ Each of the parameters corresponds to the following
 
 | Paramter | Value | Description|
 |:-:|:-:|:-|
-| bfile | EUR | Inform `plink` that the input genotype files should have a prefix of `EUR` |
-| maf | 0.05 | Filter out any SNPs with minor allele frequency less than 0.05. Genotype error are more likely to influence SNPs with low MAF. Large sample size can adapt a lower MAF threshold|
-| hwe | 1e-6 | Filtering SNPs with low p-value from the Hardy-Weinberg exact test. SNPs with significant p-value from the HWE test are more likely to harbor genotyping error or are under selection. Filtering should be performed on the control samples to avoid filtering SNPs that are causal (under selection in cases)|
-| geno | 0.01 | Exclude SNPs that are missing in large proportion of subjects. A two pass filtering is usually performed (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/)).|
-| mind | 0.01 | Exclude individual who have a high rate of genotype missingness. This might indicate problems in the DNA sample. (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/) for more details).|
-| make-just-fam | - | Inform `plink` to only generate the QCed sample name to avoid generating the .bed file.  |
-| write-snplist | - | Inform `plink` to only generate the QCed SNP list to avoid generating the .bed file. |
+| bfile | EUR | Informs `plink` that the input genotype files should have a prefix of `EUR` |
+| maf | 0.05 | Removes all SNPs with minor allele frequency less than 0.05. Genotyping errors typically have a larger influence on SNPs with low MAF. Studies with large sample sizes could apply a lower MAF threshold|
+| hwe | 1e-6 | Removes SNPs with low P-value from the Hardy-Weinberg Equilibrium Fisher's exact or chi-squared test. SNPs with significant P-values from the HWE test are more likely affected by genotyping error or the effects of natural selection. Filtering should be performed on the control samples to avoid filtering SNPs that are causal (under selection in cases)|
+| geno | 0.01 | Exclude SNPs that are missing in high fraction of subjects. A two-stage filtering process is usually performed (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/)).|
+| mind | 0.01 | Exclude individuals who have a high rate of genotype missingness, since this may indicate problems in the DNA sample. (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/) for more details).|
+| make-just-fam | - | Inform `plink` to only generate the QC'ed sample name to avoid generating the .bed file.  |
+| write-snplist | - | Inform `plink` to only generate the QC'ed SNP list to avoid generating the .bed file. |
 | out | EUR | Inform `plink` that all output should have a prefix of `EUR` |
 
 ??? note "How many SNPs and samples were filtered?"
-    - `5` samples removed due to high rate of genotype missingness
-    - `1` SNP removed due missing genotype data
-    -  `872` SNPs were removed due to Hardy-Weinberg exact test results
-    - `242,459` SNPs were removed due to minor allele frequency
+    - `5` samples were removed due to a high rate of genotype missingness
+    - `1` SNP were removed due missing genotype data
+    -  `872` SNPs were removed due to being out of Hardy-Weinberg Equilibrium
+    - `242,459` SNPs were removed due to low minor allele frequency
 
 
 !!! note
@@ -78,11 +75,10 @@ Each of the parameters corresponds to the following
     However,  this will use up a lot of storage space. Using `plink`'s
     `--extract`, `--exclude`, `--keep`, `--remove`, `--make-just-fam` and `--write-snplist` functions, we can work 
     solely on the list of samples and SNPs without duplicating the 
-    genotype file, therefore reducing the storage space usage.  
+    genotype file, reducing the storage space usage.  
 
 # Filter related samples
-Related samples in the target data might lead to overfitted results, 
-hampering the generalizability of the results. 
+Related samples in the target data may lead to overfitted results, limiting the generalisability of the results. 
 
 To remove related samples, we first need to perform prunning to remove highly correlated SNPs:
 ```bash
@@ -95,9 +91,9 @@ plink \
 ```
 
 This will generate two files 1) **EUR.QC.prune.in** and 2) **EUR.QC.prune.out**
-All SNPs within **EUR.QC.prune.in** has a pairwise $r^2 < 0.25$
+All SNPs within **EUR.QC.prune.in** have a pairwise $r^2 < 0.25$
 
-Samples with more than third-degree relatedness ($\text{pi-hat} > 0.125$) can then be removed with 
+Individuals that have a first or second degree relative in the sample ($\text{pi-hat} > 0.125$) can be removed with the following command:
 
 ```bash
 plink \
@@ -112,19 +108,15 @@ plink \
     - `2` samples were excluded
 
 !!! note
-    A greedy algorithm is used to remove the related samples. Which depending
-    on the random seed used, might generate different results. To reproduce
-    the same result, you might need to specify the random seed usage. 
+    A greedy algorithm is used to remove closely related individuals in a way that optimises the size of the sample retained.                However, the algorithm is dependent on the random seed used, which can generate different results. Therefore, to reproduce
+    the same result, you will need to specify the same random seed. 
     
-    PLINK's related sample removal does not take into account of the sample 
-    phenotype. If one would like to minimize lost of cases for example, 
-    a software called
-    [GreedyRelated](https://github.com/choishingwan/GreedyRelated) can be used.
+    PLINK's related sample removal does not account for the sample 
+    phenotype. To minimize the loss of cases, the following algorithm can be used instead: 
+    [GreedyRelated](https://github.com/choishingwan/GreedyRelated).
     
-# Remove samples with abnormal heterozygosity rate
-Individual with high or low heterozygosity rate can be contaminated or are inbreed.
-It is therefore a good idea to remove these samples from our dataset before continuing the analyse.
-Heterozygosity rate can be calculated using `plink` after performing prunning. 
+# Remove samples with extreme heterozygosity rate
+Very high or low heterozygosity rates in individuals could be due to DNA contaminated or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. Heterozygosity rates can be computed using `plink` after performing pruning. 
 ```bash
 plink \
     --bfile EUR \
@@ -134,9 +126,8 @@ plink \
     --out EUR.QC
 ```
 
-This will generate the **EUR.QC.het** file which contains the F coefficient estimates.
-It will be easier to filter the samples using `R` instead of `awk`:
-Open a `R` section by tying `R` in your terminal
+This will generate the **EUR.QC.het** file, which contains F coefficient estimates for assessing heterozygosity.
+We will remove individuals with F coefficients that are more than 3 standard deviation (SD) units from the mean, which can be performed using the following `R` command (you can open an `R` session by typing `R` in your terminal):
 
 ```R tab="Without library"
 dat <- read.table("EUR.QC.het", header=T) # Read in the EUR.het file, specify it has header
@@ -159,10 +150,11 @@ fwrite(valid[,c("FID","IID")], "EUR.valid.sample", sep="\t")
 ??? note "How many samples were excluded due to high heterozygosity rate?"
     - `7` samples were excluded
 
-# Check for mis-matched Sex information
-Sometimes, sample mislabeling can occur and will lead to invalid results. 
-A good indication of mislabeled sample is a mismatch between the biological sex and the reported sex. 
-If the biological sex does not match up with the reported sex, it is likely that the sample has been mislabeled.
+# Check for mismatching sex information
+
+Sometimes sample mislabelling can occur, which may lead to invalid results. 
+A good indication of mislabelled sample is a mismatch between biological sex and reported sex. 
+If the biological sex does not match up with the reported sex, the sample may have been mislabelled.
 
 Before performing sex check, prunning should be performed (see [here](target.md#filter-related-samples)).
 Sex check can then easily be carried out using `plink`
