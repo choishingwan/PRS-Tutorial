@@ -8,30 +8,31 @@
   
   <meta name="author" content="Shing Wan CHOI">
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Plotting the Results - Basic Tutorial for Polygenic Risk Score Analyses</title>
+  <title>4. Visualizing PRS - Basic Tutorial for Polygenic Risk Score Analyses</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
   <link href="../css/extra.css" rel="stylesheet">
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Plotting the Results";
+    var mkdocs_page_name = "4. Visualizing PRS";
     var mkdocs_page_input_path = "plink_visual.md";
-    var mkdocs_page_url = "/plink_visual/";
+    var mkdocs_page_url = null;
   </script>
   
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
       ga('create', 'UA-145068952-1', 'auto');
       ga('send', 'pageview');
@@ -49,7 +50,7 @@
         <a href=".." class="icon icon-home"> Basic Tutorial for Polygenic Risk Score Analyses</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -65,103 +66,46 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../base/">Base</a>
+    <a class="" href="../base/">1. QC of Summary Statistics</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="../lassosum/">Lassosum</a>
+    <a class="" href="../target/">2. Target Genotype QC</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="../ldpred/">Ldpred</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../plink/">Background</a>
+    <span class="caption-text">3. Running PRS</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../plink/">PLINK</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../prsice/">PRSice-2</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../ldpred/">LDpred</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../lassosum/">lassosum</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1 current">
 		
-    <a class="current" href="./">Plotting the Results</a>
+    <a class="current" href="./">4. Visualizing PRS</a>
     <ul class="subnav">
             
     <li class="toctree-l2"><a href="#plotting-the-results">Plotting the Results</a></li>
     
 
-    <li class="toctree-l2"><a href="#we-strongly-recommend-the-use-of-ggplot2-only-follow-this-code-if-you">We strongly recommend the use of ggplot2. Only follow this code if you</a></li>
-    
-
-    <li class="toctree-l2"><a href="#are-desperate">are desperate.</a></li>
-    
-
-    <li class="toctree-l2"><a href="#specify-that-we-want-to-generate-plot-in-eurheightbarpng">Specify that we want to generate plot in EUR.height.bar.png</a></li>
-    
-
-    <li class="toctree-l2"><a href="#first-obtain-the-colorings-based-on-the-p-value">First, obtain the colorings based on the p-value</a></li>
-    
-
-    <li class="toctree-l2"><a href="#we-want-the-color-gradient-to-match-the-ranking-of-p-values">We want the color gradient to match the ranking of p-values</a></li>
-    
-
-    <li class="toctree-l2"><a href="#generate-a-pretty-format-for-p-value-output">generate a pretty format for p-value output</a></li>
-    
-
-    <li class="toctree-l2"><a href="#generate-the-axis-labels">Generate the axis labels</a></li>
-    
-
-    <li class="toctree-l2"><a href="#setup-the-drawing-area">Setup the drawing area</a></li>
-    
-
-    <li class="toctree-l2"><a href="#plotting-the-bars">Plotting the bars</a></li>
-    
-
-    <li class="toctree-l2"><a href="#plot-the-axis-labels-and-axis-ticks">Plot the axis labels and axis ticks</a></li>
-    
-
-    <li class="toctree-l2"><a href="#write-the-p-value-on-top-of-each-bar">Write the p-value on top of each bar</a></li>
-    
-
-    <li class="toctree-l2"><a href="#now-plot-the-axis-lines">Now plot the axis lines</a></li>
-    
-
-    <li class="toctree-l2"><a href="#plot-the-axis-titles">Plot the axis titles</a></li>
-    
-
-    <li class="toctree-l2"><a href="#generate-plot-area-for-the-legend">Generate plot area for the legend</a></li>
-    
-
-    <li class="toctree-l2"><a href="#plot-legend-title">plot legend title</a></li>
-    
-
-    <li class="toctree-l2"><a href="#write-the-plot-to-file">write the plot to file</a></li>
-    
-
-    <li class="toctree-l2"><a href="#read-in-the-files">Read in the files</a></li>
-    
-
-    <li class="toctree-l2"><a href="#rename-the-sex">Rename the sex</a></li>
-    
-
-    <li class="toctree-l2"><a href="#merge-the-files">Merge the files</a></li>
-    
-
-    <li class="toctree-l2"><a href="#start-plotting">Start plotting</a></li>
-    
-
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../prsice/">Prsice</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../target/">Target</a>
 	    </li>
           
         </ul>
@@ -186,7 +130,7 @@
     
       
     
-    <li>Plotting the Results</li>
+    <li>4. Visualizing PRS</li>
     <li class="wy-breadcrumbs-aside">
       
         <a href="https://github.com/choishingwan/PRS-Tutorial/edit/master/docs/plink_visual.md"
@@ -205,68 +149,72 @@
 <p class="admonition-title">Note</p>
 <p>We will be using <code>prs.result</code> generated in <a href="#finding-the-best-p-value-threshold">previous section</a></p>
 </div>
-<p>```R tab="Without ggplot2"</p>
-<h1 id="we-strongly-recommend-the-use-of-ggplot2-only-follow-this-code-if-you">We strongly recommend the use of ggplot2. Only follow this code if you<a class="headerlink" href="#we-strongly-recommend-the-use-of-ggplot2-only-follow-this-code-if-you" title="Permanent link">&para;</a></h1>
-<h1 id="are-desperate">are desperate.<a class="headerlink" href="#are-desperate" title="Permanent link">&para;</a></h1>
-<h1 id="specify-that-we-want-to-generate-plot-in-eurheightbarpng">Specify that we want to generate plot in EUR.height.bar.png<a class="headerlink" href="#specify-that-we-want-to-generate-plot-in-eurheightbarpng" title="Permanent link">&para;</a></h1>
-<p>png("EUR.height.bar.png",
-      height=10, width=10, res=300, unit="in")</p>
-<h1 id="first-obtain-the-colorings-based-on-the-p-value">First, obtain the colorings based on the p-value<a class="headerlink" href="#first-obtain-the-colorings-based-on-the-p-value" title="Permanent link">&para;</a></h1>
-<p>col &lt;- suppressWarnings(colorRampPalette(c("dodgerblue", "firebrick")))</p>
-<h1 id="we-want-the-color-gradient-to-match-the-ranking-of-p-values">We want the color gradient to match the ranking of p-values<a class="headerlink" href="#we-want-the-color-gradient-to-match-the-ranking-of-p-values" title="Permanent link">&para;</a></h1>
-<p>prs.result &lt;- prs.result[order(-log10(prs.result<span class="arithmatex">\(P)),]
-prs.result\)</span>color &lt;-  col(nrow(prs.result))
-prs.result &lt;- prs.result[order(prs.result$Threshold),]</p>
-<h1 id="generate-a-pretty-format-for-p-value-output">generate a pretty format for p-value output<a class="headerlink" href="#generate-a-pretty-format-for-p-value-output" title="Permanent link">&para;</a></h1>
-<p>prs.result<span class="arithmatex">\(print.p &lt;- round(prs.result\)</span>P, digits = 3)
-prs.result<span class="arithmatex">\(print.p[!is.na(prs.result\)</span>print.p) &amp; prs.result<span class="arithmatex">\(print.p == 0 ] &lt;-
-    format(prs.result\)</span>P[!is.na(prs.result<span class="arithmatex">\(print.p) &amp; prs.result\)</span>print.p == 0 ], digits = 2)
-prs.result<span class="arithmatex">\(print.p &lt;- sub("e", "*x*10^", prs.result\)</span>print.p)</p>
-<h1 id="generate-the-axis-labels">Generate the axis labels<a class="headerlink" href="#generate-the-axis-labels" title="Permanent link">&para;</a></h1>
-<p>xlab &lt;- expression(italic(P) - value ~ threshold ~ (italic(P)[T]))
-ylab &lt;- expression(paste("PRS model fit:  ", R ^ 2))</p>
-<h1 id="setup-the-drawing-area">Setup the drawing area<a class="headerlink" href="#setup-the-drawing-area" title="Permanent link">&para;</a></h1>
-<p>layout(t(1:2), widths=c(8.8,1.2))
-par( cex.lab=1.5, cex.axis=1.25, font.lab=2, 
-    oma=c(0,0.5,0,0),
-    mar=c(4,6,0.5,0.5))</p>
-<h1 id="plotting-the-bars">Plotting the bars<a class="headerlink" href="#plotting-the-bars" title="Permanent link">&para;</a></h1>
-<p>b&lt;- barplot(height=prs.result<span class="arithmatex">\(R2, 
-            col=prs.result\)</span>color, 
-            border=NA, 
-            ylim=c(0, max(prs.result$R2)*1.25), 
-            axes = F, ann=F)</p>
-<h1 id="plot-the-axis-labels-and-axis-ticks">Plot the axis labels and axis ticks<a class="headerlink" href="#plot-the-axis-labels-and-axis-ticks" title="Permanent link">&para;</a></h1>
-<p>odd &lt;- seq(0,nrow(prs.result)+1,2)
-even &lt;- seq(1,nrow(prs.result),2)
-axis(side=1, at=b[odd], labels=prs.result<span class="arithmatex">\(Threshold[odd], lwd=2)
-axis(side=1, at=b[even], labels=prs.result\)</span>Threshold[even],lwd=2)
-axis(side=1, at=c(0,b[1],2*b[length(b)]-b[length(b)-1]), labels=c("","",""), lwd=2, lwd.tick=0)</p>
-<h1 id="write-the-p-value-on-top-of-each-bar">Write the p-value on top of each bar<a class="headerlink" href="#write-the-p-value-on-top-of-each-bar" title="Permanent link">&para;</a></h1>
-<p>text( parse(text=paste(
-    prs.result<span class="arithmatex">\(print.p)), 
-    x = b+0.1, 
-    y =  prs.result\)</span>R2+ (max(prs.result<span class="arithmatex">\(R2)*1.05-max(prs.result\)</span>R2)), 
-    srt = 45)</p>
-<h1 id="now-plot-the-axis-lines">Now plot the axis lines<a class="headerlink" href="#now-plot-the-axis-lines" title="Permanent link">&para;</a></h1>
-<p>box(bty='L', lwd=2)
-axis(2,las=2, lwd=2)</p>
-<h1 id="plot-the-axis-titles">Plot the axis titles<a class="headerlink" href="#plot-the-axis-titles" title="Permanent link">&para;</a></h1>
-<p>title(ylab=ylab, line=4, cex.lab=1.5, font=2 )
-title(xlab=xlab, line=2.5, cex.lab=1.5, font=2 )</p>
-<h1 id="generate-plot-area-for-the-legend">Generate plot area for the legend<a class="headerlink" href="#generate-plot-area-for-the-legend" title="Permanent link">&para;</a></h1>
-<p>par(cex.lab=1.5, cex.axis=1.25, font.lab=2, 
-      mar=c(20,0,20,4))
-prs.result &lt;- prs.result[order(-log10(prs.result<span class="arithmatex">\(P)),]
-image(1, -log10(prs.result\)</span>P), t(seq_along(-log10(prs.result<span class="arithmatex">\(P))), col=prs.result\)</span>color, axes=F,ann=F)
-axis(4,las=2,xaxs='r',yaxs='r', tck=0.2, col="white")</p>
-<h1 id="plot-legend-title">plot legend title<a class="headerlink" href="#plot-legend-title" title="Permanent link">&para;</a></h1>
-<p>title(bquote(atop(-log[10] ~ model, italic(P) - value), ), 
-          line=2, cex=1.5, font=2, adj=0)</p>
-<h1 id="write-the-plot-to-file">write the plot to file<a class="headerlink" href="#write-the-plot-to-file" title="Permanent link">&para;</a></h1>
-<p>dev.off()
-<div class="codehilite"><pre><span></span><span class="sb">``</span>`R tab<span class="o">=</span><span class="s">&quot;ggplot2&quot;</span>
-<span class="c1"># ggplot2 is a handy package for plotting</span>
+<div class="superfences-tabs">
+<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
+<label for="__tab_1_0">Without ggplot2</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># We strongly recommend the use of ggplot2. Only follow this code if you</span>
+<span class="c1"># are desperate.</span>
+<span class="c1"># Specify that we want to generate plot in EUR.height.bar.png</span>
+png<span class="p">(</span><span class="s">&quot;EUR.height.bar.png&quot;</span><span class="p">,</span>
+      height<span class="o">=</span><span class="m">10</span><span class="p">,</span> width<span class="o">=</span><span class="m">10</span><span class="p">,</span> res<span class="o">=</span><span class="m">300</span><span class="p">,</span> unit<span class="o">=</span><span class="s">&quot;in&quot;</span><span class="p">)</span>
+<span class="c1"># First, obtain the colorings based on the p-value</span>
+col <span class="o">&lt;-</span> <span class="kp">suppressWarnings</span><span class="p">(</span>colorRampPalette<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;dodgerblue&quot;</span><span class="p">,</span> <span class="s">&quot;firebrick&quot;</span><span class="p">)))</span>
+<span class="c1"># We want the color gradient to match the ranking of p-values</span>
+prs.result <span class="o">&lt;-</span> prs.result<span class="p">[</span><span class="kp">order</span><span class="p">(</span><span class="o">-</span><span class="kp">log10</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">)),]</span>
+prs.result<span class="o">$</span>color <span class="o">&lt;-</span>  <span class="kp">col</span><span class="p">(</span><span class="kp">nrow</span><span class="p">(</span>prs.result<span class="p">))</span>
+prs.result <span class="o">&lt;-</span> prs.result<span class="p">[</span><span class="kp">order</span><span class="p">(</span>prs.result<span class="o">$</span>Threshold<span class="p">),]</span>
+<span class="c1"># generate a pretty format for p-value output</span>
+prs.result<span class="o">$</span>print.p <span class="o">&lt;-</span> <span class="kp">round</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">,</span> digits <span class="o">=</span> <span class="m">3</span><span class="p">)</span>
+prs.result<span class="o">$</span>print.p<span class="p">[</span><span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>prs.result<span class="o">$</span>print.p<span class="p">)</span> <span class="o">&amp;</span> prs.result<span class="o">$</span>print.p <span class="o">==</span> <span class="m">0</span> <span class="p">]</span> <span class="o">&lt;-</span>
+    <span class="kp">format</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">[</span><span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>prs.result<span class="o">$</span>print.p<span class="p">)</span> <span class="o">&amp;</span> prs.result<span class="o">$</span>print.p <span class="o">==</span> <span class="m">0</span> <span class="p">],</span> digits <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+prs.result<span class="o">$</span>print.p <span class="o">&lt;-</span> <span class="kp">sub</span><span class="p">(</span><span class="s">&quot;e&quot;</span><span class="p">,</span> <span class="s">&quot;*x*10^&quot;</span><span class="p">,</span> prs.result<span class="o">$</span>print.p<span class="p">)</span>
+<span class="c1"># Generate the axis labels</span>
+xlab <span class="o">&lt;-</span> <span class="kp">expression</span><span class="p">(</span>italic<span class="p">(</span>P<span class="p">)</span> <span class="o">-</span> value <span class="o">~</span> threshold <span class="o">~</span> <span class="p">(</span>italic<span class="p">(</span>P<span class="p">)[</span><span class="bp">T</span><span class="p">]))</span>
+ylab <span class="o">&lt;-</span> <span class="kp">expression</span><span class="p">(</span><span class="kp">paste</span><span class="p">(</span><span class="s">&quot;PRS model fit:  &quot;</span><span class="p">,</span> R <span class="o">^</span> <span class="m">2</span><span class="p">))</span>
+<span class="c1"># Setup the drawing area</span>
+layout<span class="p">(</span><span class="kp">t</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">),</span> widths<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">8.8</span><span class="p">,</span><span class="m">1.2</span><span class="p">))</span>
+par<span class="p">(</span> cex.lab<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> cex.axis<span class="o">=</span><span class="m">1.25</span><span class="p">,</span> font.lab<span class="o">=</span><span class="m">2</span><span class="p">,</span> 
+    oma<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">0.5</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">),</span>
+    mar<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">0.5</span><span class="p">,</span><span class="m">0.5</span><span class="p">))</span>
+<span class="c1"># Plotting the bars</span>
+b<span class="o">&lt;-</span> barplot<span class="p">(</span>height<span class="o">=</span>prs.result<span class="o">$</span>R2<span class="p">,</span> 
+            col<span class="o">=</span>prs.result<span class="o">$</span>color<span class="p">,</span> 
+            border<span class="o">=</span><span class="kc">NA</span><span class="p">,</span> 
+            ylim<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="kp">max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">)</span><span class="o">*</span><span class="m">1.25</span><span class="p">),</span> 
+            axes <span class="o">=</span> <span class="bp">F</span><span class="p">,</span> ann<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+<span class="c1"># Plot the axis labels and axis ticks</span>
+odd <span class="o">&lt;-</span> <span class="kp">seq</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="kp">nrow</span><span class="p">(</span>prs.result<span class="p">)</span><span class="m">+1</span><span class="p">,</span><span class="m">2</span><span class="p">)</span>
+even <span class="o">&lt;-</span> <span class="kp">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="kp">nrow</span><span class="p">(</span>prs.result<span class="p">),</span><span class="m">2</span><span class="p">)</span>
+axis<span class="p">(</span>side<span class="o">=</span><span class="m">1</span><span class="p">,</span> at<span class="o">=</span>b<span class="p">[</span>odd<span class="p">],</span> labels<span class="o">=</span>prs.result<span class="o">$</span>Threshold<span class="p">[</span>odd<span class="p">],</span> lwd<span class="o">=</span><span class="m">2</span><span class="p">)</span>
+axis<span class="p">(</span>side<span class="o">=</span><span class="m">1</span><span class="p">,</span> at<span class="o">=</span>b<span class="p">[</span>even<span class="p">],</span> labels<span class="o">=</span>prs.result<span class="o">$</span>Threshold<span class="p">[</span>even<span class="p">],</span>lwd<span class="o">=</span><span class="m">2</span><span class="p">)</span>
+axis<span class="p">(</span>side<span class="o">=</span><span class="m">1</span><span class="p">,</span> at<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span>b<span class="p">[</span><span class="m">1</span><span class="p">],</span><span class="m">2</span><span class="o">*</span>b<span class="p">[</span><span class="kp">length</span><span class="p">(</span>b<span class="p">)]</span><span class="o">-</span>b<span class="p">[</span><span class="kp">length</span><span class="p">(</span>b<span class="p">)</span><span class="m">-1</span><span class="p">]),</span> labels<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">),</span> lwd<span class="o">=</span><span class="m">2</span><span class="p">,</span> lwd.tick<span class="o">=</span><span class="m">0</span><span class="p">)</span>
+<span class="c1"># Write the p-value on top of each bar</span>
+text<span class="p">(</span> <span class="kp">parse</span><span class="p">(</span>text<span class="o">=</span><span class="kp">paste</span><span class="p">(</span>
+    prs.result<span class="o">$</span>print.p<span class="p">)),</span> 
+    x <span class="o">=</span> b<span class="m">+0.1</span><span class="p">,</span> 
+    y <span class="o">=</span>  prs.result<span class="o">$</span>R2<span class="o">+</span> <span class="p">(</span><span class="kp">max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">)</span><span class="o">*</span><span class="m">1.05</span><span class="o">-</span><span class="kp">max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">)),</span> 
+    srt <span class="o">=</span> <span class="m">45</span><span class="p">)</span>
+<span class="c1"># Now plot the axis lines</span>
+box<span class="p">(</span>bty<span class="o">=</span><span class="s">&#39;L&#39;</span><span class="p">,</span> lwd<span class="o">=</span><span class="m">2</span><span class="p">)</span>
+axis<span class="p">(</span><span class="m">2</span><span class="p">,</span>las<span class="o">=</span><span class="m">2</span><span class="p">,</span> lwd<span class="o">=</span><span class="m">2</span><span class="p">)</span>
+<span class="c1"># Plot the axis titles</span>
+title<span class="p">(</span>ylab<span class="o">=</span>ylab<span class="p">,</span> line<span class="o">=</span><span class="m">4</span><span class="p">,</span> cex.lab<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> font<span class="o">=</span><span class="m">2</span> <span class="p">)</span>
+title<span class="p">(</span>xlab<span class="o">=</span>xlab<span class="p">,</span> line<span class="o">=</span><span class="m">2.5</span><span class="p">,</span> cex.lab<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> font<span class="o">=</span><span class="m">2</span> <span class="p">)</span>
+<span class="c1"># Generate plot area for the legend</span>
+par<span class="p">(</span>cex.lab<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> cex.axis<span class="o">=</span><span class="m">1.25</span><span class="p">,</span> font.lab<span class="o">=</span><span class="m">2</span><span class="p">,</span> 
+      mar<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">20</span><span class="p">,</span><span class="m">4</span><span class="p">))</span>
+prs.result <span class="o">&lt;-</span> prs.result<span class="p">[</span><span class="kp">order</span><span class="p">(</span><span class="o">-</span><span class="kp">log10</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">)),]</span>
+image<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="o">-</span><span class="kp">log10</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">),</span> <span class="kp">t</span><span class="p">(</span><span class="kp">seq_along</span><span class="p">(</span><span class="o">-</span><span class="kp">log10</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">))),</span> col<span class="o">=</span>prs.result<span class="o">$</span>color<span class="p">,</span> axes<span class="o">=</span><span class="bp">F</span><span class="p">,</span>ann<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+axis<span class="p">(</span><span class="m">4</span><span class="p">,</span>las<span class="o">=</span><span class="m">2</span><span class="p">,</span>xaxs<span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span>yaxs<span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> tck<span class="o">=</span><span class="m">0.2</span><span class="p">,</span> col<span class="o">=</span><span class="s">&quot;white&quot;</span><span class="p">)</span>
+<span class="c1"># plot legend title</span>
+title<span class="p">(</span><span class="kp">bquote</span><span class="p">(</span>atop<span class="p">(</span><span class="o">-</span><span class="kp">log</span><span class="p">[</span><span class="m">10</span><span class="p">]</span> <span class="o">~</span> model<span class="p">,</span> italic<span class="p">(</span>P<span class="p">)</span> <span class="o">-</span> value<span class="p">),</span> <span class="p">),</span> 
+          line<span class="o">=</span><span class="m">2</span><span class="p">,</span> cex<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> font<span class="o">=</span><span class="m">2</span><span class="p">,</span> adj<span class="o">=</span><span class="m">0</span><span class="p">)</span>
+<span class="c1"># write the plot to file</span>
+dev.off<span class="p">()</span>
+</pre></div></div>
+<input name="__tabs_1" type="radio" id="__tab_1_1" />
+<label for="__tab_1_1">ggplot2</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># ggplot2 is a handy package for plotting</span>
 <span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
 <span class="c1"># generate a pretty format for p-value output</span>
 prs.result<span class="o">$</span>print.p <span class="o">&lt;-</span> <span class="kp">round</span><span class="p">(</span>prs.result<span class="o">$</span>P<span class="p">,</span> digits <span class="o">=</span> <span class="m">3</span><span class="p">)</span>
@@ -313,29 +261,34 @@ ggplot<span class="p">(</span>data <span class="o">=</span> prs.result<span clas
     <span class="p">)</span>
 <span class="c1"># save the plot</span>
 ggsave<span class="p">(</span><span class="s">&quot;EUR.height.bar.png&quot;</span><span class="p">,</span> height <span class="o">=</span> <span class="m">7</span><span class="p">,</span> width <span class="o">=</span> <span class="m">7</span><span class="p">)</span>
-</pre></div></p>
+</pre></div></div>
+</div>
 <p><img alt="Example Bar Plot" src="../img/EUR.height.bar.png" /></p>
 <blockquote>
 <p>An example bar plot generated using <code>ggplot2</code></p>
 </blockquote>
 <p>In addition, we can visualize the relationship between the "best" PRS and the phenotype of interest, colored by sex</p>
-<p>```R tab="Without ggplot2"</p>
-<h1 id="read-in-the-files">Read in the files<a class="headerlink" href="#read-in-the-files" title="Permanent link">&para;</a></h1>
-<p>prs &lt;- read.table("EUR.0.2.profile", header=T)
-height &lt;- read.table("EUR.height", header=T)
-sex &lt;- read.table("EUR.covariate", header=T)</p>
-<h1 id="rename-the-sex">Rename the sex<a class="headerlink" href="#rename-the-sex" title="Permanent link">&para;</a></h1>
-<p>sex<span class="arithmatex">\(Sex &lt;- as.factor(sex\)</span>Sex)
-levels(sex$Sex) &lt;- c("Male", "Female")</p>
-<h1 id="merge-the-files">Merge the files<a class="headerlink" href="#merge-the-files" title="Permanent link">&para;</a></h1>
-<p>dat &lt;- merge(merge(prs, height), sex)</p>
-<h1 id="start-plotting">Start plotting<a class="headerlink" href="#start-plotting" title="Permanent link">&para;</a></h1>
-<p>plot(x=dat<span class="arithmatex">\(SCORE, y=dat\)</span>Height, col="white",
-    xlab="Polygenic Score", ylab="Height")
-with(subset(dat, Sex=="Male"), points(x=SCORE, y=Height, col="red"))
-with(subset(dat, Sex=="Female"), points(x=SCORE, y=Height, col="blue"))
-<div class="codehilite"><pre><span></span><span class="sb">``</span>`R tab<span class="o">=</span><span class="s">&quot;ggplot2&quot;</span>
-<span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
+<div class="superfences-tabs">
+<input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
+<label for="__tab_2_0">Without ggplot2</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># Read in the files</span>
+prs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.0.2.profile&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+height <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+sex <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+<span class="c1"># Rename the sex</span>
+sex<span class="o">$</span>Sex <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span>sex<span class="o">$</span>Sex<span class="p">)</span>
+<span class="kp">levels</span><span class="p">(</span>sex<span class="o">$</span>Sex<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;Male&quot;</span><span class="p">,</span> <span class="s">&quot;Female&quot;</span><span class="p">)</span>
+<span class="c1"># Merge the files</span>
+dat <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span><span class="kp">merge</span><span class="p">(</span>prs<span class="p">,</span> height<span class="p">),</span> sex<span class="p">)</span>
+<span class="c1"># Start plotting</span>
+plot<span class="p">(</span>x<span class="o">=</span>dat<span class="o">$</span>SCORE<span class="p">,</span> y<span class="o">=</span>dat<span class="o">$</span>Height<span class="p">,</span> col<span class="o">=</span><span class="s">&quot;white&quot;</span><span class="p">,</span>
+    xlab<span class="o">=</span><span class="s">&quot;Polygenic Score&quot;</span><span class="p">,</span> ylab<span class="o">=</span><span class="s">&quot;Height&quot;</span><span class="p">)</span>
+<span class="kp">with</span><span class="p">(</span><span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> Sex<span class="o">==</span><span class="s">&quot;Male&quot;</span><span class="p">),</span> points<span class="p">(</span>x<span class="o">=</span>SCORE<span class="p">,</span> y<span class="o">=</span>Height<span class="p">,</span> col<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">))</span>
+<span class="kp">with</span><span class="p">(</span><span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> Sex<span class="o">==</span><span class="s">&quot;Female&quot;</span><span class="p">),</span> points<span class="p">(</span>x<span class="o">=</span>SCORE<span class="p">,</span> y<span class="o">=</span>Height<span class="p">,</span> col<span class="o">=</span><span class="s">&quot;blue&quot;</span><span class="p">))</span>
+</pre></div></div>
+<input name="__tabs_2" type="radio" id="__tab_2_1" />
+<label for="__tab_2_1">ggplot2</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
 <span class="c1"># Read in the files</span>
 prs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.0.2.profile&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 height <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
@@ -350,7 +303,8 @@ ggplot<span class="p">(</span>dat<span class="p">,</span> aes<span class="p">(</
     geom_point<span class="p">()</span><span class="o">+</span>
     theme_classic<span class="p">()</span><span class="o">+</span>
     labs<span class="p">(</span>x<span class="o">=</span><span class="s">&quot;Polygenic Score&quot;</span><span class="p">,</span> y<span class="o">=</span><span class="s">&quot;Height&quot;</span><span class="p">)</span>
-</pre></div></p>
+</pre></div></div>
+</div>
 <p><img alt="Example Scatter Plot" src="../img/EUR.height.scatter.png" /></p>
 <blockquote>
 <p>An example scatter plot generated using <code>ggplot2</code></p>
@@ -362,10 +316,8 @@ ggplot<span class="p">(</span>dat<span class="p">,</span> aes<span class="p">(</
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../prsice/" class="btn btn-neutral float-right" title="Prsice">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-      
-        <a href="../plink/" class="btn btn-neutral" title="Background"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../lassosum/" class="btn btn-neutral" title="lassosum"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -393,18 +345,15 @@ ggplot<span class="p">(</span>dat<span class="p">,</span> aes<span class="p">(</
           <a href="https://github.com/choishingwan/PRS-Tutorial/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../plink/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../lassosum/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
-      
-        <span style="margin-left: 15px"><a href="../prsice/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
     <script>var base_url = '..';</script>
-    <script src="../js/theme.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-      <script src="../search/require.js"></script>
-      <script src="../search/search.js"></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+      <script src="../search/main.js" defer></script>
 
 </body>
 </html>
