@@ -1,9 +1,9 @@
-Next, we'd like to perform basic quality controls (QC) on the target genotype data. 
+In this section we will perform some quality control (QC) steps on the target data. 
 
-In this tutorial, we've simulated some samples using the 1000 genome european genotypes. 
+For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
 You can download the data [here](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip). 
 
-Or you can download using the following script:
+Or you can download the data using the following script:
 ```bash
 curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip -L -O
 ```
