@@ -26,6 +26,7 @@ md5sum GIANT.height.gz
 md5 GIANT.height.gz
 ```
 
+
 if the file is intact, then `md5sum` generates a string of characters, which in this case should be: `88413472f72823ee294f0916a36505d9`. 
 If a different string is generated, then then file is corrupted.
 
