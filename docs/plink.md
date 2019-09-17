@@ -1,10 +1,9 @@
 # Background
-In this section, we will try to calculate polygenic risk score using `plink` to illustrate some common procedure
-performed by PRS software.
+In this section of the tutorial you will use four different software programs to compute PRS from the base and target data that you QC'ed in the previous two sections. On this page, you will compute PRS using the popular genetic analyses tool `plink` - while `plink` is not a dedicated PRS software, each of the steps required to compute PRS using the C+T standard approach can be performed in `plink` and carrying out this multi-step process can be a good way to learn the processes involved in computing PRS (which are typically performed automatically by PRS software). 
 
 # Required Data
 
-In previous sections, we have generated the following files
+In the previous sections, we have generated the following files:
 
 |File Name | Description|
 |:-:|:-:|
@@ -33,11 +32,11 @@ awk '!( ($5=="A" && $6=="T") || \
     There are `330,818` ambiguous SNPs
 
 # Strand Flipping
-In addition, when there are non-ambiguous mismatch in allele 
+In addition, when there are non-ambiguous mismatches in allele 
 coding between the data sets, such as A/C in the base
 and G/T in the target data, then this can be resolved by 
 ‘flipping’ the alleles in the target data to their complementary alleles. 
-This has to be done with mulitpe steps
+This can be achieved with the following steps: 
 
 1. Get the correct A1 alleles for the bim file
 
@@ -66,7 +65,7 @@ complement <- function(x) {
         return(NA)
     )
 }
-# Get SNPs that has the same alleles across base and target
+# Get SNPs that have the same alleles across base and target
 info.match <- subset(info, A1 == B.A1 & A2 == B.A2)
 # Identify SNPs that are complementary between base and target
 info$C.A1 <- sapply(info$B.A1, complement)
@@ -173,7 +172,7 @@ mv EUR.QC.bim EUR.QC.bim.bk
 ln -s EUR.QC.adj.bim EUR.QC.bim
 ```
 
-We can then generate a new genotype file with the correct genetic encodings
+We can then generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
 ```bash
 plink \
     --bfile EUR.QC \
@@ -186,8 +185,7 @@ plink \
 ```
 
 # Update Effect Size
-When odd ratios (OR) instead of BETA are provided, the PRS might have to calculated using a multiplicative model.
-To simplify the calculation, we usually take the natural logarithm of the OR such that an additive model can be applied. 
+When the effect size relates to disease risk and is thus given as an odd ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we usually take the natural logarithm of the OR so that the PRS can be computed using a simple summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with `R`:
 
 ```R tab="Without data.table"
@@ -204,16 +202,12 @@ fwrite(dat[,OR:=log(OR)], "Height.QC.Transformed", sep="\t")
 
 
 !!! warning
-    It might be tempting to perform the log transofrmation using `awk`.
-    However, due to a lower arithmetic precision of `awk`, less accurate results
-    might be obtained. 
-    Therefore it is best to do the transformation in `R` or allow the PRS software to perform the transformation directly. 
+    It may be tempting to perform the log transofrmation using `awk`.
+    However, due to rounding of values performed in `awk`, less accurate results
+    may be obtained. Therefore, we recommend performing the transformation in `R` or allow the PRS software to perform the transformation directly.
 
 # Clumping
-Linkage disequilibrium introduce a strong correlation structure across the genome, makes identifying the independent
-genetic effects extremely challenging. 
-One simple method is to perform clumping, which preferentially selects SNPs most
-associated with the trait under study when removing SNPs in LD. 
+Linkage disequilibrium, which corresponds to the correlation between the genotypes of genetic variants across the genome, makes identifying the contribution from causal independent genetic variants extremely challenging. One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in such a way that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. Clumping can be performed using the following command in `plink`: 
 
 ```bash
 plink \
@@ -237,14 +231,14 @@ Each of the new parameters corresponds to the following
 | clump-snp-field | SNP | Specify that the column `SNP` contains the SNP IDs |
 | clump-field | P | Specify that the column `P` contains the P-value information |
 
-A more detailed document can be found [here](https://www.cog-genomics.org/plink/1.9/postproc#clump)
+A more detailed description of the clumping process can be found [here](https://www.cog-genomics.org/plink/1.9/postproc#clump)
 
 !!! note
     The $r^2$ values computed by `--clump` are based on maximum likelihood haplotype frequency estimates
 
 
 This will generate **EUR.clumped**, containing the index SNPs after clumping is performed.
-We can extract the index SNP ID by doing
+We can extract the index SNP ID by performing the following:
 
 ```bash
 awk 'NR!=1{print $3}' EUR.clumped >  EUR.valid.snp
@@ -254,20 +248,20 @@ awk 'NR!=1{print $3}' EUR.clumped >  EUR.valid.snp
 
 
 !!! note
-    If your target sample is small (e.g. <500), you can try using the 1000 Genome samples for the LD calculation.
-    Make sure you use the population that best represents your sample.
+    If your target sample is small (e.g. <500), you can use the 1000 Genomes Project samples for the LD calculation.
+    Make sure that you use the population that most closely reflects represents the base sample.
 
 # Generate PRS
-`plink` provide a handy function `--score` and `--q-score-range` for calculating polygenic score.
+`plink` provides a convenient function `--score` and `--q-score-range` for calculating polygenic score.
 
-We will need three files
+We will need three files:
 
 1. The summary statistic file: **Height.QC.Transformed**
 2. A file containing SNP ID and their corresponding p-value (`$1` because SNP ID is located at the first column; `$8` because P-value is located at the eigth column)
 ```bash
 awk '{print $1,$8}' Height.QC.Transformed > SNP.pvalue
 ```
-3. A file containing the P-value thresholds we are testing. Here we will only test a few for illustration purposes
+3. A file containing the P-value thresholds that we are testing. Here we will only test a few thresholds for illustration purposes:
 ```bash
 echo "0.001 0 0.001" > range_list
 echo "0.05 0 0.05" >> range_list
@@ -277,13 +271,13 @@ echo "0.3 0 0.3" >> range_list
 echo "0.4 0 0.4" >> range_list
 echo "0.5 0 0.5" >> range_list
 ```
-The format of the **range_list** file should be as follow
+The format of the **range_list** file should be as follows:
 
 |Name of Threshold|Lower bound| Upper Bound|
 |:-:|:-:|:-:|
 
 !!! note
-    The boundary are inclusive. For example, for the `0.05` threshold, we include all SNPs with P-value from 
+    The threshold boundaries are inclusive. For example, for the `0.05` threshold, we include all SNPs with P-value from 
     `0` to `0.05`, **including** any SNPs with P-value equal to `0.05`
 
 We can then calculate the PRS with the following `plink` command:
@@ -296,7 +290,7 @@ plink \
     --q-score-range range_list SNP.pvalue \
     --out EUR
 ```
-Meaning of the new parameters are as follow
+The meaning of the new parameters are as follows:
 
 | Paramter | Value | Description|
 |:-:|:-:|:-|
