@@ -188,7 +188,7 @@ fwrite(dat[STATUS=="OK",c("FID","IID")], "EUR.QC.valid", sep="\t")
 ??? note "How many samples were excluded due mismatched Sex information?"
     - `2` samples were excluded
 
-# Generate final QCed sample
+# Generate final QC'ed target sample
 After performing the full analysis, you can generate a QC'ed data set with the following command:
 ```bash
 plink \
