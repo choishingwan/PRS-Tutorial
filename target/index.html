@@ -83,13 +83,13 @@
     <li class="toctree-l2"><a href="#filter-related-samples">Filter related samples</a></li>
     
 
-    <li class="toctree-l2"><a href="#remove-samples-with-abnormal-heterozygosity-rate">Remove samples with abnormal heterozygosity rate</a></li>
+    <li class="toctree-l2"><a href="#remove-samples-with-extreme-heterozygosity-rate">Remove samples with extreme heterozygosity rate</a></li>
     
 
-    <li class="toctree-l2"><a href="#check-for-mis-matched-sex-information">Check for mis-matched Sex information</a></li>
+    <li class="toctree-l2"><a href="#check-for-mismatching-sex-information">Check for mismatching sex information</a></li>
     
 
-    <li class="toctree-l2"><a href="#generate-final-qced-sample">Generate final QCed sample</a></li>
+    <li class="toctree-l2"><a href="#generate-final-qced-target-sample">Generate final QC'ed target sample</a></li>
     
 
     </ul>
@@ -160,15 +160,15 @@
               
                 <p>In this section we will perform some quality control (QC) steps on the target data. </p>
 <p>For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
-You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip">here</a>. </p>
-<p>Or you can download the data using the following script:
+You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip">here</a> or you can download the data using the following command:</p>
 <div class="codehilite"><pre><span></span>curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip -L -O
-</pre></div></p>
+</pre></div>
+
 <p>Unzip the data as follow:</p>
 <div class="codehilite"><pre><span></span>unzip EUR.zip
 </pre></div>
 
-<details class="note"><summary>What's the md5sum of the genotype files?</summary><table>
+<details class="note"><summary>What is the md5sum code for each of the target files?</summary><table>
 <thead>
 <tr>
 <th align="center">File</th>
@@ -201,20 +201,18 @@ You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/
 </details>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>We assume PLINK is installed in your PATH directory, which allow us to use <code>plink</code> instead of <code>./plink</code>.
-If PLINK is not in your PATH directory, replace all instance of <code>plink</code> in the tutorial to <code>./plink</code> assuming
-the PLINK executable is located within your working directory</p>
+<p>Install the program PLINK and include its location in your PATH directory, which allows us to use <code>plink</code> instead of <code>./plink</code> in the commands below. If PLINK is not in your PATH directory and is instead in your working directory, then replace all instances of <code>plink</code> in the tutorial with <code>./plink</code>.</p>
 </div>
 <h1 id="genotype-file-format">Genotype file format<a class="headerlink" href="#genotype-file-format" title="Permanent link">&para;</a></h1>
 <h1 id="basic-filterings">Basic filterings<a class="headerlink" href="#basic-filterings" title="Permanent link">&para;</a></h1>
-<p>The power and validity of PRS analyses are highly dependent on 
-the quality of the base and target data, therefore 
-both data sets must be quality controlled to the high standards 
+<p>The power and validity of PRS analyses depend on 
+the quality of the base and target data. Therefore, 
+both data sets must be quality controlled to at least the standards 
 implemented in GWAS studies, e.g. removing SNPs with low genotyping rate, 
-low minor allele frequency, violates the Hardy-Weinberg Equilibrium and
+low minor allele frequency, out of Hardy-Weinberg Equilibrium and removing
 individuals with low genotyping rate 
 (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a>).</p>
-<p>The following <code>plink</code> command perform some basic filterings</p>
+<p>The following <code>plink</code> command applies some basic filtering:</p>
 <p><div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
     --maf <span class="m">0</span>.05 <span class="se">\</span>
@@ -238,50 +236,50 @@ Each of the parameters corresponds to the following</p>
 <tr>
 <td align="center">bfile</td>
 <td align="center">EUR</td>
-<td align="left">Inform <code>plink</code> that the input genotype files should have a prefix of <code>EUR</code></td>
+<td align="left">Informs <code>plink</code> that the input genotype files should have a prefix of <code>EUR</code></td>
 </tr>
 <tr>
 <td align="center">maf</td>
 <td align="center">0.05</td>
-<td align="left">Filter out any SNPs with minor allele frequency less than 0.05. Genotype error are more likely to influence SNPs with low MAF. Large sample size can adapt a lower MAF threshold</td>
+<td align="left">Removes all SNPs with minor allele frequency less than 0.05. Genotyping errors typically have a larger influence on SNPs with low MAF. Studies with large sample sizes could apply a lower MAF threshold</td>
 </tr>
 <tr>
 <td align="center">hwe</td>
 <td align="center">1e-6</td>
-<td align="left">Filtering SNPs with low p-value from the Hardy-Weinberg exact test. SNPs with significant p-value from the HWE test are more likely to harbor genotyping error or are under selection. Filtering should be performed on the control samples to avoid filtering SNPs that are causal (under selection in cases)</td>
+<td align="left">Removes SNPs with low P-value from the Hardy-Weinberg Equilibrium Fisher's exact or chi-squared test. SNPs with significant P-values from the HWE test are more likely affected by genotyping error or the effects of natural selection. Filtering should be performed on the control samples to avoid filtering SNPs that are causal (under selection in cases)</td>
 </tr>
 <tr>
 <td align="center">geno</td>
 <td align="center">0.01</td>
-<td align="left">Exclude SNPs that are missing in large proportion of subjects. A two pass filtering is usually performed (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a>).</td>
+<td align="left">Excludes SNPs that are missing in a high fraction of subjects. A two-stage filtering process is usually performed (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a>).</td>
 </tr>
 <tr>
 <td align="center">mind</td>
 <td align="center">0.01</td>
-<td align="left">Exclude individual who have a high rate of genotype missingness. This might indicate problems in the DNA sample. (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a> for more details).</td>
+<td align="left">Excludes individuals who have a high rate of genotype missingness, since this may indicate problems in the DNA sample or processing. (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a> for more details).</td>
 </tr>
 <tr>
 <td align="center">make-just-fam</td>
 <td align="center">-</td>
-<td align="left">Inform <code>plink</code> to only generate the QCed sample name to avoid generating the .bed file.</td>
+<td align="left">Informs <code>plink</code> to only generate the QC'ed sample name to avoid generating the .bed file.</td>
 </tr>
 <tr>
 <td align="center">write-snplist</td>
 <td align="center">-</td>
-<td align="left">Inform <code>plink</code> to only generate the QCed SNP list to avoid generating the .bed file.</td>
+<td align="left">Informs <code>plink</code> to only generate the QC'ed SNP list to avoid generating the .bed file.</td>
 </tr>
 <tr>
 <td align="center">out</td>
 <td align="center">EUR</td>
-<td align="left">Inform <code>plink</code> that all output should have a prefix of <code>EUR</code></td>
+<td align="left">Informs <code>plink</code> that all output should have a prefix of <code>EUR</code></td>
 </tr>
 </tbody>
 </table>
 <details class="note"><summary>How many SNPs and samples were filtered?</summary><ul>
-<li><code>5</code> samples removed due to high rate of genotype missingness</li>
-<li><code>1</code> SNP removed due missing genotype data</li>
-<li><code>872</code> SNPs were removed due to Hardy-Weinberg exact test results</li>
-<li><code>242,459</code> SNPs were removed due to minor allele frequency</li>
+<li><code>5</code> samples were removed due to a high rate of genotype missingness</li>
+<li><code>1</code> SNP were removed due to missing genotype data</li>
+<li><code>872</code> SNPs were removed due to being out of Hardy-Weinberg Equilibrium</li>
+<li><code>242,459</code> SNPs were removed due to low minor allele frequency</li>
 </ul>
 </details>
 <div class="admonition note">
@@ -290,12 +288,11 @@ Each of the parameters corresponds to the following</p>
 However,  this will use up a lot of storage space. Using <code>plink</code>'s
 <code>--extract</code>, <code>--exclude</code>, <code>--keep</code>, <code>--remove</code>, <code>--make-just-fam</code> and <code>--write-snplist</code> functions, we can work 
 solely on the list of samples and SNPs without duplicating the 
-genotype file, therefore reducing the storage space usage.  </p>
+genotype file, reducing the storage space usage.  </p>
 </div>
 <h1 id="filter-related-samples">Filter related samples<a class="headerlink" href="#filter-related-samples" title="Permanent link">&para;</a></h1>
-<p>Related samples in the target data might lead to overfitted results, 
-hampering the generalizability of the results. </p>
-<p>To remove related samples, we first need to perform prunning to remove highly correlated SNPs:
+<p>Closely related individuals in the target data may lead to overfitted results, limiting the generalisability of the results. </p>
+<p>As a first step to removing related individuals we perform pruning, which removes highly correlated SNPs:
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
     --keep EUR.QC.fam <span class="se">\</span>
@@ -304,8 +301,8 @@ hampering the generalizability of the results. </p>
     --out EUR.QC
 </pre></div></p>
 <p>This will generate two files 1) <strong>EUR.QC.prune.in</strong> and 2) <strong>EUR.QC.prune.out</strong>
-All SNPs within <strong>EUR.QC.prune.in</strong> has a pairwise <span class="arithmatex">\(r^2 &lt; 0.25\)</span></p>
-<p>Samples with more than third-degree relatedness (<span class="arithmatex">\(\text{pi-hat} &gt; 0.125\)</span>) can then be removed with </p>
+All SNPs within <strong>EUR.QC.prune.in</strong> have a pairwise <span class="arithmatex">\(r^2 &lt; 0.25\)</span></p>
+<p>Individuals that have a first or second degree relative in the sample (<span class="arithmatex">\(\text{pi-hat} &gt; 0.125\)</span>) can be removed with the following command:</p>
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
     --extract EUR.QC.prune.in <span class="se">\</span>
@@ -320,18 +317,14 @@ All SNPs within <strong>EUR.QC.prune.in</strong> has a pairwise <span class="ari
 </details>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>A greedy algorithm is used to remove the related samples. Which depending
-on the random seed used, might generate different results. To reproduce
-the same result, you might need to specify the random seed usage. </p>
-<p>PLINK's related sample removal does not take into account of the sample 
-phenotype. If one would like to minimize lost of cases for example, 
-a software called
-<a href="https://github.com/choishingwan/GreedyRelated">GreedyRelated</a> can be used.</p>
+<p>A greedy algorithm is used to remove closely related individuals in a way that optimises the size of the sample retained.                However, the algorithm is dependent on the random seed used, which can generate different results. Therefore, to reproduce
+the same result, you will need to specify the same random seed. </p>
+<p>PLINK's algorithm for removing related individuals does not account for the phenotype under study. 
+To minimize the removal of cases of a disease, the following algorithm can be used instead: 
+<a href="https://github.com/choishingwan/GreedyRelated">GreedyRelated</a>.</p>
 </div>
-<h1 id="remove-samples-with-abnormal-heterozygosity-rate">Remove samples with abnormal heterozygosity rate<a class="headerlink" href="#remove-samples-with-abnormal-heterozygosity-rate" title="Permanent link">&para;</a></h1>
-<p>Individual with high or low heterozygosity rate can be contaminated or are inbreed.
-It is therefore a good idea to remove these samples from our dataset before continuing the analyse.
-Heterozygosity rate can be calculated using <code>plink</code> after performing prunning. 
+<h1 id="remove-samples-with-extreme-heterozygosity-rate">Remove samples with extreme heterozygosity rate<a class="headerlink" href="#remove-samples-with-extreme-heterozygosity-rate" title="Permanent link">&para;</a></h1>
+<p>Very high or low heterozygosity rates in individuals could be due to DNA contamination or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. Heterozygosity rates can be computed using <code>plink</code> after performing pruning.
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
     --extract EUR.QC.prune.in <span class="se">\</span>
@@ -339,9 +332,8 @@ Heterozygosity rate can be calculated using <code>plink</code> after performing 
     --het <span class="se">\</span>
     --out EUR.QC
 </pre></div></p>
-<p>This will generate the <strong>EUR.QC.het</strong> file which contains the F coefficient estimates.
-It will be easier to filter the samples using <code>R</code> instead of <code>awk</code>:
-Open a <code>R</code> section by tying <code>R</code> in your terminal</p>
+<p>This will generate the <strong>EUR.QC.het</strong> file, which contains F coefficient estimates for assessing heterozygosity.
+We will remove individuals with F coefficients that are more than 3 standard deviation (SD) units from the mean, which can be performed using the following <code>R</code> command (assuming that you have R downloaded, then you can open an <code>R</code> session by typing <code>R</code> in your terminal):</p>
 <div class="superfences-tabs">
 <input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
 <label for="__tab_1_0">Without library</label>
@@ -366,12 +358,12 @@ fwrite<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</
 <li><code>7</code> samples were excluded</li>
 </ul>
 </details>
-<h1 id="check-for-mis-matched-sex-information">Check for mis-matched Sex information<a class="headerlink" href="#check-for-mis-matched-sex-information" title="Permanent link">&para;</a></h1>
-<p>Sometimes, sample mislabeling can occur and will lead to invalid results. 
-A good indication of mislabeled sample is a mismatch between the biological sex and the reported sex. 
-If the biological sex does not match up with the reported sex, it is likely that the sample has been mislabeled.</p>
-<p>Before performing sex check, prunning should be performed (see <a href="./#filter-related-samples">here</a>).
-Sex check can then easily be carried out using <code>plink</code>
+<h1 id="check-for-mismatching-sex-information">Check for mismatching sex information<a class="headerlink" href="#check-for-mismatching-sex-information" title="Permanent link">&para;</a></h1>
+<p>Sometimes sample mislabelling can occur, which may lead to invalid results. 
+A good indication of a mislabelled sample is a mismatch between biological sex and reported sex. 
+If the biological sex does not match up with the reported sex, then the sample may have been mislabelled.</p>
+<p>Before performing a sex check, pruning should be performed (see <a href="./#filter-related-samples">here</a>).
+A sex check can then easily be conducted using <code>plink</code>
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
     --extract EUR.QC.prune.in <span class="se">\</span>
@@ -379,8 +371,7 @@ Sex check can then easily be carried out using <code>plink</code>
     --check-sex <span class="se">\</span>
     --out EUR.QC
 </pre></div></p>
-<p>This will generate a file called <strong>EUR.sexcheck</strong> containing the F-statistics for each individual.
-For male, the F-statistic should be &gt; 0.8 and Female should have a value &lt; 0.2.</p>
+<p>This will generate a file called <strong>EUR.sexcheck</strong> containing the F-statistics for each individual. Individuals are typically called as being biologically male if the F-statistic is &gt; 0.8 and biologically female if F &lt; 0.2.</p>
 <div class="superfences-tabs">
 <input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
 <label for="__tab_2_0">Without library</label>
@@ -403,8 +394,8 @@ fwrite<span class="p">(</span>dat<span class="p">[</span>STATUS<span class="o">=
 <li><code>2</code> samples were excluded</li>
 </ul>
 </details>
-<h1 id="generate-final-qced-sample">Generate final QCed sample<a class="headerlink" href="#generate-final-qced-sample" title="Permanent link">&para;</a></h1>
-<p>After performing the full analysis, you can generate a QCed data set with the following command
+<h1 id="generate-final-qced-target-sample">Generate final QC'ed target sample<a class="headerlink" href="#generate-final-qced-target-sample" title="Permanent link">&para;</a></h1>
+<p>After performing the full analysis, you can generate a QC'ed data set with the following command:
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
     --make-bed <span class="se">\</span>
@@ -415,7 +406,7 @@ fwrite<span class="p">(</span>dat<span class="p">[</span>STATUS<span class="o">=
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For some software, the <strong>EUR.QC.valid</strong> and <strong>EUR.QC.snplist</strong> can be passed as a parameter to perform the 
-extraction directly. For those software (e.g. PRSice-2, lassosum, etc), this step is not required</p>
+extraction directly. For those software (e.g. PRSice-2, lassosum, etc), this step is not required.</p>
 </div>
               
             </div>
