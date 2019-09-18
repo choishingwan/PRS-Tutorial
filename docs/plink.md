@@ -163,8 +163,9 @@ mismatch <- bim[!SNP%in%matched$SNP, SNP]
 write.table(mismatch, "EUR.mismatch", quote=F, row.names=F, col.names=F)
 ```
 
-The above script will generate three files: **EUR.QC.adj.bim**, **EUR.update.a1** and **EUR.mismatch**. We want to replace
-**EUR.QC.bim** with **EUR.QC.adj.bim**:
+The above script will generate three files: **EUR.QC.adj.bim**, **EUR.update.a1** and **EUR.mismatch**. 
+
+2. Replace **EUR.QC.bim** with **EUR.QC.adj.bim**:
 
 ```bash
 # Make a back up
@@ -172,7 +173,7 @@ mv EUR.QC.bim EUR.QC.bim.bk
 ln -s EUR.QC.adj.bim EUR.QC.bim
 ```
 
-We can then generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
+3. Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
 ```bash
 plink \
     --bfile EUR.QC \
