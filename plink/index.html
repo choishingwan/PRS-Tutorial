@@ -413,14 +413,17 @@ matched <span class="o">&lt;-</span> info<span class="p">[(</span>A1 <span class
 mismatch <span class="o">&lt;-</span> bim<span class="p">[</span><span class="o">!</span>SNP<span class="o">%in%</span>matched<span class="o">$</span>SNP<span class="p">,</span> SNP<span class="p">]</span>
 write.table<span class="p">(</span>mismatch<span class="p">,</span> <span class="s">&quot;EUR.mismatch&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> col.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
 </pre></div></p>
-<p>The above script will generate three files: <strong>EUR.QC.adj.bim</strong>, <strong>EUR.update.a1</strong> and <strong>EUR.mismatch</strong>. We want to replace
-<strong>EUR.QC.bim</strong> with <strong>EUR.QC.adj.bim</strong>:</p>
+<p>The above script will generate three files: <strong>EUR.QC.adj.bim</strong>, <strong>EUR.update.a1</strong> and <strong>EUR.mismatch</strong>. </p>
+<ol>
+<li>Replace <strong>EUR.QC.bim</strong> with <strong>EUR.QC.adj.bim</strong>:</li>
+</ol>
 <div class="codehilite"><pre><span></span><span class="c1"># Make a back up</span>
 mv EUR.QC.bim EUR.QC.bim.bk
 ln -s EUR.QC.adj.bim EUR.QC.bim
 </pre></div>
 
-<p>We can then generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
+<ol>
+<li>Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR.QC <span class="se">\</span>
     --a1-allele EUR.update.a1 <span class="se">\</span>
@@ -429,7 +432,8 @@ ln -s EUR.QC.adj.bim EUR.QC.bim
     --extract EUR.unambig.snp <span class="se">\</span>
     --exclude EUR.mismatch <span class="se">\</span>
     --out EUR.QC.flipped
-</pre></div></p>
+</pre></div></li>
+</ol>
 <h1 id="update-effect-size">Update Effect Size<a class="headerlink" href="#update-effect-size" title="Permanent link">&para;</a></h1>
 <p>When the effect size relates to disease risk and is thus given as an odd ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we usually take the natural logarithm of the OR so that the PRS can be computed using a simple summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with <code>R</code>:</p>
