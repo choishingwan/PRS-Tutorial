@@ -144,10 +144,10 @@
             <div class="section">
               
                 <h1 id="plotting-the-results">Plotting the Results<a class="headerlink" href="#plotting-the-results" title="Permanent link">&para;</a></h1>
-<p>The P-value threshold results can be visualized using <code>R</code></p>
+<p>The PRS results corresponding to a range of P-value thresholds obtained by application of the C+T PRS method (eg. using PLINK or PRSice-2) can be visualised using <code>R</code> as follows:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>We will be using <code>prs.result</code> generated in <a href="#finding-the-best-p-value-threshold">previous section</a></p>
+<p>We will be using <code>prs.result</code>, which was generated in the <a href="#finding-the-best-p-value-threshold">previous section</a></p>
 </div>
 <div class="superfences-tabs">
 <input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
@@ -267,7 +267,7 @@ ggsave<span class="p">(</span><span class="s">&quot;EUR.height.bar.png&quot;</sp
 <blockquote>
 <p>An example bar plot generated using <code>ggplot2</code></p>
 </blockquote>
-<p>In addition, we can visualize the relationship between the "best" PRS and the phenotype of interest, colored by sex</p>
+<p>In addition, we can visualise the relationship between the "best-fit" PRS (which may have been obtained from any of the PRS programs) and the phenotype of interest, coloured according to sex:</p>
 <div class="superfences-tabs">
 <input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
 <label for="__tab_2_0">Without ggplot2</label>
@@ -309,6 +309,7 @@ ggplot<span class="p">(</span>dat<span class="p">,</span> aes<span class="p">(</
 <blockquote>
 <p>An example scatter plot generated using <code>ggplot2</code></p>
 </blockquote>
+<p>Programs such as PRSice-2 and <a href="https://privefl.github.io/bigsnpr/">bigsnpr</a> include numerous options for plotting PRS results.</p>
               
             </div>
           </div>

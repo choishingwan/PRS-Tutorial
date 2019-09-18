@@ -107,7 +107,7 @@
     <li class="toctree-l3"><a href="#accounting-for-population-stratification">Accounting for Population Stratification</a></li>
     
 
-    <li class="toctree-l3"><a href="#finding-the-best-p-value-threshold">Finding the "Best" P-value threshold</a></li>
+    <li class="toctree-l3"><a href="#finding-the-best-fit-prs">Finding the "best-fit" PRS</a></li>
     
 
     </ul>
@@ -380,7 +380,7 @@ ln -s EUR.QC.adj.bim EUR.QC.bim
 </pre></div></li>
 </ol>
 <h1 id="update-effect-size">Update Effect Size<a class="headerlink" href="#update-effect-size" title="Permanent link">&para;</a></h1>
-<p>When the effect size relates to disease risk and is thus given as an odd ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we usually take the natural logarithm of the OR so that the PRS can be computed using a simple summation instead (which can be back-transformed afterwards). 
+<p>When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we usually take the natural logarithm of the OR so that the PRS can be computed using a simple summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with <code>R</code>:</p>
 <div class="superfences-tabs">
 <input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
@@ -404,7 +404,7 @@ may be obtained. Therefore, we recommend performing the transformation in <code>
 </div>
 <h1 id="clumping">Clumping<a class="headerlink" href="#clumping" title="Permanent link">&para;</a></h1>
 <p>Linkage disequilibrium, which corresponds to the correlation between the genotypes of genetic variants across the genome, makes identifying the contribution from causal independent genetic variants extremely challenging. One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in such a way that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. Clumping can be performed using the following command in <code>plink</code>: </p>
-<p><div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+<div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR.QC.flipped <span class="se">\</span>
     --clump-p1 <span class="m">1</span> <span class="se">\</span>
     --clump-r2 <span class="m">0</span>.1 <span class="se">\</span>
@@ -414,7 +414,8 @@ may be obtained. Therefore, we recommend performing the transformation in <code>
     --clump-field P <span class="se">\</span>
     --out EUR
 </pre></div>
-Each of the new parameters corresponds to the following</p>
+
+<p>Each of the new parameters corresponds to the following</p>
 <table>
 <thead>
 <tr>
@@ -442,17 +443,17 @@ Each of the new parameters corresponds to the following</p>
 <tr>
 <td align="center">clump</td>
 <td align="center">Height.QC.transformed</td>
-<td align="left">Summary statistic file containing the p-value information</td>
+<td align="left">Base data (summary statistic) file containing the P-value information</td>
 </tr>
 <tr>
 <td align="center">clump-snp-field</td>
 <td align="center">SNP</td>
-<td align="left">Specify that the column <code>SNP</code> contains the SNP IDs</td>
+<td align="left">Specifies that the column <code>SNP</code> contains the SNP IDs</td>
 </tr>
 <tr>
 <td align="center">clump-field</td>
 <td align="center">P</td>
-<td align="left">Specify that the column <code>P</code> contains the P-value information</td>
+<td align="left">Specifies that the column <code>P</code> contains the P-value information</td>
 </tr>
 </tbody>
 </table>
@@ -462,7 +463,7 @@ Each of the new parameters corresponds to the following</p>
 <p>The <span class="arithmatex">\(r^2\)</span> values computed by <code>--clump</code> are based on maximum likelihood haplotype frequency estimates</p>
 </div>
 <p>This will generate <strong>EUR.clumped</strong>, containing the index SNPs after clumping is performed.
-We can extract the index SNP ID by performing the following:</p>
+We can extract the index SNP ID by performing the following command:</p>
 <div class="codehilite"><pre><span></span>awk <span class="s1">&#39;NR!=1{print $3}&#39;</span> EUR.clumped &gt;  EUR.valid.snp
 </pre></div>
 
@@ -471,18 +472,18 @@ We can extract the index SNP ID by performing the following:</p>
 </blockquote>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If your target sample is small (e.g. &lt;500), you can use the 1000 Genomes Project samples for the LD calculation.
-Make sure that you use the population that most closely reflects represents the base sample.</p>
+<p>If your target data are small (e.g. N &lt; 500) then you can use the 1000 Genomes Project samples for the LD calculation.
+Make sure to use the population that most closely reflects represents the base sample.</p>
 </div>
 <h1 id="generate-prs">Generate PRS<a class="headerlink" href="#generate-prs" title="Permanent link">&para;</a></h1>
-<p><code>plink</code> provides a convenient function <code>--score</code> and <code>--q-score-range</code> for calculating polygenic score.</p>
+<p><code>plink</code> provides a convenient function <code>--score</code> and <code>--q-score-range</code> for calculating polygenic scores.</p>
 <p>We will need three files:</p>
 <ol>
-<li>The summary statistic file: <strong>Height.QC.Transformed</strong></li>
-<li>A file containing SNP ID and their corresponding p-value (<code>$1</code> because SNP ID is located at the first column; <code>$8</code> because P-value is located at the eigth column)
+<li>The base data file: <strong>Height.QC.Transformed</strong></li>
+<li>A file containing SNP IDs and their corresponding P-values (<code>$1</code> because SNP ID is located in the first column; <code>$8</code> because the P-value is located in the eighth column)
 <div class="codehilite"><pre><span></span>awk <span class="s1">&#39;{print $1,$8}&#39;</span> Height.QC.Transformed &gt; SNP.pvalue
 </pre></div></li>
-<li>A file containing the P-value thresholds that we are testing. Here we will only test a few thresholds for illustration purposes:
+<li>A file containing the different P-value thresholds for inclusion of SNPs in the PRS. Here calculate PRS corresponding to a few thresholds for illustration purposes:
 <div class="codehilite"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;0.001 0 0.001&quot;</span> &gt; range_list
 <span class="nb">echo</span> <span class="s2">&quot;0.05 0 0.05&quot;</span> &gt;&gt; range_list
 <span class="nb">echo</span> <span class="s2">&quot;0.1 0 0.1&quot;</span> &gt;&gt; range_list
@@ -512,7 +513,7 @@ The format of the <strong>range_list</strong> file should be as follows:</li>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The threshold boundaries are inclusive. For example, for the <code>0.05</code> threshold, we include all SNPs with P-value from 
-<code>0</code> to <code>0.05</code>, <strong>including</strong> any SNPs with P-value equal to <code>0.05</code></p>
+<code>0</code> to <code>0.05</code>, <strong>including</strong> any SNPs with P-value equal to <code>0.05</code>.</p>
 </div>
 <p>We can then calculate the PRS with the following <code>plink</code> command:</p>
 <p><div class="codehilite"><pre><span></span>plink <span class="se">\</span>
@@ -535,12 +536,12 @@ The meaning of the new parameters are as follows:</p>
 <tr>
 <td align="center">score</td>
 <td align="center">Height.QC.Transformed 1 4 11 header</td>
-<td align="left">We read from the <strong>Height.QC.Transformed</strong> file, assuming the <code>1</code>st column to be the SNP ID; <code>4</code>th column to be the effective allele information; <code>11</code>th column to be the effect size estimate; and the file contains a <code>header</code></td>
+<td align="left">We read from the <strong>Height.QC.Transformed</strong> file, assuming that the <code>1</code>st column is the SNP ID; <code>4</code>th column is the effective allele information; the <code>11</code>th column is the effect size estimate; and that the file contains a <code>header</code></td>
 </tr>
 <tr>
 <td align="center">q-score-range</td>
 <td align="center">range_test SNP.pvalue</td>
-<td align="left">We want to calculate PRS based on the thresholds defined in <strong>range_test</strong>, where the threshold values (p-values) were stored in <strong>SNP.pvalue</strong></td>
+<td align="left">We want to calculate PRS based on the thresholds defined in <strong>range_test</strong>, where the threshold values (P-values) were stored in <strong>SNP.pvalue</strong></td>
 </tr>
 </tbody>
 </table>
@@ -556,17 +557,15 @@ The meaning of the new parameters are as follows:</p>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The default formular for PRS calculation in PLINK is:
-(Assuming the effect size of SNP <span class="arithmatex">\(i\)</span> is <span class="arithmatex">\(S_i\)</span>;  the number of effective allele observed in sample <span class="arithmatex">\(j\)</span> is <span class="arithmatex">\(G_{ij}\)</span>; the ploidy of the sample is <span class="arithmatex">\(P\)</span> (It should be 2 for human); the number of samples included in the PRS be <span class="arithmatex">\(N\)</span>; and the number of non-missing SNPs observed in sample <span class="arithmatex">\(j\)</span> be <span class="arithmatex">\(M_j\)</span>)
-$$
+<p>The default formula for PRS calculation in PLINK is:</p>
+<div class="arithmatex">\[
 PRS_j =\frac{ \sum_i^NS_i*G_{ij}}{P*M_j}
-$$</p>
-<p>If sample has a missing genotype for SNP <span class="arithmatex">\(i\)</span>, the population minor allele frequency times ploidy (<span class="arithmatex">\(MAF_i*P\)</span>) is used inplace of <span class="arithmatex">\(G_{ij}\)</span></p>
+\]</div>
+<p>where the effect size of SNP <span class="arithmatex">\(i\)</span> is <span class="arithmatex">\(S_i\)</span>;  the number of effect alleles observed in sample <span class="arithmatex">\(j\)</span> is <span class="arithmatex">\(G_{ij}\)</span>; the ploidy of the sample is <span class="arithmatex">\(P\)</span> (is generally 2 for humans); the number of samples included in the PRS is <span class="arithmatex">\(N\)</span>; and the number of non-missing SNPs observed in sample <span class="arithmatex">\(j\)</span> is <span class="arithmatex">\(M_j\)</span>. If the sample has a missing genotype for SNP <span class="arithmatex">\(i\)</span>, then the population minor allele frequency multiplied by the ploidy (<span class="arithmatex">\(MAF_i*P\)</span>) is used instead of <span class="arithmatex">\(G_{ij}\)</span>.</p>
 </div>
 <h1 id="accounting-for-population-stratification">Accounting for Population Stratification<a class="headerlink" href="#accounting-for-population-stratification" title="Permanent link">&para;</a></h1>
-<p>Population structure is the principal source of confounding in GWAS and are usually accounted for by incorporating the principal components (PCs) as a covariate. 
-Similarly, we can incorporate PCs in our PRS analysis to account for population stratification.</p>
-<p>Again, we can calculate the PCs using <code>plink</code> 
+<p>Population structure is the principal source of confounding in GWAS and is usually accounted for by incorporating principal components (PCs) as covariates. We can incorporate PCs into our PRS analysis to account for population stratification.</p>
+<p>Again, we can calculate the PCs using <code>plink</code>: 
 <div class="codehilite"><pre><span></span><span class="c1"># First, we need to perform prunning</span>
 plink <span class="se">\</span>
     --bfile EUR.QC.flipped <span class="se">\</span>
@@ -582,21 +581,18 @@ plink <span class="se">\</span>
 </pre></div></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>One way to select the appropriate number of PCs is to perform GWAS on the trait of interest with different number of PCs.
-<a href="https://github.com/bulik/ldsc">LDSC</a> analysis can then be performed on each of the resulted GWAS summary statistics. 
-By observing the estimated intercept, one can select the number of PCs that provide an intercept estimate closer to 1, which might
-suggest a smaller influence of population stratification.</p>
+<p>One way to select the appropriate number of PCs is to perform GWAS on the phenotype under study with different numbers of PCs.
+<a href="https://github.com/bulik/ldsc">LDSC</a> analysis can then be performed on the set of GWAS summary statistics and the GWAS that used the number of PCs that gave an LDSC intercept closest to 1 should correspond to that for which population structure was most accurately controlled for. </p>
 </div>
-<p>The eigen-vector (PCs) are stored in <strong>EUR.eigenvec</strong> and can be used as a covariate in the regression model to account for population stratification.</p>
+<p>Here the PCs have been stored in the <strong>EUR.eigenvec</strong> file and can be used as covariates in the regression model to account for population stratification.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>If the base and target samples are collected from different population (e.g. Caucasian vs African ), the results from PRS analysis will be biased (see <a href="https://www.ncbi.nlm.nih.gov/pubmed/28366442">Martin et al</a>).</p>
+<p>If the base and target samples are collected from different worldwide populations then the results from the PRS analysis may be biased (see Section 3.4 of our papper).</p>
 </div>
-<h1 id="finding-the-best-p-value-threshold">Finding the "Best" P-value threshold<a class="headerlink" href="#finding-the-best-p-value-threshold" title="Permanent link">&para;</a></h1>
-<p>The "best" p-value threshold for PRS construction are usually not known. 
-To identify the "best" PRS, we can perform a regression between the calculated PRS and the 
-sample phenotype and select the PRS that explains most of the phenotypic variation. 
-This can be achieved using <code>R</code>.</p>
+<h1 id="finding-the-best-fit-prs">Finding the "best-fit" PRS<a class="headerlink" href="#finding-the-best-fit-prs" title="Permanent link">&para;</a></h1>
+<p>The P-value threshold that provides the "best-fit" PRS under the C+T method is usually unknown. 
+To approximate the "best-fit" PRS, we can perform a regression between PRS calculated at a range of P-value thresholds and then select the PRS that explains the highest phenotypic variance (please see Section 4.6 of our paper on overfitting issues). 
+This can be achieved using <code>R</code> as follows:</p>
 <div class="superfences-tabs">
 <input name="__tabs_3" type="radio" id="__tab_3_0" checked="checked" />
 <label for="__tab_3_0">detail</label>
@@ -671,9 +667,9 @@ prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
 <span class="kp">print</span><span class="p">(</span>prs.result<span class="p">[</span><span class="kp">which.max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">),])</span>
 </pre></div></div>
 </div>
-<details class="note"><summary>Which p-value threshold generate the "best" PRS?</summary><p>0.05</p>
+<details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.05</p>
 </details>
-<details class="note"><summary>How much phenotypic variation does the "best" PRS explains?</summary><p>0.03921047</p>
+<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.03921047</p>
 </details>
               
             </div>

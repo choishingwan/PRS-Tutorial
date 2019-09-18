@@ -147,16 +147,14 @@
           <div role="main">
             <div class="section">
               
-                <p><code>lassosum</code> is an <code>R</code> package for PRS calculation. 
-It uses LASSO/Elastic Net estimates rather than p-value thresholding to generate PRS and are 
-expected to provide a higher <span class="arithmatex">\(R^2\)</span> when compared to p-value thresholding.</p>
-<p>You can install <code>lassosum</code> and its dependencies in <code>R</code> with the following</p>
+                <p>Here we use another PRS program, <code>lassosum</code>, which is an <code>R</code> package that uses penalised regression (LASSO) in its approach to PRS calculation.</p>
+<p>You can install <code>lassosum</code> and its dependencies in <code>R</code> with the following command:</p>
 <div class="codehilite"><pre><span></span>install.packages<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;devtools&quot;</span><span class="p">,</span><span class="s">&quot;RcppArmadillo&quot;</span><span class="p">,</span> <span class="s">&quot;data.table&quot;</span><span class="p">,</span> <span class="s">&quot;Matrix&quot;</span><span class="p">),</span> dependencies<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
 <span class="kn">library</span><span class="p">(</span>devtools<span class="p">)</span>
 install_github<span class="p">(</span><span class="s">&quot;tshmak/lassosum&quot;</span><span class="p">)</span>
 </pre></div>
 
-<p>Assuming we have the following files</p>
+<p>Again, we assume that we have the following files: </p>
 <table>
 <thead>
 <tr>
@@ -200,7 +198,7 @@ install_github<span class="p">(</span><span class="s">&quot;tshmak/lassosum&quot
 </tbody>
 </table>
 <h1 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h1>
-<p>We can run lassosum as follow</p>
+<p>We can run lassosum as follows: </p>
 <div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>lassosum<span class="p">)</span>
 <span class="c1"># Prefer to work with data.table as it speeds up file reading</span>
 <span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
