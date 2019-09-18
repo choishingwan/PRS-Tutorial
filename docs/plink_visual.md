@@ -1,6 +1,6 @@
 
 # Plotting the Results
-The P-value threshold results from applying the C+T PRS method can be visualized using `R` as follows:
+The PRS results corresponding to a range of P-value thresholds obtained by application of the C+T PRS method (eg. using PLINK or PRSice-2) can be visualized using `R` as follows:
 
 !!! note
     We will be using `prs.result` generated in [previous section](#finding-the-best-p-value-threshold)
@@ -159,3 +159,7 @@ ggplot(dat, aes(x=SCORE, y=Height, color=Sex))+
 
 ![Example Scatter Plot](img/EUR.height.scatter.png)
 > An example scatter plot generated using `ggplot2`
+
+
+Programs such as PRSice-2 and [bigsnpr](https://privefl.github.io/bigsnpr/) include numerous options for plotting PRS results.
+
