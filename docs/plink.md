@@ -186,7 +186,7 @@ plink \
 ```
 
 # Update Effect Size
-When the effect size relates to disease risk and is thus given as an odd ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we usually take the natural logarithm of the OR so that the PRS can be computed using a simple summation instead (which can be back-transformed afterwards). 
+When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we usually take the natural logarithm of the OR so that the PRS can be computed using a simple summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with `R`:
 
 ```R tab="Without data.table"
@@ -221,6 +221,7 @@ plink \
     --clump-field P \
     --out EUR
 ```
+
 Each of the new parameters corresponds to the following
 
 | Paramter | Value | Description|
@@ -228,9 +229,9 @@ Each of the new parameters corresponds to the following
 | clump-p1 | 1 | P-value threshold for a SNP to be included as an index SNP. 1 is selected such that all SNPs are include for clumping|
 | clump-r2 | 0.1 | SNPs having $r^2$ higher than 0.1 with the index SNPs will be removed |
 | clump-kb | 250 | SNPs within 250k of the index SNP are considered for clumping|
-| clump | Height.QC.transformed | Summary statistic file containing the p-value information|
-| clump-snp-field | SNP | Specify that the column `SNP` contains the SNP IDs |
-| clump-field | P | Specify that the column `P` contains the P-value information |
+| clump | Height.QC.transformed | Base data (summary statistic) file containing the P-value information|
+| clump-snp-field | SNP | Specifies that the column `SNP` contains the SNP IDs |
+| clump-field | P | Specifies that the column `P` contains the P-value information |
 
 A more detailed description of the clumping process can be found [here](https://www.cog-genomics.org/plink/1.9/postproc#clump)
 
@@ -239,7 +240,7 @@ A more detailed description of the clumping process can be found [here](https://
 
 
 This will generate **EUR.clumped**, containing the index SNPs after clumping is performed.
-We can extract the index SNP ID by performing the following:
+We can extract the index SNP ID by performing the following command:
 
 ```bash
 awk 'NR!=1{print $3}' EUR.clumped >  EUR.valid.snp
@@ -249,20 +250,20 @@ awk 'NR!=1{print $3}' EUR.clumped >  EUR.valid.snp
 
 
 !!! note
-    If your target sample is small (e.g. <500), you can use the 1000 Genomes Project samples for the LD calculation.
-    Make sure that you use the population that most closely reflects represents the base sample.
+    If your target data are small (e.g. N < 500) then you can use the 1000 Genomes Project samples for the LD calculation.
+    Make sure to use the population that most closely reflects represents the base sample.
 
 # Generate PRS
-`plink` provides a convenient function `--score` and `--q-score-range` for calculating polygenic score.
+`plink` provides a convenient function `--score` and `--q-score-range` for calculating polygenic scores.
 
 We will need three files:
 
-1. The summary statistic file: **Height.QC.Transformed**
-2. A file containing SNP ID and their corresponding p-value (`$1` because SNP ID is located at the first column; `$8` because P-value is located at the eigth column)
+1. The base data file: **Height.QC.Transformed**
+2. A file containing SNP IDs and their corresponding P-values (`$1` because SNP ID is located in the first column; `$8` because the P-value is located in the eighth column)
 ```bash
 awk '{print $1,$8}' Height.QC.Transformed > SNP.pvalue
 ```
-3. A file containing the P-value thresholds that we are testing. Here we will only test a few thresholds for illustration purposes:
+3. A file containing the different P-value thresholds for inclusion of SNPs in the PRS. Here calculate PRS corresponding to a few thresholds for illustration purposes:
 ```bash
 echo "0.001 0 0.001" > range_list
 echo "0.05 0 0.05" >> range_list
@@ -279,7 +280,7 @@ The format of the **range_list** file should be as follows:
 
 !!! note
     The threshold boundaries are inclusive. For example, for the `0.05` threshold, we include all SNPs with P-value from 
-    `0` to `0.05`, **including** any SNPs with P-value equal to `0.05`
+    `0` to `0.05`, **including** any SNPs with P-value equal to `0.05`.
 
 We can then calculate the PRS with the following `plink` command:
 
@@ -295,8 +296,8 @@ The meaning of the new parameters are as follows:
 
 | Paramter | Value | Description|
 |:-:|:-:|:-|
-|score|Height.QC.Transformed 1 4 11 header| We read from the **Height.QC.Transformed** file, assuming the `1`st column to be the SNP ID; `4`th column to be the effective allele information; `11`th column to be the effect size estimate; and the file contains a `header`|
-|q-score-range| range_test SNP.pvalue| We want to calculate PRS based on the thresholds defined in **range_test**, where the threshold values (p-values) were stored in **SNP.pvalue**|
+|score|Height.QC.Transformed 1 4 11 header| We read from the **Height.QC.Transformed** file, assuming that the `1`st column is the SNP ID; `4`th column is the effective allele information; the `11`th column is the effect size estimate; and that the file contains a `header`|
+|q-score-range| range_test SNP.pvalue| We want to calculate PRS based on the thresholds defined in **range_test**, where the threshold values (P-values) were stored in **SNP.pvalue**|
 
 The above command and range_list will generate 7 files:
 
@@ -309,20 +310,19 @@ The above command and range_list will generate 7 files:
 7. EUR.0.001.profile
 
 !!! Note
-    The default formular for PRS calculation in PLINK is:
-    (Assuming the effect size of SNP $i$ is $S_i$;  the number of effective allele observed in sample $j$ is $G_{ij}$; the ploidy of the sample is $P$ (It should be 2 for human); the number of samples included in the PRS be $N$; and the number of non-missing SNPs observed in sample $j$ be $M_j$)
+    The default formula for PRS calculation in PLINK is:
+    
     $$
     PRS_j =\frac{ \sum_i^NS_i*G_{ij}}{P*M_j}
     $$
 
-    If sample has a missing genotype for SNP $i$, the population minor allele frequency times ploidy ($MAF_i*P$) is used inplace of $G_{ij}$
+    where the effect size of SNP $i$ is $S_i$;  the number of effect alleles observed in sample $j$ is $G_{ij}$; the ploidy of the sample is $P$ (is generally 2 for humans); the number of samples included in the PRS is $N$; and the number of non-missing SNPs observed in sample $j$ is $M_j$. If the sample has a missing genotype for SNP $i$, then the population minor allele frequency multiplied by the ploidy ($MAF_i*P$) is used instead of $G_{ij}$.
 
 # Accounting for Population Stratification
 
-Population structure is the principal source of confounding in GWAS and are usually accounted for by incorporating the principal components (PCs) as a covariate. 
-Similarly, we can incorporate PCs in our PRS analysis to account for population stratification.
+Population structure is the principal source of confounding in GWAS and is usually accounted for by incorporating principal components (PCs) as covariates. We can incorporate PCs into our PRS analysis to account for population stratification.
 
-Again, we can calculate the PCs using `plink` 
+Again, we can calculate the PCs using `plink`: 
 ```bash
 # First, we need to perform prunning
 plink \
@@ -339,22 +339,19 @@ plink \
 ```
 
 !!! note
-    One way to select the appropriate number of PCs is to perform GWAS on the trait of interest with different number of PCs.
-    [LDSC](https://github.com/bulik/ldsc) analysis can then be performed on each of the resulted GWAS summary statistics. 
-    By observing the estimated intercept, one can select the number of PCs that provide an intercept estimate closer to 1, which might
-    suggest a smaller influence of population stratification.
+    One way to select the appropriate number of PCs is to perform GWAS on the phenotype under study with different numbers of PCs.
+    [LDSC](https://github.com/bulik/ldsc) analysis can then be performed on the set of GWAS summary statistics and the GWAS that used the number of PCs that gave an LDSC intercept closest to 1 should correspond to that for which population structure was most accurately controlled for. 
 
-The eigen-vector (PCs) are stored in **EUR.eigenvec** and can be used as a covariate in the regression model to account for population stratification.
+Here the PCs have been stored in the **EUR.eigenvec** file and can be used as covariates in the regression model to account for population stratification.
 
 !!! important
-    If the base and target samples are collected from different population (e.g. Caucasian vs African ), the results from PRS analysis will be biased (see [Martin et al](https://www.ncbi.nlm.nih.gov/pubmed/28366442)).
+    If the base and target samples are collected from different worldwide populations then the results from the PRS analysis may be biased (see Section 3.4 of our papper).
 
 
-# Finding the "Best" P-value threshold
-The "best" p-value threshold for PRS construction are usually not known. 
-To identify the "best" PRS, we can perform a regression between the calculated PRS and the 
-sample phenotype and select the PRS that explains most of the phenotypic variation. 
-This can be achieved using `R`.
+# Finding the "best-fit" PRS
+The P-value threshold that provides the "best-fit" PRS under the C+T method is usually unknown. 
+To approximate the "best-fit" PRS, we can perform a regression between PRS calculated at a range of P-value thresholds and then select the PRS that explains the highest phenotypic variance (please see Section 4.6 of our paper on overfitting issues). 
+This can be achieved using `R` as follows:
 
 ```R tab="detail"
 p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
