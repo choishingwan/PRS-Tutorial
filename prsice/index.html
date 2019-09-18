@@ -147,8 +147,8 @@
           <div role="main">
             <div class="section">
               
-                <p>An alternative to <code>plink</code> is <code>PRSice-2</code>, which automates much of the PRS analyses.</p>
-<p>Assuming we have the following files</p>
+                <p>Over the following three pages you can run three devoted PRS programs, which automate many of the steps from the previous page that used a sequence of PLINK functions (plus some QC steps from earlier pages). On this page you will run a PRS analysis using PRSice-2, which implements the standard C+T method.</p>
+<p>This analysis assumes that you have the following files: </p>
 <table>
 <thead>
 <tr>
@@ -159,27 +159,27 @@
 <tbody>
 <tr>
 <td align="center"><strong>GIANT.height.gz</strong></td>
-<td align="center">The original summary statistic. PRSice-2 can directly apply INFO and MAF filtering on the summary statistic</td>
+<td align="center">The original base data file. PRSice-2 can apply INFO and MAF filtering to these base summary statistic data directly</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.QC.bed</strong></td>
-<td align="center">The genotype file after performing some basic filtering</td>
+<td align="center">This file contains the genotype data that passed the QC steps</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.QC.bim</strong></td>
-<td align="center">This file contains the SNPs that passed the basic filtering</td>
+<td align="center">This file contains the list of SNPs that passed the QC steps</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.QC.fam</strong></td>
-<td align="center">This file contains the samples that passed the basic filtering</td>
+<td align="center">This file contains the samples that passed the QC steps</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.valid.sample</strong></td>
-<td align="center">This file contains the samples that passed all the QC</td>
+<td align="center">This file contains the samples that passed the QC steps</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.height</strong></td>
-<td align="center">This file contains the phenotype of the samples</td>
+<td align="center">This file contains the phenotype data of the samples</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.covariate</strong></td>
@@ -187,11 +187,11 @@
 </tr>
 <tr>
 <td align="center"><strong>EUR.eigenvec</strong></td>
-<td align="center">This file contains the PCs of the samples</td>
+<td align="center">This file contains the principal components (PCs) of the samples</td>
 </tr>
 </tbody>
 </table>
-<p>And <code>PRSice-2</code>, which can be downloaded from</p>
+<p>And <code>PRSice-2</code>, which can be downloaded from:</p>
 <table>
 <thead>
 <tr>
@@ -220,15 +220,15 @@
 </table>
 <p>In this tutorial, you will only need <code>PRSice.R</code> and <code>PRSice_XXX</code> where XXX is the operation system</p>
 <h1 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h1>
-<p>It is simple to run PRSice-2. First, we need a single covariate file. This can be done with <code>R</code>:</p>
+<p>To run PRSice-2 we need a single covariate file, and therefore our covariate file and PCs file should be combined. This can be done with <code>R</code> as follows:</p>
 <p><div class="codehilite"><pre><span></span>covariate <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 pcs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
 <span class="kp">colnames</span><span class="p">(</span>pcs<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span>
 cov <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>covariate<span class="p">,</span> pcs<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">))</span>
 write.table<span class="p">(</span>cov<span class="p">,</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
 </pre></div>
-which generates <strong>EUR.cov</strong></p>
-<p>PRSice-2 can then be run to obtain the PRS results:</p>
+which generates <strong>EUR.cov</strong>.</p>
+<p>PRSice-2 can then be run to obtain the PRS results as follows:</p>
 <div class="superfences-tabs">
 <input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
 <label for="__tab_1_0">Linux</label>
@@ -273,7 +273,7 @@ which generates <strong>EUR.cov</strong></p>
     --out EUR
 </pre></div></div>
 </div>
-<p>This will automatically perform a "high-resolution scoring" and generate the "best" PRS (in <strong>EUR.best</strong>) and relevant graphs    </p>
+<p>This will automatically perform "high-resolution scoring" and generate the "best-fit" PRS (in <strong>EUR.best</strong>), with associated plots of the results. Users should read Section 4.6 of our paper to learn more about issues relating to overfitting in PRS analyses.  </p>
               
             </div>
           </div>

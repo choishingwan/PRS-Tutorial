@@ -147,22 +147,20 @@
           <div role="main">
             <div class="section">
               
-                <p>Another popular PRS software is <a href="https://github.com/bvilhjal/ldpred">LDpred</a>, which instead of performing p-value thresholding,
-infers the posterior mean effect size of each marker by using a prior on effect sizes and LD information from an external reference panel, 
-thus allow for a better <span class="arithmatex">\(R^2\)</span>.</p>
+                <p>Here we use another PRS program, <a href="https://github.com/bvilhjal/ldpred">LDpred</a>, that uses a Bayesian approach to polygenic risk scoring.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Python 3 and other packages need to be installed before running LDpred. 
-Please refer to their website for instructions of installation.</p>
-<p>If you have Python installed, you might be able to install LDpred with
+Please refer to their website for installation instructions.</p>
+<p>If you have Python installed, you should be able to install LDpred with the following command:
 <div class="codehilite"><pre><span></span>pip install ldpred
 </pre></div></p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Current script is based on version 1.0.6</p>
+<p>The script used here is based on LDpred version 1.0.6</p>
 </div>
-<p>Assuming we have the following files</p>
+<p>We assume that you have the following files:</p>
 <table>
 <thead>
 <tr>
@@ -206,7 +204,7 @@ Please refer to their website for instructions of installation.</p>
 </tbody>
 </table>
 <h1 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h1>
-<p>LDpred does not support in place filtering of sample and SNPs, therefore we need to generate a new QCed genotype file using <code>plink</code></p>
+<p>LDpred does not support filtering of samples and SNPs, so therefore we must generate a new QC'ed genotype file using <code>plink</code>:</p>
 <div class="codehilite"><pre><span></span><span class="c1"># We also add the height phenotype for convenience</span>
 plink <span class="se">\</span>
     --bfile EUR.QC <span class="se">\</span>
@@ -216,10 +214,10 @@ plink <span class="se">\</span>
     --out EUR.ldpred
 </pre></div>
 
-<p>LDpred can then performs PRS analysis in three steps</p>
+<p>LDpred can then perform PRS analysis in three steps:</p>
 <ol>
 <li>
-<p>Preprocessing the summary statistic file
+<p>Preprocessing the base data file:
 <div class="codehilite"><pre><span></span><span class="c1"># There are 253,288 samples in the Height GWAS</span>
 python LDpred.py coord <span class="se">\</span>
     --rs SNP <span class="se">\</span>
@@ -237,7 +235,7 @@ python LDpred.py coord <span class="se">\</span>
 </pre></div></p>
 </li>
 <li>
-<p>Adjust the effect size
+<p>Adjust the effect size estimates:
 <div class="codehilite"><pre><span></span><span class="c1"># LDpred recommend radius to be Total number of SNPs in target / 3000</span>
  python LDpred.py gibbs <span class="se">\</span>
     --cf EUR.coord <span class="se">\</span>
@@ -248,7 +246,7 @@ python LDpred.py coord <span class="se">\</span>
 </pre></div></p>
 </li>
 <li>
-<p>Calculate the PRS
+<p>Calculate the PRS:
 <div class="codehilite"><pre><span></span>python LDpred.py score <span class="se">\</span>
     --gf EUR.ldpred <span class="se">\</span>
     --rf EUR.weight <span class="se">\</span>
@@ -260,8 +258,8 @@ python LDpred.py coord <span class="se">\</span>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To obtain the <span class="arithmatex">\(R^2\)</span> of PRS obtained from different parameters, and / or 
-adjust for covariate, you might need to use <code>R</code> (see <a href="https://github.com/bvilhjal/ldpred/wiki/Q-and-A#im-having-trouble-with-covariates-can-you-help-me">here</a>)</p>
+<p>To obtain the PRS <span class="arithmatex">\(R^2\)</span> according to the use of different parameters, and / or 
+to adjust for covariates, you may need to use <code>R</code> (see <a href="https://github.com/bvilhjal/ldpred/wiki/Q-and-A#im-having-trouble-with-covariates-can-you-help-me">here</a>).</p>
 </div>
               
             </div>
