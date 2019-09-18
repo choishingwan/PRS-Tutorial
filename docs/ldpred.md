@@ -1,20 +1,18 @@
-Another popular PRS software is [LDpred](https://github.com/bvilhjal/ldpred), which instead of performing p-value thresholding,
-infers the posterior mean effect size of each marker by using a prior on effect sizes and LD information from an external reference panel, 
-thus allow for a better $R^2$.
+Here we use another PRS program, [LDpred](https://github.com/bvilhjal/ldpred), that uses a Bayesian approach to polygenic risk scoring.
 
 !!! note
     Python 3 and other packages need to be installed before running LDpred. 
-    Please refer to their website for instructions of installation.
+    Please refer to their website for installation instructions.
     
-    If you have Python installed, you might be able to install LDpred with
+    If you have Python installed, you should be able to install LDpred with the following command:
     ```
     pip install ldpred
     ```
 
 !!! note
-    Current script is based on version 1.0.6
+    The script used here is based on LDpred version 1.0.6
 
-Assuming we have the following files
+We assume that you have the following files:
 
 |File Name | Description|
 |:-:|:-:|
@@ -29,7 +27,7 @@ Assuming we have the following files
 
 
 # Running PRS analysis
-LDpred does not support in place filtering of sample and SNPs, therefore we need to generate a new QCed genotype file using `plink`
+LDpred does not support filtering of samples and SNPs, so therefore we must generate a new QC'ed genotype file using `plink`:
 
 ``` bash
 # We also add the height phenotype for convenience
@@ -41,9 +39,9 @@ plink \
     --out EUR.ldpred
 ```
 
-LDpred can then performs PRS analysis in three steps
+LDpred can then perform PRS analysis in three steps:
 
-1. Preprocessing the summary statistic file
+1. Preprocessing the base data file:
 ```bash
 # There are 253,288 samples in the Height GWAS
 python LDpred.py coord \
@@ -61,7 +59,7 @@ python LDpred.py coord \
     --gf EUR.ldpred
 ```
 
-2. Adjust the effect size
+2. Adjust the effect size estimates:
 ``` bash
 # LDpred recommend radius to be Total number of SNPs in target / 3000
  python LDpred.py gibbs \
@@ -72,7 +70,7 @@ python LDpred.py coord \
     --N 253288
 ```
 
-3. Calculate the PRS
+3. Calculate the PRS:
 ```bash 
 python LDpred.py score \
     --gf EUR.ldpred \
@@ -83,5 +81,5 @@ python LDpred.py score \
 ```
 
 !!! note
-    To obtain the $R^2$ of PRS obtained from different parameters, and / or 
-    adjust for covariate, you might need to use `R` (see [here](https://github.com/bvilhjal/ldpred/wiki/Q-and-A#im-having-trouble-with-covariates-can-you-help-me))
+    To obtain the PRS $R^2$ according to the use of different parameters, and / or 
+    to adjust for covariates, you may need to use `R` (see [here](https://github.com/bvilhjal/ldpred/wiki/Q-and-A#im-having-trouble-with-covariates-can-you-help-me)).
