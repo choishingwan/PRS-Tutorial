@@ -1,19 +1,19 @@
-An alternative to `plink` is `PRSice-2`, which automates much of the PRS analyses.
+Over the following three pages you can run three devoted PRS programs, which automate many of the steps from the previous page that used a sequence of PLINK functions as well as some of the QC steps in the QC pages. On this page you will run a PRS analysis using PRSice-2, which implements the standard C+T method.
 
-Assuming we have the following files
+This analysis assumes that you have the following files: 
 
 |File Name | Description|
 |:-:|:-:|
-|**GIANT.height.gz**| The original summary statistic. PRSice-2 can directly apply INFO and MAF filtering on the summary statistic |
-|**EUR.QC.bed**| The genotype file after performing some basic filtering |
-|**EUR.QC.bim**| This file contains the SNPs that passed the basic filtering |
-|**EUR.QC.fam**| This file contains the samples that passed the basic filtering |
-|**EUR.valid.sample**| This file contains the samples that passed all the QC |
-|**EUR.height**| This file contains the phenotype of the samples |
+|**GIANT.height.gz**| The original base data file. PRSice-2 can apply INFO and MAF filtering to these base summary statistic data directly |
+|**EUR.QC.bed**| This file contains the genotype data that passed the QC steps |
+|**EUR.QC.bim**| This file contains the list of SNPs that passed the QC steps |
+|**EUR.QC.fam**| This file contains the samples that passed the QC steps |
+|**EUR.valid.sample**| This file contains the samples that passed the QC steps |
+|**EUR.height**| This file contains the phenotype data of the samples |
 |**EUR.covariate**| This file contains the covariates of the samples |
-|**EUR.eigenvec**| This file contains the PCs of the samples |
+|**EUR.eigenvec**| This file contains the principal components (PCs) of the samples |
 
-And `PRSice-2`, which can be downloaded from
+And `PRSice-2`, which can be downloaded from:
 
 | Operating System | Link |
 | -----------------|:----:|
@@ -25,7 +25,7 @@ And `PRSice-2`, which can be downloaded from
 In this tutorial, you will only need `PRSice.R` and `PRSice_XXX` where XXX is the operation system
 
 # Running PRS analysis
-It is simple to run PRSice-2. First, we need a single covariate file. This can be done with `R`:
+To run PRSice-2 we need a single covariate file, and therefore our covariate file and PCs file should be combined. This can be done with `R` as follows:
 
 ```R
 covariate <- read.table("EUR.covariate", header=T)
@@ -36,7 +36,7 @@ write.table(cov,"EUR.cov", quote=F, row.names=F)
 ```
 which generates **EUR.cov**
 
-PRSice-2 can then be run to obtain the PRS results:
+PRSice-2 can then be run to obtain the PRS results as follows:
 
 ```bash tab="Linux"
 Rscript PRSice.R \
@@ -81,6 +81,6 @@ Rscript PRSice.R ^
     --out EUR
 ```
 
-This will automatically perform a "high-resolution scoring" and generate the "best" PRS (in **EUR.best**) and relevant graphs    
+This will automatically perform "high-resolution scoring" and generate the "best-fit" PRS (in **EUR.best**), with associated plots of the results. Users should read Section 4.6 of our paper to learn more about issues relating to overfitting in PRS analyses.  
 
 
