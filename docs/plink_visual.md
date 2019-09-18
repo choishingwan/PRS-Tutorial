@@ -1,9 +1,9 @@
 
 # Plotting the Results
-The PRS results corresponding to a range of P-value thresholds obtained by application of the C+T PRS method (eg. using PLINK or PRSice-2) can be visualized using `R` as follows:
+The PRS results corresponding to a range of P-value thresholds obtained by application of the C+T PRS method (eg. using PLINK or PRSice-2) can be visualised using `R` as follows:
 
 !!! note
-    We will be using `prs.result` generated in [previous section](#finding-the-best-p-value-threshold)
+    We will be using `prs.result`, which was generated in the [previous section](#finding-the-best-p-value-threshold)
 
 ```R tab="Without ggplot2"
 # We strongly recommend the use of ggplot2. Only follow this code if you
