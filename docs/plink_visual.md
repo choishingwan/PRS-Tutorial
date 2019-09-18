@@ -1,6 +1,6 @@
 
 # Plotting the Results
-The P-value threshold results can be visualized using `R`
+The P-value threshold results from applying the C+T PRS method can be visualized using `R` as follows:
 
 !!! note
     We will be using `prs.result` generated in [previous section](#finding-the-best-p-value-threshold)
@@ -120,7 +120,7 @@ ggsave("EUR.height.bar.png", height = 7, width = 7)
 ![Example Bar Plot](img/EUR.height.bar.png)
 > An example bar plot generated using `ggplot2`
 
-In addition, we can visualize the relationship between the "best" PRS and the phenotype of interest, colored by sex
+In addition, we can visualise the relationship between the "best-fit" PRS (which may have been obtained from any of the PRS programs) and the phenotype of interest, coloured according to sex:
 
 ```R tab="Without ggplot2"
 # Read in the files
