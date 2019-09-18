@@ -229,38 +229,33 @@ write.table<span class="p">(</span>cov<span class="p">,</span><span class="s">&q
 </pre></div>
 which generates <strong>EUR.cov</strong></p>
 <p>PRSice-2 can then be run to obtain the PRS results:</p>
-<div class="superfences-tabs">
-<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
-<label for="__tab_1_0">Linux</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>Rscript PRSice.R <span class="se">\</span>
-    --prsice PRSice_linux <span class="se">\</span>
-    --base Height.QC.gz <span class="se">\</span>
-    --target EUR.QC <span class="se">\</span>
-    --keep EUR.valid.sample <span class="se">\</span>
-    --binary-target F <span class="se">\</span>
-    --pheno-file EUR.height <span class="se">\</span>
-    --cov-file EUR.cov <span class="se">\</span>
-    --maf-base MAF,0.05 <span class="se">\</span>
-    --info-base INFO,0.8 <span class="se">\</span>
+<p>```bash tab="Linux"
+Rscript PRSice.R \
+    --prsice PRSice_linux \
+    --base Height.QC.gz \
+    --target EUR.QC \
+    --keep EUR.valid.sample \
+    --binary-target F \
+    --pheno-file EUR.height \
+    --cov-file EUR.cov \
+    --maf-base MAF,0.05 \
+    --info-base INFO,0.8 \
     --out EUR
-</pre></div></div>
-<input name="__tabs_1" type="radio" id="__tab_1_1" />
-<label for="__tab_1_1">OS X</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>Rscript PRSice.R <span class="se">\</span>
-    --prsice PRSice_mac <span class="se">\</span>
-    --base Height.QC.gz <span class="se">\</span>
-    --target EUR.QC <span class="se">\</span>
-    --keep EUR.valid.sample <span class="se">\</span>
-    --binary-target F <span class="se">\</span>
-    --pheno-file EUR.height <span class="se">\</span>
-    --cov-file EUR.cov <span class="se">\</span>
-    --maf-base MAF,0.05 <span class="se">\</span>
-    --info-base INFO,0.8 <span class="se">\</span>
+<div class="codehilite"><pre><span></span>```bash tab=&quot;OS X&quot;
+Rscript PRSice.R \
+    --prsice PRSice_mac \
+    --base Height.QC.gz \
+    --target EUR.QC \
+    --keep EUR.valid.sample \
+    --binary-target F \
+    --pheno-file EUR.height \
+    --cov-file EUR.cov \
+    --maf-base MAF,0.05 \
+    --info-base INFO,0.8 \
     --out EUR
-</pre></div></div>
-<input name="__tabs_1" type="radio" id="__tab_1_2" />
-<label for="__tab_1_2">Windows</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>Rscript PRSice.R ^
+</pre></div></p>
+<p><code>bash tab="Windows"
+Rscript PRSice.R ^
     --prsice PRSice_win64.exe ^
     --base Height.QC.gz ^
     --target EUR.QC ^
@@ -270,9 +265,7 @@ which generates <strong>EUR.cov</strong></p>
     --cov-file EUR.cov ^
     --maf-base MAF,0.05 ^
     --info-base INFO,0.8 ^
-    --out EUR
-</pre></div></div>
-</div>
+    --out EUR</code></p>
 <p>This will automatically perform a "high-resolution scoring" and generate the "best" PRS (in <strong>EUR.best</strong>) and relevant graphs    </p>
               
             </div>

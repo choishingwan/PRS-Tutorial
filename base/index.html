@@ -164,16 +164,11 @@ which can cause PRS software to crash or to produce errors in
 results. However, a <code>md5sum</code> hash is generally included in files 
 so that file integrity can be checked. The following command 
 performs this <code>md5sum</code> check: </p>
-<div class="superfences-tabs">
-<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
-<label for="__tab_1_0">Linux</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>md5sum GIANT.height.gz
-</pre></div></div>
-<input name="__tabs_1" type="radio" id="__tab_1_1" />
-<label for="__tab_1_1">OS X</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>md5 GIANT.height.gz
-</pre></div></div>
-</div>
+<p>```bash tab="Linux"
+md5sum GIANT.height.gz
+<div class="codehilite"><pre><span></span>```bash tab=&quot;OS X&quot;
+md5 GIANT.height.gz
+</pre></div></p>
 <p>if the file is intact, then <code>md5sum</code> generates a string of characters, which in this case should be: <code>88413472f72823ee294f0916a36505d9</code>. 
 If a different string is generated, then the file is corrupted.</p>
 <h1 id="reading-the-summary-statistic-file">Reading the summary statistic file<a class="headerlink" href="#reading-the-summary-statistic-file" title="Permanent link">&para;</a></h1>
@@ -281,9 +276,7 @@ uniq -d &gt; duplicated.snp
 <li>Sort the SNP IDs. This will put duplicated SNP IDs next to each other</li>
 <li>Print out any duplicated SNP IDs using the uniq command and print them to the <em>duplicated.snp</em> file</li>
 </ol>
-<details class="note"><summary>How many duplicated SNPs are there?</summary><p>There are a total of <code>13</code> duplicated SNPs</p>
-</details>
-<p>Duplicated SNPs can then be removed using the <code>grep</code> command:
+<details class="note"><summary>How many duplicated SNPs are there?</summary><p>There are a total of <code>13</code> duplicated SNPs</p></details><p>Duplicated SNPs can then be removed using the <code>grep</code> command:
 <div class="codehilite"><pre><span></span>gunzip -c GIANT.height.gz  <span class="p">|</span><span class="se">\</span>
 grep -vf duplicated.snp <span class="p">|</span><span class="se">\</span>
 gzip - &gt; Height.gz
