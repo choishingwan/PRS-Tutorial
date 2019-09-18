@@ -425,8 +425,8 @@ for(i in p.threshold){
 print(prs.result[which.max(prs.result$R2),])
 ```
 
-??? note "Which p-value threshold generate the "best" PRS?"
+??? note "Which P-value threshold generates the "best-fit" PRS?"
     0.05
 
-??? note "How much phenotypic variation does the "best" PRS explains?"
+??? note "How much phenotypic variation does the "best-fit" PRS explain?"
     0.03921047
