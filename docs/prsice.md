@@ -1,4 +1,4 @@
-Over the following three pages you can run three devoted PRS programs, which automate many of the steps from the previous page that used a sequence of PLINK functions (plus some QC steps from earlier pages). On this page you will run a PRS analysis using PRSice-2, which implements the standard C+T method.
+Over the following three pages you can run three dedicated PRS programs, which automate many of the steps from the previous page that used a sequence of PLINK functions (plus some QC steps from earlier pages). On this page you will run a PRS analysis using PRSice-2, which implements the standard C+T method.
 
 This analysis assumes that you have the following files: 
 
@@ -34,6 +34,7 @@ colnames(pcs) <- c("FID","IID", paste0("PC",1:6))
 cov <- merge(covariate, pcs, by=c("FID", "IID"))
 write.table(cov,"EUR.cov", quote=F, row.names=F)
 ```
+
 which generates **EUR.cov**.
 
 PRSice-2 can then be run to obtain the PRS results as follows:
