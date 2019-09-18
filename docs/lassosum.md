@@ -1,8 +1,6 @@
-`lassosum` is an `R` package for PRS calculation. 
-It uses LASSO/Elastic Net estimates rather than p-value thresholding to generate PRS and are 
-expected to provide a higher $R^2$ when compared to p-value thresholding.
+Here we use another PRS program, `lassosum`, which is an `R` package that uses penalised regression (LASSO) in its approach to PRS calculation.
 
-You can install `lassosum` and its dependencies in `R` with the following
+You can install `lassosum` and its dependencies in `R` with the following command:
 
 ```R
 install.packages(c("devtools","RcppArmadillo", "data.table", "Matrix"), dependencies=TRUE)
@@ -10,7 +8,7 @@ library(devtools)
 install_github("tshmak/lassosum")
 ```
 
-Assuming we have the following files
+Again, we assume that we have the following files: 
 
 |File Name | Description|
 |:-:|:-:|
@@ -25,7 +23,7 @@ Assuming we have the following files
 
 # Running PRS analysis
 
-We can run lassosum as follow
+We can run lassosum as follows: 
 
 ``` R
 library(lassosum)
