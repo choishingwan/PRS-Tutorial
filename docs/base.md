@@ -52,13 +52,14 @@ The column headers correspond to the following:
 
 Below we perform QC on these base data according to the 'QC checklist' in the guide paper, which we recommend that users follow each time they perform a PRS analysis:
 
-# Heritability check
+# \# Heritability check
 We recommend that PRS analyses are performed on base data with a chip-heritability estimate $h_{snp}^{2} > 0.05$. The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). Our GIANT height GWAS data are known to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. 
 
-# Effect allele
+# \# Effect allele
 The GIANT consortium report which is the effect allele and which is the non-effect allele in their results, critical for PRS association results to be in the correction direction.
 
-# File transfer 
+# \# File transfer
+
 A common problem is that the downloaded base data file becomes 
 corrupted during download, which can cause PRS software to crash 
 or to produce errors in results. However, a `md5sum` hash is 
@@ -77,10 +78,10 @@ md5 GIANT.height.gz
 if the file is intact, then `md5sum` generates a string of characters, which in this case should be: `88413472f72823ee294f0916a36505d9`. 
 If a different string is generated, then the file is corrupted.
 
-# Genome build
+# \# Genome build
 These base data are on the same genome build as the target data that we will be using. You must check that your base and target data are on the same genome build, and if they are not then use a tool such as LiftOver to make the builds consistent across the data sets.
 
-# Standard GWAS QC
+# \# Standard GWAS QC
 As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. If the base data have been obtained as summary statistics from a public source, then the typical QC steps that you will be able to perform on them are to filter the SNPs according to INFO score and MAF. SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). Therefore, SNPs with low MAF and INFO are typically removed before performing downstream analyses. We recommend removing SNPs with MAF < 1% and INFO < 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results). These SNP filters can be acheived using the following code:
 
 ```bash
@@ -96,7 +97,7 @@ The bash code above does the following:
 4. Prints any line with INFO above 0.8 (`$10` because the tenth column of the file contains the INFO information)
 5. Compresses and writes the results to **Height.QC.gz**
 
-# Duplicate SNPs
+# \# Duplicate SNPs
 If an error has occurred in the generation of the base data then there may be duplicated SNPs in your base file.
 Most PRS software do not allow duplicated SNPs in the base input and thus they should be removed, using a command such as the one below: 
 
@@ -131,13 +132,13 @@ The above script does the following:
 2. Establishes whether any row contains entries observed in `duplicated.snp` and removes them if so
 3. Compresses and writes the results to **Height.gz**
 
-# Sex chromosomes 
+# \# Sex chromosomes 
 Previously performed QC on these data removed individuals with mismatching (inferred) biological and reported sex, while the sex chromosomes are not included. Please refer to the corresponding section in the paper for details relating QC performed in relation to the sex chromosomes. 
 
-# Sample overlap
+# \# Sample overlap
 In this tutorial the target data are simulated and thus there must be no sample overlap. However, users should ensure that the possibility of sample overlap between the base and target data is minimised. 
 
-# Relatedness
+# \# Relatedness
 In this tutorial the target data are simulated and thus there must be no closely related individuals across the base and target data. However, users should ensure that the possibility of closely related individuals between the base and target data is minimised. 
 
 The **Height.QC.gz** base data are now ready for using in downstream analyses.
