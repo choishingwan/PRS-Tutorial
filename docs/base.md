@@ -97,9 +97,28 @@ The bash code above does the following:
 4. Prints any line with INFO above 0.8 (`$10` because the tenth column of the file contains the INFO information)
 5. Compresses and writes the results to **Height.QC.gz**
 
+# \# Ambiguous SNPs
+If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.
+
+Ambiguous SNPs can be obtained by examining the bim file:
+```bash
+awk '!( ($5=="A" && $6=="T") || \
+        ($5=="T" && $6=="A") || \
+        ($5=="G" && $6=="C") || \
+        ($5=="C" && $6=="G")) {print}' \
+        EUR.QC.bim > EUR.unambig.snp 
+```
+
+??? note "How many ambiguous SNPs were there?"
+    There are `330,818` ambiguous SNPs
+
+
+# \# Mismatching genotypes
+If there is a non-ambiguous mismatch in allele coding between the base and target data sets, such as A/C in the base and G/T in the target data, then this can be resolved by ‘flipping’ the alleles in either data set to their complementary alleles. However, since we need the target data to know which SNPs have mismatching genotypes across the data sets, then we will perform this 'allele flipping' in the target data.
+
 # \# Duplicate SNPs
-If an error has occurred in the generation of the base data then there may be duplicated SNPs in your base file.
-Most PRS software do not allow duplicated SNPs in the base input and thus they should be removed, using a command such as the one below: 
+If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
+Most PRS software do not allow duplicated SNPs in the base data input and thus they should be removed, using a command such as the one below: 
 
 ```bash
 gunzip -c GIANT.height.gz |\
