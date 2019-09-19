@@ -42,13 +42,6 @@ The column headers correspond to the following:
 - **INFO**: The imputation information score
 - **OR**: The effect size estimate of the SNP, if the outcome is binary/case-control. If the outcome is continuous or treated as continuous then this will be the BETA
 
-!!! Important
-    Some GWAS results files do not make clear which allele is the effect allele and which the non-effect allele. 
-    If the incorrect assumption is made in computing the PRS, then the effect of the PRS in the target data will be in the wrong direction.
-    
-    To avoid misleading conclusions the effect allele from the base (GWAS) data must be known.
-    
-    
 # QC checklist: Base data
 
 Below we perform QC on these base data according to the 'QC checklist' in the guide paper, which we recommend that users follow each time they perform a PRS analysis:
@@ -58,6 +51,13 @@ We recommend that PRS analyses are performed on base data with a chip-heritabili
 
 # \# Effect allele
 The GIANT consortium report which is the effect allele and which is the non-effect allele in their results, critical for PRS association results to be in the correction direction.
+
+!!! Important
+    Some GWAS results files do not make clear which allele is the effect allele and which the non-effect allele.
+    If the incorrect assumption is made in computing the PRS, then the effect of the PRS in the target data will be in the wrong direction.
+
+    To avoid misleading conclusions the effect allele from the base (GWAS) data must be known.
+
 
 # \# File transfer
 
@@ -86,9 +86,9 @@ These base data are on the same genome build as the target data that we will be 
 As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. If the base data have been obtained as summary statistics from a public source, then the typical QC steps that you will be able to perform on them are to filter the SNPs according to INFO score and MAF. SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). Therefore, SNPs with low MAF and INFO are typically removed before performing downstream analyses. We recommend removing SNPs with MAF < 1% and INFO < 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results). These SNP filters can be acheived using the following code:
 
 ```bash
-gunzip -c Height.gz |\
+gunzip -c GIANT.height.gz |\
 awk 'NR==1 || ($6 > 0.01) && ($10 > 0.8) {print}' |\
-gzip  > Height.QC.gz
+gzip  > Height.gz
 ```
 
 The bash code above does the following:
@@ -103,15 +103,16 @@ If the base and target data were generated using different genotyping chips and 
 
 Ambiguous SNPs can be obtained by examining the bim file:
 ```bash
-awk '!( ($5=="A" && $6=="T") || \
-        ($5=="T" && $6=="A") || \
-        ($5=="G" && $6=="C") || \
-        ($5=="C" && $6=="G")) {print}' \
-        EUR.QC.bim > EUR.unambig.snp 
+gunzip -c Height.gz |\
+awk '!( ($4=="A" && $5=="T") || \
+        ($4=="T" && $5=="A") || \
+        ($4=="G" && $5=="C") || \
+        ($4=="C" && $5=="G")) {print}' |\
+    gzip > Height.noambig.gz
 ```
 
 ??? note "How many ambiguous SNPs were there?"
-    There are `330,818` ambiguous SNPs
+    There are `36,683` ambiguous SNPs
 
 
 # \# Mismatching genotypes
@@ -122,7 +123,7 @@ If an error has occurred in the generation of the base data then there may be du
 Most PRS software do not allow duplicated SNPs in the base data input and thus they should be removed, using a command such as the one below: 
 
 ```bash
-gunzip -c GIANT.height.gz |\
+gunzip -c Height.noambig.gz |\
 awk '{ print $1}' |\
 sort |\
 uniq -d > duplicated.snp
@@ -130,27 +131,27 @@ uniq -d > duplicated.snp
 
 The above command does the following:
 
-1. Decompresses and reads the **GIANT.height.gz** file
+1. Decompresses and reads the **Height.noambig.gz** file
 2. Prints out the first column of the file (which contains the SNP ID; change `$1` to another number if the SNP ID is located in another column, e.g. `$3` if the SNP ID is located on the third column)
 3. Sort the SNP IDs. This will put duplicated SNP IDs next to each other
 4. Print out any duplicated SNP IDs using the uniq command and print them to the *duplicated.snp* file
 
 
 ??? note "How many duplicated SNPs are there?"
-    There are a total of `13` duplicated SNPs
+    There are a total of `10` duplicated SNPs
 
 Duplicated SNPs can then be removed using the `grep` command:
 ```bash
-gunzip -c GIANT.height.gz  |\
+gunzip -c Height.noambig.gz  |\
 grep -vf duplicated.snp |\
-gzip - > Height.gz
+gzip - > Height.QC.gz
 ```
 
 The above script does the following:
 
-1. Decompresses and reads the **GIANT.height.gz** file 
+1. Decompresses and reads the **Height.noambig.gz** file 
 2. Establishes whether any row contains entries observed in `duplicated.snp` and removes them if so
-3. Compresses and writes the results to **Height.gz**
+3. Compresses and writes the results to **Height.QC.gz**
 
 # \# Sex chromosomes 
 Previously performed QC on these data removed individuals with mismatching (inferred) biological and reported sex, while the sex chromosomes are not included. Please refer to the corresponding section in the paper for details relating QC performed in relation to the sex chromosomes. 
