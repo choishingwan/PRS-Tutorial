@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Shing Wan CHOI">
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>prsice (Beatrice’s MacBook Pro's conflicted copy 2019 09 18) - Basic Tutorial for Polygenic Risk Score Analyses</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="../css/extra.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "prsice (Beatrice\u2019s MacBook Pro's conflicted copy 2019 09 18)";
+    var mkdocs_page_input_path = "prsice (Beatrice\u2019s MacBook Pro's conflicted copy 2019-09-18).md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-145068952-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Basic Tutorial for Polygenic Risk Score Analyses</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Overview</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../base/">1. QC of Summary Statistics</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../target/">2. Target Genotype QC</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">3. Running PRS</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../plink/">PLINK</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../prsice/">PRSice-2</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../ldpred/">LDpred</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../lassosum/">lassosum</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../plink_visual/">4. Visualizing PRS</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Basic Tutorial for Polygenic Risk Score Analyses</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>prsice (Beatrice’s MacBook Pro's conflicted copy 2019 09 18)</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/choishingwan/PRS-Tutorial/edit/master/docs/prsice (Beatrice’s MacBook Pro's conflicted copy 2019-09-18).md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>Over the following three pages you can run three dedicated PRS programs, which automate many of the steps from the previous page that used a sequence of PLINK functions (plus some QC steps from earlier pages). On this page you will run a PRS analysis using PRSice-2, which implements the standard C+T method.</p>
+<p>This analysis assumes that you have the following files: </p>
+<table>
+<thead>
+<tr>
+<th align="center">File Name</th>
+<th align="center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><strong>GIANT.height.gz</strong></td>
+<td align="center">The original base data file. PRSice-2 can apply INFO and MAF filtering to these base summary statistic data directly</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.QC.bed</strong></td>
+<td align="center">This file contains the genotype data that passed the QC steps</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.QC.bim</strong></td>
+<td align="center">This file contains the list of SNPs that passed the QC steps</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.QC.fam</strong></td>
+<td align="center">This file contains the samples that passed the QC steps</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.valid.sample</strong></td>
+<td align="center">This file contains the samples that passed the QC steps</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.height</strong></td>
+<td align="center">This file contains the phenotype data of the samples</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.covariate</strong></td>
+<td align="center">This file contains the covariates of the samples</td>
+</tr>
+<tr>
+<td align="center"><strong>EUR.eigenvec</strong></td>
+<td align="center">This file contains the principal components (PCs) of the samples</td>
+</tr>
+</tbody>
+</table>
+<p>And <code>PRSice-2</code>, which can be downloaded from:</p>
+<table>
+<thead>
+<tr>
+<th>Operating System</th>
+<th align="center">Link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linux 64-bit</td>
+<td align="center"><a href="https://github.com/choishingwan/PRSice/releases/download/2.2.5/PRSice_linux.zip">v2.2.5</a></td>
+</tr>
+<tr>
+<td>OS X 64-bit</td>
+<td align="center"><a href="https://github.com/choishingwan/PRSice/releases/download/2.2.5/PRSice_mac.zip">v2.2.5</a></td>
+</tr>
+<tr>
+<td>Windows 32-bit</td>
+<td align="center"><a href="https://github.com/choishingwan/PRSice/releases/download/2.2.5/PRSice_win32.zip">v2.2.5</a></td>
+</tr>
+<tr>
+<td>Windows 64-bit</td>
+<td align="center"><a href="https://github.com/choishingwan/PRSice/releases/download/2.2.5/PRSice_win64.zip">v2.2.5</a></td>
+</tr>
+</tbody>
+</table>
+<p>In this tutorial, you will only need <code>PRSice.R</code> and <code>PRSice_XXX</code> where XXX is the operation system</p>
+<h1 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h1>
+<p>To run PRSice-2 we need a single covariate file, and therefore our covariate file and PCs file should be combined. This can be done with <code>R</code> as follows:</p>
+<div class="codehilite"><pre><span></span>covariate <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+pcs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+<span class="kp">colnames</span><span class="p">(</span>pcs<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span>
+cov <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>covariate<span class="p">,</span> pcs<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">))</span>
+write.table<span class="p">(</span>cov<span class="p">,</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+</pre></div>
+
+<p>which generates <strong>EUR.cov</strong>.</p>
+<p>PRSice-2 can then be run to obtain the PRS results as follows:</p>
+<div class="superfences-tabs">
+<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
+<label for="__tab_1_0">Linux</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>Rscript PRSice.R <span class="se">\</span>
+    --prsice PRSice_linux <span class="se">\</span>
+    --base Height.QC.gz <span class="se">\</span>
+    --target EUR.QC <span class="se">\</span>
+    --keep EUR.valid.sample <span class="se">\</span>
+    --binary-target F <span class="se">\</span>
+    --pheno-file EUR.height <span class="se">\</span>
+    --cov-file EUR.cov <span class="se">\</span>
+    --maf-base MAF,0.05 <span class="se">\</span>
+    --info-base INFO,0.8 <span class="se">\</span>
+    --out EUR
+</pre></div></div>
+<input name="__tabs_1" type="radio" id="__tab_1_1" />
+<label for="__tab_1_1">OS X</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>Rscript PRSice.R <span class="se">\</span>
+    --prsice PRSice_mac <span class="se">\</span>
+    --base Height.QC.gz <span class="se">\</span>
+    --target EUR.QC <span class="se">\</span>
+    --keep EUR.valid.sample <span class="se">\</span>
+    --binary-target F <span class="se">\</span>
+    --pheno-file EUR.height <span class="se">\</span>
+    --cov-file EUR.cov <span class="se">\</span>
+    --maf-base MAF,0.05 <span class="se">\</span>
+    --info-base INFO,0.8 <span class="se">\</span>
+    --out EUR
+</pre></div></div>
+<input name="__tabs_1" type="radio" id="__tab_1_2" />
+<label for="__tab_1_2">Windows</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>Rscript PRSice.R ^
+    --prsice PRSice_win64.exe ^
+    --base Height.QC.gz ^
+    --target EUR.QC ^
+    --keep EUR.valid.sample ^
+    --binary-target F ^
+    --pheno-file EUR.height ^
+    --cov-file EUR.cov ^
+    --maf-base MAF,0.05 ^
+    --info-base INFO,0.8 ^
+    --out EUR
+</pre></div></div>
+</div>
+<p>This will automatically perform "high-resolution scoring" and generate the "best-fit" PRS (in <strong>EUR.best</strong>), with associated plots of the results. Users should read Section 4.6 of our paper to learn more about issues relating to overfitting in PRS analyses.  </p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/choishingwan/PRS-Tutorial/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

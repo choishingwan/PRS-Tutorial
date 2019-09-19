@@ -156,15 +156,15 @@
             <div class="section">
               
                 <h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
-<p>This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our <a href="https://doi.org/10.1101/416545">PRS Guide paper</a>. The aim of this tutorial is to help those new to PRS to get started on PRS analyses and to provide existing users with a better understanding of the processes and implemention underlying popular PRS software.</p>
-<p>The tutorial is separated into four main sections:</p>
+<p>This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our <a href="https://doi.org/10.1101/416545">PRS Guide paper</a>. The aim of this tutorial is to provide a simple introduction to PRS analyses to those new to PRS, while equipping existing users with a better understanding of the processes and implementation "underneath the hood" of popular PRS software.</p>
+<p>The tutorial is separated into four main sections and reflects the structure of our <a href="https://doi.org/10.1101/416545">guide paper</a>: the first two sections on QC correspond to Section 2 of the paper and constitute a 'QC checklist' for PRS analyses, the third section on calculating PRS (here with examples using <a href="plink/">PLINK</a>, <a href="prsice/">PRSice-2</a>, <a href="ldpred/">LDpred</a> and <a href="lassosum/">lassosum</a>) corresponds to Section 3 of the paper, while the fourth section, which provides some examples of visualising PRS results, accompanies Section 4 of the paper.</p>
 <ol>
-<li><a href="base/">QC of Base GWAS Summary Data</a></li>
-<li><a href="target/">QC of Target Individual-Level Data</a></li>
-<li><a href="plink/">Running PRS Analyses</a></li>
-<li><a href="plink_visual/">Visualizing PRS Results</a></li>
+<li><a href="base/">Quality Control (QC) of Base Data</a></li>
+<li><a href="target/">Quality Control (QC) of Target Data</a></li>
+<li><a href="plink/">Calculating and analysing PRS</a></li>
+<li><a href="plink_visual/">Visualising PRS Results</a></li>
 </ol>
-<p>We provide examples of performing PRS analyses using four software for polygenic risk score analyses: <a href="plink/">PLINK</a>, <a href="prsice/">PRSice-2</a>, <a href="ldpred/">LDpred</a> and <a href="lassosum/">lassosum</a></p>
+<p>We will be referring to our <a href="https://doi.org/10.1101/416545">guide paper</a> in each section and so you may find it helpful to have the paper open as you go through the tutorial.</p>
 <p>If you are only interested in how to perform PRS on previously QC'ed data then you can skip to <a href="plink/">Step 3</a>. Links to download the required data are provided under each section.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -188,7 +188,7 @@ Windows users will need to change some commands accordingly.</p>
 </div>
 <h1 id="datasets">Datasets<a class="headerlink" href="#datasets" title="Permanent link">&para;</a></h1>
 <ol>
-<li><a href="https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/GIANT.height.gz">Base data</a>: Modified summary statistic file from the GIANT consortium study on height</li>
+<li><a href="https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/GIANT.height.gz">Base data</a>: Modified summary statistics file from the GIANT consortium study on height</li>
 <li><a href="https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip">Target data</a>: Simulated data based on the 1000 Genomes Project European samples</li>
 </ol>
 <h1 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h1>
@@ -255,5 +255,5 @@ bioRxiv 416545 (2018). https://doi.org/10.1101/416545</p>
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-09-18 17:26:30
+Build Date UTC : 2019-09-19 14:58:49
 -->
