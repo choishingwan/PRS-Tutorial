@@ -1,6 +1,5 @@
-In this section we will perform some quality control (QC) steps on the target data. 
-
-For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
+# Obtaining the target data
+Target data consist of individual-level genotype-phenotype data, usually generated within your lab/department/collaboration. For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
 You can download the data [here](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip) or you can download the data using the following command:
 
 ```bash
@@ -13,6 +12,18 @@ Unzip the data as follow:
 unzip EUR.zip
 ```
 
+!!! note
+    Install the program PLINK and include its location in your PATH directory, which allows us to use `plink` instead of `./plink` in the commands below. If PLINK is not in your PATH directory and is instead in your working directory, then replace all instances of `plink` in the tutorial with `./plink`.
+
+# QC checklist: Target data
+Below are the QC steps that comprise the QC checklist for the target data.
+
+# \# Sample size
+We recommend that users only perform PRS analyses on target data of at least 100 individuals. The sample size of our target data here is X individuals. 
+
+# \# File transfer
+Usually we do not need to download and transfer the target data file because it is typically generated locally. However, the file should contain an md5sum code in case we send the data file to collaborators who may want to confirm that the file has not changed during the transfer.
+
 ??? note "What is the md5sum code for each of the target files?"
 
     |File|md5sum|
@@ -23,21 +34,17 @@ unzip EUR.zip
     |**EUR.fam**           |17e8184fb03c690db6980bb7499d4982|
     |**EUR.height**        |052beb4cae32ac7673f1d6b9e854c85b|
 
-!!! note
-    Install the program PLINK and include its location in your PATH directory, which allows us to use `plink` instead of `./plink` in the commands below. If PLINK is not in your PATH directory and is instead in your working directory, then replace all instances of `plink` in the tutorial with `./plink`.
+# \# Genome build
+As stated in the base data section, the genome build for our base and target data is the same, as it should be.
 
-# Genotype file format
-
-# Basic filterings
-The power and validity of PRS analyses depend on 
-the quality of the base and target data. Therefore, 
-both data sets must be quality controlled to at least the standards 
+# \# Standard GWAS QC
+The target data must be quality controlled to at least the standards 
 implemented in GWAS studies, e.g. removing SNPs with low genotyping rate, 
-low minor allele frequency, out of Hardy-Weinberg Equilibrium and removing
+low minor allele frequency, out of Hardy-Weinberg Equilibrium, removing
 individuals with low genotyping rate 
 (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/)).
 
-The following `plink` command applies some basic filtering:
+The following `plink` command applies some of these QC metrics to the target data:
 
 ```bash
 plink \
@@ -76,46 +83,7 @@ Each of the parameters corresponds to the following
     `--extract`, `--exclude`, `--keep`, `--remove`, `--make-just-fam` and `--write-snplist` functions, we can work 
     solely on the list of samples and SNPs without duplicating the 
     genotype file, reducing the storage space usage.  
-
-# Filter related samples
-Closely related individuals in the target data may lead to overfitted results, limiting the generalisability of the results. 
-
-As a first step to removing related individuals we perform pruning, which removes highly correlated SNPs:
-```bash
-plink \
-    --bfile EUR \
-    --keep EUR.QC.fam \
-    --extract EUR.QC.snplist \
-    --indep-pairwise 200 50 0.25 \
-    --out EUR.QC
-```
-
-This will generate two files 1) **EUR.QC.prune.in** and 2) **EUR.QC.prune.out**
-All SNPs within **EUR.QC.prune.in** have a pairwise $r^2 < 0.25$
-
-Individuals that have a first or second degree relative in the sample ($\text{pi-hat} > 0.125$) can be removed with the following command:
-
-```bash
-plink \
-    --bfile EUR \
-    --extract EUR.QC.prune.in \
-    --keep EUR.QC.fam \
-    --rel-cutoff 0.125 \
-    --out EUR.QC
-```
-
-??? note "How many related samples were excluded?"
-    - `2` samples were excluded
-
-!!! note
-    A greedy algorithm is used to remove closely related individuals in a way that optimises the size of the sample retained.                However, the algorithm is dependent on the random seed used, which can generate different results. Therefore, to reproduce
-    the same result, you will need to specify the same random seed. 
     
-    PLINK's algorithm for removing related individuals does not account for the phenotype under study. 
-    To minimize the removal of cases of a disease, the following algorithm can be used instead: 
-    [GreedyRelated](https://github.com/choishingwan/GreedyRelated).
-    
-# Remove samples with extreme heterozygosity rate
 Very high or low heterozygosity rates in individuals could be due to DNA contamination or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. Heterozygosity rates can be computed using `plink` after performing pruning.
 ```bash
 plink \
@@ -150,7 +118,167 @@ fwrite(valid[,c("FID","IID")], "EUR.valid.sample", sep="\t")
 ??? note "How many samples were excluded due to high heterozygosity rate?"
     - `7` samples were excluded
 
-# Check for mismatching sex information
+# \# Ambiguous SNPs
+There were removed during the base data QC
+
+# \# Mismatching genotypes
+In addition, when there are non-ambiguous mismatches in allele 
+coding between the data sets, such as A/C in the base
+and G/T in the target data, then this can be resolved by 
+‘flipping’ the alleles in the target data to their complementary alleles. 
+This can be achieved with the following steps: 
+
+1. Get the correct A1 alleles for the bim file
+
+```R tab="Without data.table"
+bim <- read.table("EUR.QC.bim", header = F, stringsAsFactors = F)
+colnames(bim) <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
+height <-
+    read.table(gzfile("Height.QC.gz"),
+               header = T,
+               stringsAsFactors = F)
+# Change all alleles to upper case for easy comparison
+height$A1 <- toupper(height$A1)
+height$A2 <- toupper(height$A2)
+bim$B.A1 <- toupper(bim$B.A1)
+bim$B.A2 <- toupper(bim$B.A2)
+info <- merge(bim, height, by = c("SNP", "CHR", "BP"))
+
+# Function for finding the complementary allele
+complement <- function(x) {
+    switch (
+        x,
+        "A" = "T",
+        "C" = "G",
+        "T" = "A",
+        "G" = "C",
+        return(NA)
+    )
+}
+# Get SNPs that have the same alleles across base and target
+info.match <- subset(info, A1 == B.A1 & A2 == B.A2)
+# Identify SNPs that are complementary between base and target
+info$C.A1 <- sapply(info$B.A1, complement)
+info$C.A2 <- sapply(info$B.A2, complement)
+info.complement <- subset(info, A1 == C.A1 & A2 == C.A2)
+# Update these allele coding in the bim file
+bim[bim$SNP %in% info.complement$SNP,]$B.A1 <-
+    sapply(bim[bim$SNP %in% info.complement$SNP,]$B.A1, complement)
+bim[bim$SNP %in% info.complement$SNP,]$B.A2 <-
+    sapply(bim[bim$SNP %in% info.complement$SNP,]$B.A2, complement)
+# identify SNPs that need flipping
+info.flip <- subset(info, A1 == B.A2 & A2 == B.A1)
+# identify SNPs that need flipping & complement
+info.cflip <- subset(info, A1 == C.A2 & A2 == C.A1)
+# Update these allele coding in the bim file
+com.snps <- bim$SNP %in% info.cflip$SNP
+bim[com.snps,]$B.A1 <- sapply(bim[com.snps,]$B.A1, complement)
+bim[com.snps,]$B.A2 <- sapply(bim[com.snps,]$B.A2, complement)
+# Get list of SNPs that need to change the A1 encoding
+flip <- rbind(info.flip, info.cflip)
+flip.snp <- data.frame(SNP = flip$SNP, A1 = flip$A1)
+write.table(flip.snp,
+            "EUR.update.a1",
+            quote = F,
+            row.names = F)
+write.table(
+    bim,
+    "EUR.QC.adj.bim",
+    quote = F,
+    row.names = F,
+    col.names = F
+)
+# And we want to remove any SNPs that do not match with the base data
+mismatch <-
+    bim$SNP[!(bim$SNP %in% info.match$SNP |
+                  bim$SNP %in% info.complement$SNP | 
+                  bim$SNP %in% flip$SNP)]
+write.table(
+    mismatch,
+    "EUR.mismatch",
+    quote = F,
+    row.names = F,
+    col.names = F
+)
+```
+
+```R tab="With data.table"
+library(data.table)
+bim <- fread("EUR.QC.bim")
+bim.col <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
+setnames(bim, colnames(bim), bim.col)
+height <- fread("Height.QC.gz")
+# Change all alleles to upper case for easy comparison
+height[,c("A1","A2"):=list(toupper(A1), toupper(A2))]
+bim[,c("B.A1","B.A2"):=list(toupper(B.A1), toupper(B.A2))]
+info <- merge(bim, height, by=c("SNP", "CHR", "BP"))
+# Function for calculating the complementary allele
+complement <- function(x){
+    switch (x,
+        "A" = "T",
+        "C" = "G",
+        "T" = "A",
+        "G" = "C",
+        return(NA)
+    )
+}
+# Identify SNPs that are complementary between base and target
+com.snps <- info[sapply(B.A1, complement) == A1 &
+                     sapply(B.A2, complement) == A2, SNP]
+# Now update the bim file
+bim[SNP %in% com.snps, c("B.A1", "B.A2") :=
+        list(sapply(B.A1, complement),
+             sapply(B.A2, complement))]
+# identify SNPs that need flipping & complement
+com.flip <- info[sapply(B.A1, complement) == A2 &
+                     sapply(B.A2, complement) == A1, SNP]
+# Now update the bim file
+bim[SNP %in% com.flip, c("B.A1", "B.A2") :=
+        list(sapply(B.A1, complement),
+             sapply(B.A2, complement))]
+# Obtain list of SNPs that require flipping
+flip <- info[B.A1==A2 & B.A2==A1]
+# Now generate file for PLINK 
+fwrite(flip[,c("SNP", "A1")], "EUR.update.a1", sep="\t")
+# Write the updated bim file
+fwrite(bim, "EUR.QC.adj.bim", col.names=F, sep="\t")
+# We can then remove all mismatch SNPs
+matched <- info[(A1 == B.A1 & A2 == B.A2) |
+                    (A1 == B.A2 & A2 == B.A1) |
+                    (A1 == sapply(B.A1, complement) &
+                         A2 == sapply(B.A2, complement)) |
+                    (A1 == sapply(B.A2, complement) &
+                         A2 == sapply(B.A1, complement))]
+mismatch <- bim[!SNP%in%matched$SNP, SNP]
+write.table(mismatch, "EUR.mismatch", quote=F, row.names=F, col.names=F)
+```
+
+The above script will generate three files: **EUR.QC.adj.bim**, **EUR.update.a1** and **EUR.mismatch**. 
+
+2. Replace **EUR.QC.bim** with **EUR.QC.adj.bim**:
+
+```bash
+# Make a back up
+mv EUR.QC.bim EUR.QC.bim.bk
+ln -s EUR.QC.adj.bim EUR.QC.bim
+```
+
+3. Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
+```bash
+plink \
+    --bfile EUR.QC \
+    --a1-allele EUR.update.a1 \
+    --make-bed \
+    --keep EUR.valid.sample \
+    --extract EUR.unambig.snp \
+    --exclude EUR.mismatch \
+    --out EUR.QC.flipped
+```
+
+# \# Duplicate SNPs
+Make sure to remove any duplicate SNPs in your target data (these target data were simulated and so include no duplicated SNPs)
+
+# \# Sex chromosomes 
 
 Sometimes sample mislabelling can occur, which may lead to invalid results. 
 A good indication of a mislabelled sample is a mismatch between biological sex and reported sex. 
@@ -188,7 +316,49 @@ fwrite(dat[STATUS=="OK",c("FID","IID")], "EUR.QC.valid", sep="\t")
 ??? note "How many samples were excluded due mismatched Sex information?"
     - `2` samples were excluded
 
-# Generate final QC'ed target sample
+
+# \# Sample overlap
+Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper] (https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). 
+
+# \# Relatedness
+Closely related individuals in the target data may lead to overfitted results, limiting the generalisability of the results. 
+
+As a first step to removing related individuals we perform pruning, which removes highly correlated SNPs:
+```bash
+plink \
+    --bfile EUR \
+    --keep EUR.QC.fam \
+    --extract EUR.QC.snplist \
+    --indep-pairwise 200 50 0.25 \
+    --out EUR.QC
+```
+
+This will generate two files 1) **EUR.QC.prune.in** and 2) **EUR.QC.prune.out**
+All SNPs within **EUR.QC.prune.in** have a pairwise $r^2 < 0.25$
+
+Individuals that have a first or second degree relative in the sample ($\text{pi-hat} > 0.125$) can be removed with the following command:
+
+```bash
+plink \
+    --bfile EUR \
+    --extract EUR.QC.prune.in \
+    --keep EUR.QC.fam \
+    --rel-cutoff 0.125 \
+    --out EUR.QC
+```
+
+??? note "How many related samples were excluded?"
+    - `2` samples were excluded
+
+!!! note
+    A greedy algorithm is used to remove closely related individuals in a way that optimises the size of the sample retained.                However, the algorithm is dependent on the random seed used, which can generate different results. Therefore, to reproduce
+    the same result, you will need to specify the same random seed. 
+    
+    PLINK's algorithm for removing related individuals does not account for the phenotype under study. 
+    To minimize the removal of cases of a disease, the following algorithm can be used instead: 
+    [GreedyRelated](https://github.com/choishingwan/GreedyRelated).
+
+# Generate final QC'ed target data file
 After performing the full analysis, you can generate a QC'ed data set with the following command:
 ```bash
 plink \
