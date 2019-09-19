@@ -49,6 +49,7 @@ The column headers correspond to the following:
     To avoid misleading conclusions the effect allele from the base (GWAS) data must be known.
     
     
+# QC checklist: Base data
 
 Below we perform QC on these base data according to the 'QC checklist' in the guide paper, which we recommend that users follow each time they perform a PRS analysis:
 
