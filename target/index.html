@@ -74,22 +74,43 @@
     <a class="current" href="./">2. Target Genotype QC</a>
     <ul class="subnav">
             
-    <li class="toctree-l2"><a href="#genotype-file-format">Genotype file format</a></li>
+    <li class="toctree-l2"><a href="#obtaining-the-target-data">Obtaining the target data</a></li>
     
 
-    <li class="toctree-l2"><a href="#basic-filterings">Basic filterings</a></li>
+    <li class="toctree-l2"><a href="#qc-checklist-target-data">QC checklist: Target data</a></li>
     
 
-    <li class="toctree-l2"><a href="#filter-related-samples">Filter related samples</a></li>
+    <li class="toctree-l2"><a href="#35-sample-size"># Sample size</a></li>
     
 
-    <li class="toctree-l2"><a href="#remove-samples-with-extreme-heterozygosity-rate">Remove samples with extreme heterozygosity rate</a></li>
+    <li class="toctree-l2"><a href="#35-file-transfer"># File transfer</a></li>
     
 
-    <li class="toctree-l2"><a href="#check-for-mismatching-sex-information">Check for mismatching sex information</a></li>
+    <li class="toctree-l2"><a href="#35-genome-build"># Genome build</a></li>
     
 
-    <li class="toctree-l2"><a href="#generate-final-qced-target-sample">Generate final QC'ed target sample</a></li>
+    <li class="toctree-l2"><a href="#35-standard-gwas-qc"># Standard GWAS QC</a></li>
+    
+
+    <li class="toctree-l2"><a href="#35-ambiguous-snps"># Ambiguous SNPs</a></li>
+    
+
+    <li class="toctree-l2"><a href="#35-sex-chromosomes"># Sex chromosomes</a></li>
+    
+
+    <li class="toctree-l2"><a href="#35-mismatching-genotypes"># Mismatching genotypes</a></li>
+    
+
+    <li class="toctree-l2"><a href="#35-duplicate-snps"># Duplicate SNPs</a></li>
+    
+
+    <li class="toctree-l2"><a href="#35-sample-overlap"># Sample overlap</a></li>
+    
+
+    <li class="toctree-l2"><a href="#35-relatedness"># Relatedness</a></li>
+    
+
+    <li class="toctree-l2"><a href="#generate-final-qced-target-data-file">Generate final QC'ed target data file</a></li>
     
 
     </ul>
@@ -158,8 +179,8 @@
           <div role="main">
             <div class="section">
               
-                <p>In this section we will perform some quality control (QC) steps on the target data. </p>
-<p>For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
+                <h1 id="obtaining-the-target-data">Obtaining the target data<a class="headerlink" href="#obtaining-the-target-data" title="Permanent link">&para;</a></h1>
+<p>Target data consist of individual-level genotype-phenotype data, usually generated within your lab/department/collaboration. For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
 You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip">here</a> or you can download the data using the following command:</p>
 <div class="codehilite"><pre><span></span>curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip -L -O
 </pre></div>
@@ -168,6 +189,16 @@ You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/
 <div class="codehilite"><pre><span></span>unzip EUR.zip
 </pre></div>
 
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Install the program PLINK and include its location in your PATH directory, which allows us to use <code>plink</code> instead of <code>./plink</code> in the commands below. If PLINK is not in your PATH directory and is instead in your working directory, then replace all instances of <code>plink</code> in the tutorial with <code>./plink</code>.</p>
+</div>
+<h1 id="qc-checklist-target-data">QC checklist: Target data<a class="headerlink" href="#qc-checklist-target-data" title="Permanent link">&para;</a></h1>
+<p>Below are the QC steps that comprise the QC checklist for the target data.</p>
+<h1 id="35-sample-size"># Sample size<a class="headerlink" href="#35-sample-size" title="Permanent link">&para;</a></h1>
+<p>We recommend that users only perform PRS analyses on target data of at least 100 individuals. The sample size of our target data here is 503 individuals. </p>
+<h1 id="35-file-transfer"># File transfer<a class="headerlink" href="#35-file-transfer" title="Permanent link">&para;</a></h1>
+<p>Usually we do not need to download and transfer the target data file because it is typically generated locally. However, the file should contain an md5sum code in case we send the data file to collaborators who may want to confirm that the file has not changed during the transfer.</p>
 <details class="note"><summary>What is the md5sum code for each of the target files?</summary><table>
 <thead>
 <tr>
@@ -199,20 +230,15 @@ You can download the data <a href="https://github.com/choishingwan/PRS-Tutorial/
 </tbody>
 </table>
 </details>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Install the program PLINK and include its location in your PATH directory, which allows us to use <code>plink</code> instead of <code>./plink</code> in the commands below. If PLINK is not in your PATH directory and is instead in your working directory, then replace all instances of <code>plink</code> in the tutorial with <code>./plink</code>.</p>
-</div>
-<h1 id="genotype-file-format">Genotype file format<a class="headerlink" href="#genotype-file-format" title="Permanent link">&para;</a></h1>
-<h1 id="basic-filterings">Basic filterings<a class="headerlink" href="#basic-filterings" title="Permanent link">&para;</a></h1>
-<p>The power and validity of PRS analyses depend on 
-the quality of the base and target data. Therefore, 
-both data sets must be quality controlled to at least the standards 
+<h1 id="35-genome-build"># Genome build<a class="headerlink" href="#35-genome-build" title="Permanent link">&para;</a></h1>
+<p>As stated in the base data section, the genome build for our base and target data is the same, as it should be.</p>
+<h1 id="35-standard-gwas-qc"># Standard GWAS QC<a class="headerlink" href="#35-standard-gwas-qc" title="Permanent link">&para;</a></h1>
+<p>The target data must be quality controlled to at least the standards 
 implemented in GWAS studies, e.g. removing SNPs with low genotyping rate, 
-low minor allele frequency, out of Hardy-Weinberg Equilibrium and removing
+low minor allele frequency, out of Hardy-Weinberg Equilibrium, removing
 individuals with low genotyping rate 
 (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a>).</p>
-<p>The following <code>plink</code> command applies some basic filtering:</p>
+<p>The following <code>plink</code> command applies some of these QC metrics to the target data:</p>
 <p><div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
     --maf <span class="m">0</span>.05 <span class="se">\</span>
@@ -290,9 +316,8 @@ However,  this will use up a lot of storage space. Using <code>plink</code>'s
 solely on the list of samples and SNPs without duplicating the 
 genotype file, reducing the storage space usage.  </p>
 </div>
-<h1 id="filter-related-samples">Filter related samples<a class="headerlink" href="#filter-related-samples" title="Permanent link">&para;</a></h1>
-<p>Closely related individuals in the target data may lead to overfitted results, limiting the generalisability of the results. </p>
-<p>As a first step to removing related individuals we perform pruning, which removes highly correlated SNPs:
+<p>Very high or low heterozygosity rates in individuals could be due to DNA contamination or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. </p>
+<p>First, we perform prunning to remove highly correlated SNPs:
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
     --keep EUR.QC.fam <span class="se">\</span>
@@ -300,35 +325,11 @@ genotype file, reducing the storage space usage.  </p>
     --indep-pairwise <span class="m">200</span> <span class="m">50</span> <span class="m">0</span>.25 <span class="se">\</span>
     --out EUR.QC
 </pre></div></p>
-<p>This will generate two files 1) <strong>EUR.QC.prune.in</strong> and 2) <strong>EUR.QC.prune.out</strong>
-All SNPs within <strong>EUR.QC.prune.in</strong> have a pairwise <span class="arithmatex">\(r^2 &lt; 0.25\)</span></p>
-<p>Individuals that have a first or second degree relative in the sample (<span class="arithmatex">\(\text{pi-hat} &gt; 0.125\)</span>) can be removed with the following command:</p>
+<p>This will generate two files 1) <strong>EUR.QC.prune.in</strong> and 2) <strong>EUR.QC.prune.out</strong>.All SNPs within <strong>EUR.QC.prune.in</strong> have a pairwise <span class="arithmatex">\(r^2 &lt; 0.25\)</span>. </p>
+<p>Heterozygosity rates can then be computed using <code>plink</code>:
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
     --extract EUR.QC.prune.in <span class="se">\</span>
-    --keep EUR.QC.fam <span class="se">\</span>
-    --rel-cutoff <span class="m">0</span>.125 <span class="se">\</span>
-    --out EUR.QC
-</pre></div>
-
-<details class="note"><summary>How many related samples were excluded?</summary><ul>
-<li><code>2</code> samples were excluded</li>
-</ul>
-</details>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>A greedy algorithm is used to remove closely related individuals in a way that optimises the size of the sample retained.                However, the algorithm is dependent on the random seed used, which can generate different results. Therefore, to reproduce
-the same result, you will need to specify the same random seed. </p>
-<p>PLINK's algorithm for removing related individuals does not account for the phenotype under study. 
-To minimize the removal of cases of a disease, the following algorithm can be used instead: 
-<a href="https://github.com/choishingwan/GreedyRelated">GreedyRelated</a>.</p>
-</div>
-<h1 id="remove-samples-with-extreme-heterozygosity-rate">Remove samples with extreme heterozygosity rate<a class="headerlink" href="#remove-samples-with-extreme-heterozygosity-rate" title="Permanent link">&para;</a></h1>
-<p>Very high or low heterozygosity rates in individuals could be due to DNA contamination or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. Heterozygosity rates can be computed using <code>plink</code> after performing pruning.
-<div class="codehilite"><pre><span></span>plink <span class="se">\</span>
-    --bfile EUR <span class="se">\</span>
-    --extract EUR.QC.prune.in <span class="se">\</span>
-    --keep EUR.QC.rel.id <span class="se">\</span>
     --het <span class="se">\</span>
     --out EUR.QC
 </pre></div></p>
@@ -358,11 +359,13 @@ fwrite<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</
 <li><code>7</code> samples were excluded</li>
 </ul>
 </details>
-<h1 id="check-for-mismatching-sex-information">Check for mismatching sex information<a class="headerlink" href="#check-for-mismatching-sex-information" title="Permanent link">&para;</a></h1>
+<h1 id="35-ambiguous-snps"># Ambiguous SNPs<a class="headerlink" href="#35-ambiguous-snps" title="Permanent link">&para;</a></h1>
+<p>There were removed during the base data QC</p>
+<h1 id="35-sex-chromosomes"># Sex chromosomes<a class="headerlink" href="#35-sex-chromosomes" title="Permanent link">&para;</a></h1>
 <p>Sometimes sample mislabelling can occur, which may lead to invalid results. 
 A good indication of a mislabelled sample is a mismatch between biological sex and reported sex. 
 If the biological sex does not match up with the reported sex, then the sample may have been mislabelled.</p>
-<p>Before performing a sex check, pruning should be performed (see <a href="./#filter-related-samples">here</a>).
+<p>Before performing a sex check, pruning should be performed (see <a href="./#35-standard-gwas-qc">here</a>).
 A sex check can then easily be conducted using <code>plink</code>
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
@@ -379,7 +382,7 @@ A sex check can then easily be conducted using <code>plink</code>
 valid <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.QC.sexcheck&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 valid <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> STATUS<span class="o">==</span><span class="s">&quot;OK&quot;</span> <span class="o">&amp;</span> FID <span class="o">%in%</span> valid<span class="o">$</span>FID<span class="p">)</span>
-write.table<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.QC.valid&quot;</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> col.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span> 
+write.table<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.QC.valid&quot;</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> col.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">)</span> 
 </pre></div></div>
 <input name="__tabs_2" type="radio" id="__tab_2_1" />
 <label for="__tab_2_1">With data.table</label>
@@ -394,20 +397,212 @@ fwrite<span class="p">(</span>dat<span class="p">[</span>STATUS<span class="o">=
 <li><code>2</code> samples were excluded</li>
 </ul>
 </details>
-<h1 id="generate-final-qced-target-sample">Generate final QC'ed target sample<a class="headerlink" href="#generate-final-qced-target-sample" title="Permanent link">&para;</a></h1>
-<p>After performing the full analysis, you can generate a QC'ed data set with the following command:
+<h1 id="35-mismatching-genotypes"># Mismatching genotypes<a class="headerlink" href="#35-mismatching-genotypes" title="Permanent link">&para;</a></h1>
+<p>In addition, when there are non-ambiguous mismatches in allele 
+coding between the data sets, such as A/C in the base
+and G/T in the target data, then this can be resolved by 
+‘flipping’ the alleles in the target data to their complementary alleles. 
+This can be achieved with the following steps: </p>
+<ol>
+<li>Get the correct A1 alleles for the bim file</li>
+</ol>
+<div class="superfences-tabs">
+<input name="__tabs_3" type="radio" id="__tab_3_0" checked="checked" />
+<label for="__tab_3_0">Without data.table</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>bim <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.bim&quot;</span><span class="p">)</span>
+<span class="kp">colnames</span><span class="p">(</span>bim<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CM&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">,</span> <span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span>
+qc <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.QC.snplist&quot;</span><span class="p">,</span> header <span class="o">=</span> <span class="bp">F</span><span class="p">,</span> stringsAsFactors <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
+height <span class="o">&lt;-</span>
+    read.table<span class="p">(</span><span class="kp">gzfile</span><span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">),</span>
+               header <span class="o">=</span> <span class="bp">T</span><span class="p">,</span>
+               stringsAsFactors <span class="o">=</span> <span class="bp">F</span><span class="p">,</span> 
+               sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
+<span class="c1"># Change all alleles to upper case for easy comparison</span>
+height<span class="o">$</span>A1 <span class="o">&lt;-</span> <span class="kp">toupper</span><span class="p">(</span>height<span class="o">$</span>A1<span class="p">)</span>
+height<span class="o">$</span>A2 <span class="o">&lt;-</span> <span class="kp">toupper</span><span class="p">(</span>height<span class="o">$</span>A2<span class="p">)</span>
+bim<span class="o">$</span>B.A1 <span class="o">&lt;-</span> <span class="kp">toupper</span><span class="p">(</span>bim<span class="o">$</span>B.A1<span class="p">)</span>
+bim<span class="o">$</span>B.A2 <span class="o">&lt;-</span> <span class="kp">toupper</span><span class="p">(</span>bim<span class="o">$</span>B.A2<span class="p">)</span>
+info <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>bim<span class="p">,</span> height<span class="p">,</span> by <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">))</span>
+info <span class="o">&lt;-</span> info<span class="p">[</span>info<span class="o">$</span>SNP <span class="o">%in%</span> qc<span class="o">$</span>V1<span class="p">,]</span>
+<span class="c1"># Function for finding the complementary allele</span>
+complement <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">)</span> <span class="p">{</span>
+    <span class="kr">switch</span> <span class="p">(</span>
+        x<span class="p">,</span>
+        <span class="s">&quot;A&quot;</span> <span class="o">=</span> <span class="s">&quot;T&quot;</span><span class="p">,</span>
+        <span class="s">&quot;C&quot;</span> <span class="o">=</span> <span class="s">&quot;G&quot;</span><span class="p">,</span>
+        <span class="s">&quot;T&quot;</span> <span class="o">=</span> <span class="s">&quot;A&quot;</span><span class="p">,</span>
+        <span class="s">&quot;G&quot;</span> <span class="o">=</span> <span class="s">&quot;C&quot;</span><span class="p">,</span>
+        <span class="kr">return</span><span class="p">(</span><span class="kc">NA</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+<span class="c1"># Get SNPs that have the same alleles across base and target</span>
+info.match <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>info<span class="p">,</span> A1 <span class="o">==</span> B.A1 <span class="o">&amp;</span> A2 <span class="o">==</span> B.A2<span class="p">)</span>
+<span class="c1"># Identify SNPs that are complementary between base and target</span>
+info<span class="o">$</span>C.A1 <span class="o">&lt;-</span> <span class="kp">sapply</span><span class="p">(</span>info<span class="o">$</span>B.A1<span class="p">,</span> complement<span class="p">)</span>
+info<span class="o">$</span>C.A2 <span class="o">&lt;-</span> <span class="kp">sapply</span><span class="p">(</span>info<span class="o">$</span>B.A2<span class="p">,</span> complement<span class="p">)</span>
+info.complement <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>info<span class="p">,</span> A1 <span class="o">==</span> C.A1 <span class="o">&amp;</span> A2 <span class="o">==</span> C.A2<span class="p">)</span>
+<span class="c1"># Update these allele coding in the bim file</span>
+bim<span class="p">[</span>bim<span class="o">$</span>SNP <span class="o">%in%</span> info.complement<span class="o">$</span>SNP<span class="p">,]</span><span class="o">$</span>B.A1 <span class="o">&lt;-</span>
+    <span class="kp">sapply</span><span class="p">(</span>bim<span class="p">[</span>bim<span class="o">$</span>SNP <span class="o">%in%</span> info.complement<span class="o">$</span>SNP<span class="p">,]</span><span class="o">$</span>B.A1<span class="p">,</span> complement<span class="p">)</span>
+bim<span class="p">[</span>bim<span class="o">$</span>SNP <span class="o">%in%</span> info.complement<span class="o">$</span>SNP<span class="p">,]</span><span class="o">$</span>B.A2 <span class="o">&lt;-</span>
+    <span class="kp">sapply</span><span class="p">(</span>bim<span class="p">[</span>bim<span class="o">$</span>SNP <span class="o">%in%</span> info.complement<span class="o">$</span>SNP<span class="p">,]</span><span class="o">$</span>B.A2<span class="p">,</span> complement<span class="p">)</span>
+<span class="c1"># identify SNPs that need flipping</span>
+info.flip <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>info<span class="p">,</span> A1 <span class="o">==</span> B.A2 <span class="o">&amp;</span> A2 <span class="o">==</span> B.A1<span class="p">)</span>
+<span class="c1"># identify SNPs that need flipping &amp; complement</span>
+info.cflip <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>info<span class="p">,</span> A1 <span class="o">==</span> C.A2 <span class="o">&amp;</span> A2 <span class="o">==</span> C.A1<span class="p">)</span>
+<span class="c1"># Update these allele coding in the bim file</span>
+<span class="c1"># Note that we don&#39;t flip the SNP here. We will let PLINK do that. </span>
+com.snps <span class="o">&lt;-</span> bim<span class="o">$</span>SNP <span class="o">%in%</span> info.cflip<span class="o">$</span>SNP
+bim<span class="p">[</span>com.snps<span class="p">,]</span><span class="o">$</span>B.A1 <span class="o">&lt;-</span> <span class="kp">sapply</span><span class="p">(</span>bim<span class="p">[</span>com.snps<span class="p">,]</span><span class="o">$</span>B.A1<span class="p">,</span> complement<span class="p">)</span>
+bim<span class="p">[</span>com.snps<span class="p">,]</span><span class="o">$</span>B.A2 <span class="o">&lt;-</span> <span class="kp">sapply</span><span class="p">(</span>bim<span class="p">[</span>com.snps<span class="p">,]</span><span class="o">$</span>B.A2<span class="p">,</span> complement<span class="p">)</span>
+<span class="c1"># Get list of SNPs that need to change the A1 encoding</span>
+flip <span class="o">&lt;-</span> <span class="kp">rbind</span><span class="p">(</span>info.flip<span class="p">,</span> info.cflip<span class="p">)</span>
+flip.snp <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>SNP <span class="o">=</span> flip<span class="o">$</span>SNP<span class="p">,</span> A1 <span class="o">=</span> flip<span class="o">$</span>A1<span class="p">)</span>
+write.table<span class="p">(</span>flip.snp<span class="p">,</span>
+            <span class="s">&quot;EUR.update.a1&quot;</span><span class="p">,</span>
+            quote <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
+            row.names <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
+write.table<span class="p">(</span>
+    bim<span class="p">,</span>
+    <span class="s">&quot;EUR.QC.adj.bim&quot;</span><span class="p">,</span>
+    quote <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
+    row.names <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
+    col.names <span class="o">=</span> <span class="bp">F</span>
+<span class="p">)</span>
+<span class="c1"># And we want to remove any SNPs that do not match with the base data</span>
+mismatch <span class="o">&lt;-</span>
+    bim<span class="o">$</span>SNP<span class="p">[</span><span class="o">!</span><span class="p">(</span>bim<span class="o">$</span>SNP <span class="o">%in%</span> info.match<span class="o">$</span>SNP <span class="o">|</span>
+                  bim<span class="o">$</span>SNP <span class="o">%in%</span> info.complement<span class="o">$</span>SNP <span class="o">|</span> 
+                  bim<span class="o">$</span>SNP <span class="o">%in%</span> flip<span class="o">$</span>SNP<span class="p">)]</span>
+write.table<span class="p">(</span>
+    mismatch<span class="p">,</span>
+    <span class="s">&quot;EUR.mismatch&quot;</span><span class="p">,</span>
+    quote <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
+    row.names <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
+    col.names <span class="o">=</span> <span class="bp">F</span>
+<span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_3" type="radio" id="__tab_3_1" />
+<label for="__tab_3_1">With data.table</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
+bim <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.bim&quot;</span><span class="p">)</span>
+bim.col <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CM&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">,</span> <span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span>
+setnames<span class="p">(</span>bim<span class="p">,</span> <span class="kp">colnames</span><span class="p">(</span>bim<span class="p">),</span> bim.col<span class="p">)</span>
+qc <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.QC.snplist&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+height <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">)</span>
+<span class="c1"># Change all alleles to upper case for easy comparison</span>
+height<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;A1&quot;</span><span class="p">,</span><span class="s">&quot;A2&quot;</span><span class="p">)</span><span class="o">:=</span><span class="kt">list</span><span class="p">(</span><span class="kp">toupper</span><span class="p">(</span>A1<span class="p">),</span> <span class="kp">toupper</span><span class="p">(</span>A2<span class="p">))]</span>
+bim<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;B.A1&quot;</span><span class="p">,</span><span class="s">&quot;B.A2&quot;</span><span class="p">)</span><span class="o">:=</span><span class="kt">list</span><span class="p">(</span><span class="kp">toupper</span><span class="p">(</span>B.A1<span class="p">),</span> <span class="kp">toupper</span><span class="p">(</span>B.A2<span class="p">))]</span>
+info <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>bim<span class="p">,</span> height<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">))</span>
+info <span class="o">&lt;-</span> info<span class="p">[</span>SNP <span class="o">%in%</span> qc<span class="o">$</span>V1<span class="p">]</span>
+<span class="c1"># Function for calculating the complementary allele</span>
+complement <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">){</span>
+    <span class="kr">switch</span> <span class="p">(</span>x<span class="p">,</span>
+        <span class="s">&quot;A&quot;</span> <span class="o">=</span> <span class="s">&quot;T&quot;</span><span class="p">,</span>
+        <span class="s">&quot;C&quot;</span> <span class="o">=</span> <span class="s">&quot;G&quot;</span><span class="p">,</span>
+        <span class="s">&quot;T&quot;</span> <span class="o">=</span> <span class="s">&quot;A&quot;</span><span class="p">,</span>
+        <span class="s">&quot;G&quot;</span> <span class="o">=</span> <span class="s">&quot;C&quot;</span><span class="p">,</span>
+        <span class="kr">return</span><span class="p">(</span><span class="kc">NA</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+<span class="c1"># Identify SNPs that are complementary between base and target</span>
+com.snps <span class="o">&lt;-</span> info<span class="p">[</span><span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">)</span> <span class="o">==</span> A1 <span class="o">&amp;</span>
+                     <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">)</span> <span class="o">==</span> A2<span class="p">,</span> SNP<span class="p">]</span>
+<span class="c1"># Now update the bim file</span>
+bim<span class="p">[</span>SNP <span class="o">%in%</span> com.snps<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span> <span class="o">:=</span>
+        <span class="kt">list</span><span class="p">(</span><span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">),</span>
+             <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">))]</span>
+<span class="c1"># And update the info structure</span>
+info<span class="p">[</span>SNP <span class="o">%in%</span> com.snps<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span> <span class="o">:=</span>
+        <span class="kt">list</span><span class="p">(</span><span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">),</span>
+             <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">))]</span>
+<span class="c1"># identify SNPs that need flipping &amp; complement</span>
+com.flip <span class="o">&lt;-</span> info<span class="p">[</span><span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">)</span> <span class="o">==</span> A2 <span class="o">&amp;</span>
+                     <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">)</span> <span class="o">==</span> A1<span class="p">,</span> SNP<span class="p">]</span>
+<span class="c1"># Now update the bim file</span>
+bim<span class="p">[</span>SNP <span class="o">%in%</span> com.flip<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span> <span class="o">:=</span>
+        <span class="kt">list</span><span class="p">(</span><span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">),</span>
+             <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">))]</span>
+<span class="c1"># And update the info structure</span>
+info<span class="p">[</span>SNP <span class="o">%in%</span> com.flip<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span> <span class="o">:=</span>
+        <span class="kt">list</span><span class="p">(</span><span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">),</span>
+             <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">))]</span>
+<span class="c1"># Obtain list of SNPs that require flipping</span>
+flip <span class="o">&lt;-</span> info<span class="p">[</span>B.A1<span class="o">==</span>A2 <span class="o">&amp;</span> B.A2<span class="o">==</span>A1<span class="p">]</span>
+<span class="c1"># Now generate file for PLINK </span>
+fwrite<span class="p">(</span>flip<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;A1&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.update.a1&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
+<span class="c1"># Write the updated bim file</span>
+fwrite<span class="p">(</span>bim<span class="p">,</span> <span class="s">&quot;EUR.QC.adj.bim&quot;</span><span class="p">,</span> col.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
+<span class="c1"># We can then remove all mismatch SNPs</span>
+matched <span class="o">&lt;-</span> info<span class="p">[(</span>A1 <span class="o">==</span> B.A1 <span class="o">&amp;</span> A2 <span class="o">==</span> B.A2<span class="p">)</span> <span class="o">|</span>
+                    <span class="p">(</span>A1 <span class="o">==</span> B.A2 <span class="o">&amp;</span> A2 <span class="o">==</span> B.A1<span class="p">)</span> <span class="o">|</span>
+                    <span class="p">(</span>A1 <span class="o">==</span> <span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">)</span> <span class="o">&amp;</span>
+                         A2 <span class="o">==</span> <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">))</span> <span class="o">|</span>
+                    <span class="p">(</span>A1 <span class="o">==</span> <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">)</span> <span class="o">&amp;</span>
+                         A2 <span class="o">==</span> <span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">))]</span>
+mismatch <span class="o">&lt;-</span> bim<span class="p">[</span><span class="o">!</span>SNP<span class="o">%in%</span>matched<span class="o">$</span>SNP<span class="p">,</span> SNP<span class="p">]</span>
+write.table<span class="p">(</span>mismatch<span class="p">,</span> <span class="s">&quot;EUR.mismatch&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> col.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+</pre></div></div>
+</div>
+<p>The above script will generate three files: <strong>EUR.QC.adj.bim</strong>, <strong>EUR.update.a1</strong> and <strong>EUR.mismatch</strong>. </p>
+<ol>
+<li>Replace <strong>EUR.QC.bim</strong> with <strong>EUR.QC.adj.bim</strong>:</li>
+</ol>
+<div class="codehilite"><pre><span></span><span class="c1"># Make a back up</span>
+mv EUR.bim EUR.bim.bk
+ln -s EUR.QC.adj.bim EUR.bim
+</pre></div>
+
+<ol>
+<li>Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
+    --a1-allele EUR.update.a1 <span class="se">\</span>
     --make-bed <span class="se">\</span>
-    --out EUR.QC <span class="se">\</span>
     --keep EUR.QC.valid <span class="se">\</span>
-    --extract EUR.QC.snplist
-</pre></div></p>
+    --exclude EUR.mismatch <span class="se">\</span>
+    --out EUR.QC.flipped
+</pre></div></li>
+</ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For some software, the <strong>EUR.QC.valid</strong> and <strong>EUR.QC.snplist</strong> can be passed as a parameter to perform the 
-extraction directly. For those software (e.g. PRSice-2, lassosum, etc), this step is not required.</p>
+<p>Most PRS software will perform flipping automatically, thus this step is usually not required.</p>
 </div>
+<h1 id="35-duplicate-snps"># Duplicate SNPs<a class="headerlink" href="#35-duplicate-snps" title="Permanent link">&para;</a></h1>
+<p>Make sure to remove any duplicate SNPs in your target data (these target data were simulated and so include no duplicated SNPs)</p>
+<h1 id="35-sample-overlap"># Sample overlap<a class="headerlink" href="#35-sample-overlap" title="Permanent link">&para;</a></h1>
+<p>Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper] (https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). </p>
+<h1 id="35-relatedness"># Relatedness<a class="headerlink" href="#35-relatedness" title="Permanent link">&para;</a></h1>
+<p>Closely related individuals in the target data may lead to overfitted results, limiting the generalisability of the results. </p>
+<p>Before calculating the relatedness, pruning should be performed (see <a href="./#35-standard-gwas-qc">here</a>).
+Individuals that have a first or second degree relative in the sample (<span class="arithmatex">\(\text{pi-hat} &gt; 0.125\)</span>) can be removed with the following command:</p>
+<div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --bfile EUR.QC.flipped <span class="se">\</span>
+    --extract EUR.QC.prune.in <span class="se">\</span>
+    --rel-cutoff <span class="m">0</span>.125 <span class="se">\</span>
+    --out EUR.QC
+</pre></div>
+
+<details class="note"><summary>How many related samples were excluded?</summary><ul>
+<li><code>2</code> samples were excluded</li>
+</ul>
+</details>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A greedy algorithm is used to remove closely related individuals in a way that optimises the size of the sample retained.                However, the algorithm is dependent on the random seed used, which can generate different results. Therefore, to reproduce
+the same result, you will need to specify the same random seed. </p>
+<p>PLINK's algorithm for removing related individuals does not account for the phenotype under study. 
+To minimize the removal of cases of a disease, the following algorithm can be used instead: 
+<a href="https://github.com/choishingwan/GreedyRelated">GreedyRelated</a>.</p>
+</div>
+<h1 id="generate-final-qced-target-data-file">Generate final QC'ed target data file<a class="headerlink" href="#generate-final-qced-target-data-file" title="Permanent link">&para;</a></h1>
+<p>After performing the full analysis, you can generate a QC'ed data set with the following command:
+<div class="codehilite"><pre><span></span>plink <span class="se">\</span>
+    --bfile EUR.QC.flipped <span class="se">\</span>
+    --make-bed <span class="se">\</span>
+    --out EUR.QC <span class="se">\</span>
+    --extract EUR.QC.snplist
+</pre></div></p>
               
             </div>
           </div>

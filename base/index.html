@@ -270,18 +270,18 @@
 <li><strong>INFO</strong>: The imputation information score</li>
 <li><strong>OR</strong>: The effect size estimate of the SNP, if the outcome is binary/case-control. If the outcome is continuous or treated as continuous then this will be the BETA</li>
 </ul>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Some GWAS results files do not make clear which allele is the effect allele and which the non-effect allele. 
-If the incorrect assumption is made in computing the PRS, then the effect of the PRS in the target data will be in the wrong direction.</p>
-<p>To avoid misleading conclusions the effect allele from the base (GWAS) data must be known.</p>
-</div>
 <h1 id="qc-checklist-base-data">QC checklist: Base data<a class="headerlink" href="#qc-checklist-base-data" title="Permanent link">&para;</a></h1>
 <p>Below we perform QC on these base data according to the 'QC checklist' in the guide paper, which we recommend that users follow each time they perform a PRS analysis:</p>
 <h1 id="35-heritability-check"># Heritability check<a class="headerlink" href="#35-heritability-check" title="Permanent link">&para;</a></h1>
 <p>We recommend that PRS analyses are performed on base data with a chip-heritability estimate <span class="arithmatex">\(h_{snp}^{2} &gt; 0.05\)</span>. The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). Our GIANT height GWAS data are known to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. </p>
 <h1 id="35-effect-allele"># Effect allele<a class="headerlink" href="#35-effect-allele" title="Permanent link">&para;</a></h1>
 <p>The GIANT consortium report which is the effect allele and which is the non-effect allele in their results, critical for PRS association results to be in the correction direction.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Some GWAS results files do not make clear which allele is the effect allele and which the non-effect allele.
+If the incorrect assumption is made in computing the PRS, then the effect of the PRS in the target data will be in the wrong direction.</p>
+<p>To avoid misleading conclusions the effect allele from the base (GWAS) data must be known.</p>
+</div>
 <h1 id="35-file-transfer"># File transfer<a class="headerlink" href="#35-file-transfer" title="Permanent link">&para;</a></h1>
 <p>A common problem is that the downloaded base data file becomes 
 corrupted during download, which can cause PRS software to crash 
@@ -304,9 +304,9 @@ If a different string is generated, then the file is corrupted.</p>
 <p>These base data are on the same genome build as the target data that we will be using. You must check that your base and target data are on the same genome build, and if they are not then use a tool such as LiftOver to make the builds consistent across the data sets.</p>
 <h1 id="35-standard-gwas-qc"># Standard GWAS QC<a class="headerlink" href="#35-standard-gwas-qc" title="Permanent link">&para;</a></h1>
 <p>As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. If the base data have been obtained as summary statistics from a public source, then the typical QC steps that you will be able to perform on them are to filter the SNPs according to INFO score and MAF. SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). Therefore, SNPs with low MAF and INFO are typically removed before performing downstream analyses. We recommend removing SNPs with MAF &lt; 1% and INFO &lt; 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results). These SNP filters can be acheived using the following code:</p>
-<div class="codehilite"><pre><span></span>gunzip -c Height.gz <span class="p">|</span><span class="se">\</span>
+<div class="codehilite"><pre><span></span>gunzip -c GIANT.height.gz <span class="p">|</span><span class="se">\</span>
 awk <span class="s1">&#39;NR==1 || ($6 &gt; 0.01) &amp;&amp; ($10 &gt; 0.8) {print}&#39;</span> <span class="p">|</span><span class="se">\</span>
-gzip  &gt; Height.QC.gz
+gzip  &gt; Height.gz
 </pre></div>
 
 <p>The bash code above does the following:
@@ -318,20 +318,21 @@ gzip  &gt; Height.QC.gz
 <h1 id="35-ambiguous-snps"># Ambiguous SNPs<a class="headerlink" href="#35-ambiguous-snps" title="Permanent link">&para;</a></h1>
 <p>If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.</p>
 <p>Ambiguous SNPs can be obtained by examining the bim file:
-<div class="codehilite"><pre><span></span>awk <span class="s1">&#39;!( ($5==&quot;A&quot; &amp;&amp; $6==&quot;T&quot;) || \</span>
-<span class="s1">        ($5==&quot;T&quot; &amp;&amp; $6==&quot;A&quot;) || \</span>
-<span class="s1">        ($5==&quot;G&quot; &amp;&amp; $6==&quot;C&quot;) || \</span>
-<span class="s1">        ($5==&quot;C&quot; &amp;&amp; $6==&quot;G&quot;)) {print}&#39;</span> <span class="se">\</span>
-        EUR.QC.bim &gt; EUR.unambig.snp 
+<div class="codehilite"><pre><span></span>gunzip -c Height.gz <span class="p">|</span><span class="se">\</span>
+awk <span class="s1">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) || \</span>
+<span class="s1">        ($4==&quot;T&quot; &amp;&amp; $5==&quot;A&quot;) || \</span>
+<span class="s1">        ($4==&quot;G&quot; &amp;&amp; $5==&quot;C&quot;) || \</span>
+<span class="s1">        ($4==&quot;C&quot; &amp;&amp; $5==&quot;G&quot;)) {print}&#39;</span> <span class="p">|</span><span class="se">\</span>
+    gzip &gt; Height.noambig.gz
 </pre></div></p>
-<details class="note"><summary>How many ambiguous SNPs were there?</summary><p>There are <code>330,818</code> ambiguous SNPs</p>
+<details class="note"><summary>How many ambiguous SNPs were there?</summary><p>There are <code>36,683</code> ambiguous SNPs</p>
 </details>
 <h1 id="35-mismatching-genotypes"># Mismatching genotypes<a class="headerlink" href="#35-mismatching-genotypes" title="Permanent link">&para;</a></h1>
 <p>If there is a non-ambiguous mismatch in allele coding between the base and target data sets, such as A/C in the base and G/T in the target data, then this can be resolved by ‘flipping’ the alleles in either data set to their complementary alleles. However, since we need the target data to know which SNPs have mismatching genotypes across the data sets, then we will perform this 'allele flipping' in the target data.</p>
 <h1 id="35-duplicate-snps"># Duplicate SNPs<a class="headerlink" href="#35-duplicate-snps" title="Permanent link">&para;</a></h1>
 <p>If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
 Most PRS software do not allow duplicated SNPs in the base data input and thus they should be removed, using a command such as the one below: </p>
-<div class="codehilite"><pre><span></span>gunzip -c GIANT.height.gz <span class="p">|</span><span class="se">\</span>
+<div class="codehilite"><pre><span></span>gunzip -c Height.noambig.gz <span class="p">|</span><span class="se">\</span>
 awk <span class="s1">&#39;{ print $1}&#39;</span> <span class="p">|</span><span class="se">\</span>
 sort <span class="p">|</span><span class="se">\</span>
 uniq -d &gt; duplicated.snp
@@ -339,23 +340,23 @@ uniq -d &gt; duplicated.snp
 
 <p>The above command does the following:</p>
 <ol>
-<li>Decompresses and reads the <strong>GIANT.height.gz</strong> file</li>
+<li>Decompresses and reads the <strong>Height.noambig.gz</strong> file</li>
 <li>Prints out the first column of the file (which contains the SNP ID; change <code>$1</code> to another number if the SNP ID is located in another column, e.g. <code>$3</code> if the SNP ID is located on the third column)</li>
 <li>Sort the SNP IDs. This will put duplicated SNP IDs next to each other</li>
 <li>Print out any duplicated SNP IDs using the uniq command and print them to the <em>duplicated.snp</em> file</li>
 </ol>
-<details class="note"><summary>How many duplicated SNPs are there?</summary><p>There are a total of <code>13</code> duplicated SNPs</p>
+<details class="note"><summary>How many duplicated SNPs are there?</summary><p>There are a total of <code>10</code> duplicated SNPs</p>
 </details>
 <p>Duplicated SNPs can then be removed using the <code>grep</code> command:
-<div class="codehilite"><pre><span></span>gunzip -c GIANT.height.gz  <span class="p">|</span><span class="se">\</span>
+<div class="codehilite"><pre><span></span>gunzip -c Height.noambig.gz  <span class="p">|</span><span class="se">\</span>
 grep -vf duplicated.snp <span class="p">|</span><span class="se">\</span>
-gzip - &gt; Height.gz
+gzip - &gt; Height.QC.gz
 </pre></div></p>
 <p>The above script does the following:</p>
 <ol>
-<li>Decompresses and reads the <strong>GIANT.height.gz</strong> file </li>
+<li>Decompresses and reads the <strong>Height.noambig.gz</strong> file </li>
 <li>Establishes whether any row contains entries observed in <code>duplicated.snp</code> and removes them if so</li>
-<li>Compresses and writes the results to <strong>Height.gz</strong></li>
+<li>Compresses and writes the results to <strong>Height.QC.gz</strong></li>
 </ol>
 <h1 id="35-sex-chromosomes"># Sex chromosomes<a class="headerlink" href="#35-sex-chromosomes" title="Permanent link">&para;</a></h1>
 <p>Previously performed QC on these data removed individuals with mismatching (inferred) biological and reported sex, while the sex chromosomes are not included. Please refer to the corresponding section in the paper for details relating QC performed in relation to the sex chromosomes. </p>

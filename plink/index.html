@@ -89,9 +89,6 @@
     <li class="toctree-l3"><a href="#required-data">Required Data</a></li>
     
 
-    <li class="toctree-l3"><a href="#remove-ambiguous-snps">Remove Ambiguous SNPs</a></li>
-    
-
     <li class="toctree-l3"><a href="#strand-flipping">Strand Flipping</a></li>
     
 
@@ -213,17 +210,6 @@
 </tr>
 </tbody>
 </table>
-<h1 id="remove-ambiguous-snps">Remove Ambiguous SNPs<a class="headerlink" href="#remove-ambiguous-snps" title="Permanent link">&para;</a></h1>
-<p>If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. </p>
-<p>Ambiguous SNPs can be obtained by examining the bim file:
-<div class="codehilite"><pre><span></span>awk <span class="s1">&#39;!( ($5==&quot;A&quot; &amp;&amp; $6==&quot;T&quot;) || \</span>
-<span class="s1">        ($5==&quot;T&quot; &amp;&amp; $6==&quot;A&quot;) || \</span>
-<span class="s1">        ($5==&quot;G&quot; &amp;&amp; $6==&quot;C&quot;) || \</span>
-<span class="s1">        ($5==&quot;C&quot; &amp;&amp; $6==&quot;G&quot;)) {print}&#39;</span> <span class="se">\</span>
-        EUR.QC.bim &gt; EUR.unambig.snp 
-</pre></div></p>
-<details class="note"><summary>How many ambiguous SNPs were there?</summary><p>There are <code>330,818</code> ambiguous SNPs</p>
-</details>
 <h1 id="strand-flipping">Strand Flipping<a class="headerlink" href="#strand-flipping" title="Permanent link">&para;</a></h1>
 <p>In addition, when there are non-ambiguous mismatches in allele 
 coding between the data sets, such as A/C in the base
