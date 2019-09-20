@@ -19,7 +19,7 @@ unzip EUR.zip
 Below are the QC steps that comprise the QC checklist for the target data.
 
 # \# Sample size
-We recommend that users only perform PRS analyses on target data of at least 100 individuals. The sample size of our target data here is X individuals. 
+We recommend that users only perform PRS analyses on target data of at least 100 individuals. The sample size of our target data here is 503 individuals. 
 
 # \# File transfer
 Usually we do not need to download and transfer the target data file because it is typically generated locally. However, the file should contain an md5sum code in case we send the data file to collaborators who may want to confirm that the file has not changed during the transfer.
@@ -84,12 +84,26 @@ Each of the parameters corresponds to the following
     solely on the list of samples and SNPs without duplicating the 
     genotype file, reducing the storage space usage.  
     
-Very high or low heterozygosity rates in individuals could be due to DNA contamination or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. Heterozygosity rates can be computed using `plink` after performing pruning.
+Very high or low heterozygosity rates in individuals could be due to DNA contamination or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. 
+
+First, we perform prunning to remove highly correlated SNPs:
+```bash
+plink \
+    --bfile EUR \
+    --keep EUR.QC.fam \
+    --extract EUR.QC.snplist \
+    --indep-pairwise 200 50 0.25 \
+    --out EUR.QC
+```
+
+This will generate two files 1) **EUR.QC.prune.in** and 2) **EUR.QC.prune.out**.All SNPs within **EUR.QC.prune.in** have a pairwise $r^2 < 0.25$. 
+
+
+Heterozygosity rates can then be computed using `plink`:
 ```bash
 plink \
     --bfile EUR \
     --extract EUR.QC.prune.in \
-    --keep EUR.QC.rel.id \
     --het \
     --out EUR.QC
 ```
@@ -121,6 +135,46 @@ fwrite(valid[,c("FID","IID")], "EUR.valid.sample", sep="\t")
 # \# Ambiguous SNPs
 There were removed during the base data QC
 
+
+# \# Sex chromosomes 
+
+Sometimes sample mislabelling can occur, which may lead to invalid results. 
+A good indication of a mislabelled sample is a mismatch between biological sex and reported sex. 
+If the biological sex does not match up with the reported sex, then the sample may have been mislabelled.
+
+Before performing a sex check, pruning should be performed (see [here](target.md#35-standard-gwas-qc)).
+A sex check can then easily be conducted using `plink`
+```bash
+plink \
+    --bfile EUR \
+    --extract EUR.QC.prune.in \
+    --keep EUR.valid.sample \
+    --check-sex \
+    --out EUR.QC
+```
+
+This will generate a file called **EUR.sexcheck** containing the F-statistics for each individual. Individuals are typically called as being biologically male if the F-statistic is > 0.8 and biologically female if F < 0.2.
+
+```R tab="Without library"
+# Read in file
+valid <- read.table("EUR.valid.sample", header=T)
+dat <- read.table("EUR.QC.sexcheck", header=T)
+valid <- subset(dat, STATUS=="OK" & FID %in% valid$FID)
+write.table(valid[,c("FID", "IID")], "EUR.QC.valid", row.names=F, col.names=F, sep="\t", quote=F) 
+```
+
+```R tab="With data.table"
+library(data.table)
+# Read in file
+valid <- fread("EUR.valid.sample")
+dat <- fread("EUR.QC.sexcheck")[FID%in%valid$FID]
+fwrite(dat[STATUS=="OK",c("FID","IID")], "EUR.QC.valid", sep="\t") 
+```
+
+??? note "How many samples were excluded due mismatched Sex information?"
+    - `2` samples were excluded
+
+
 # \# Mismatching genotypes
 In addition, when there are non-ambiguous mismatches in allele 
 coding between the data sets, such as A/C in the base
@@ -131,19 +185,21 @@ This can be achieved with the following steps:
 1. Get the correct A1 alleles for the bim file
 
 ```R tab="Without data.table"
-bim <- read.table("EUR.QC.bim", header = F, stringsAsFactors = F)
+bim <- read.table("EUR.bim")
 colnames(bim) <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
+qc <- read.table("EUR.QC.snplist", header = F, stringsAsFactors = F)
 height <-
     read.table(gzfile("Height.QC.gz"),
                header = T,
-               stringsAsFactors = F)
+               stringsAsFactors = F, 
+               sep="\t")
 # Change all alleles to upper case for easy comparison
 height$A1 <- toupper(height$A1)
 height$A2 <- toupper(height$A2)
 bim$B.A1 <- toupper(bim$B.A1)
 bim$B.A2 <- toupper(bim$B.A2)
 info <- merge(bim, height, by = c("SNP", "CHR", "BP"))
-
+info <- info[info$SNP %in% qc$V1,]
 # Function for finding the complementary allele
 complement <- function(x) {
     switch (
@@ -171,6 +227,7 @@ info.flip <- subset(info, A1 == B.A2 & A2 == B.A1)
 # identify SNPs that need flipping & complement
 info.cflip <- subset(info, A1 == C.A2 & A2 == C.A1)
 # Update these allele coding in the bim file
+# Note that we don't flip the SNP here. We will let PLINK do that. 
 com.snps <- bim$SNP %in% info.cflip$SNP
 bim[com.snps,]$B.A1 <- sapply(bim[com.snps,]$B.A1, complement)
 bim[com.snps,]$B.A2 <- sapply(bim[com.snps,]$B.A2, complement)
@@ -204,14 +261,16 @@ write.table(
 
 ```R tab="With data.table"
 library(data.table)
-bim <- fread("EUR.QC.bim")
+bim <- fread("EUR.bim")
 bim.col <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
 setnames(bim, colnames(bim), bim.col)
+qc <- fread("EUR.QC.snplist", header=F)
 height <- fread("Height.QC.gz")
 # Change all alleles to upper case for easy comparison
 height[,c("A1","A2"):=list(toupper(A1), toupper(A2))]
 bim[,c("B.A1","B.A2"):=list(toupper(B.A1), toupper(B.A2))]
 info <- merge(bim, height, by=c("SNP", "CHR", "BP"))
+info <- info[SNP %in% qc$V1]
 # Function for calculating the complementary allele
 complement <- function(x){
     switch (x,
@@ -229,11 +288,19 @@ com.snps <- info[sapply(B.A1, complement) == A1 &
 bim[SNP %in% com.snps, c("B.A1", "B.A2") :=
         list(sapply(B.A1, complement),
              sapply(B.A2, complement))]
+# And update the info structure
+info[SNP %in% com.snps, c("B.A1", "B.A2") :=
+        list(sapply(B.A1, complement),
+             sapply(B.A2, complement))]
 # identify SNPs that need flipping & complement
 com.flip <- info[sapply(B.A1, complement) == A2 &
                      sapply(B.A2, complement) == A1, SNP]
 # Now update the bim file
 bim[SNP %in% com.flip, c("B.A1", "B.A2") :=
+        list(sapply(B.A1, complement),
+             sapply(B.A2, complement))]
+# And update the info structure
+info[SNP %in% com.flip, c("B.A1", "B.A2") :=
         list(sapply(B.A1, complement),
              sapply(B.A2, complement))]
 # Obtain list of SNPs that require flipping
@@ -259,62 +326,27 @@ The above script will generate three files: **EUR.QC.adj.bim**, **EUR.update.a1*
 
 ```bash
 # Make a back up
-mv EUR.QC.bim EUR.QC.bim.bk
-ln -s EUR.QC.adj.bim EUR.QC.bim
+mv EUR.bim EUR.bim.bk
+ln -s EUR.QC.adj.bim EUR.bim
 ```
 
 3. Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
 ```bash
 plink \
-    --bfile EUR.QC \
+    --bfile EUR \
     --a1-allele EUR.update.a1 \
     --make-bed \
-    --keep EUR.valid.sample \
-    --extract EUR.unambig.snp \
+    --keep EUR.QC.valid \
     --exclude EUR.mismatch \
     --out EUR.QC.flipped
 ```
 
+!!! note
+    Most PRS software will perform flipping automatically, thus this step is usually not required.
+
+
 # \# Duplicate SNPs
 Make sure to remove any duplicate SNPs in your target data (these target data were simulated and so include no duplicated SNPs)
-
-# \# Sex chromosomes 
-
-Sometimes sample mislabelling can occur, which may lead to invalid results. 
-A good indication of a mislabelled sample is a mismatch between biological sex and reported sex. 
-If the biological sex does not match up with the reported sex, then the sample may have been mislabelled.
-
-Before performing a sex check, pruning should be performed (see [here](target.md#filter-related-samples)).
-A sex check can then easily be conducted using `plink`
-```bash
-plink \
-    --bfile EUR \
-    --extract EUR.QC.prune.in \
-    --keep EUR.valid.sample \
-    --check-sex \
-    --out EUR.QC
-```
-
-This will generate a file called **EUR.sexcheck** containing the F-statistics for each individual. Individuals are typically called as being biologically male if the F-statistic is > 0.8 and biologically female if F < 0.2.
-
-```R tab="Without library"
-# Read in file
-valid <- read.table("EUR.valid.sample", header=T)
-dat <- read.table("EUR.QC.sexcheck", header=T)
-valid <- subset(dat, STATUS=="OK" & FID %in% valid$FID)
-write.table(valid[,c("FID", "IID")], "EUR.QC.valid", row.names=F, col.names=F, sep="\t") 
-```
-
-```R tab="With data.table"
-library(data.table)
-# Read in file
-valid <- fread("EUR.valid.sample")
-dat <- fread("EUR.QC.sexcheck")[FID%in%valid$FID]
-fwrite(dat[STATUS=="OK",c("FID","IID")], "EUR.QC.valid", sep="\t") 
-```
-
-??? note "How many samples were excluded due mismatched Sex information?"
-    - `2` samples were excluded
 
 
 # \# Sample overlap
@@ -323,26 +355,13 @@ Since the target data were simulated there are no overlapping samples between th
 # \# Relatedness
 Closely related individuals in the target data may lead to overfitted results, limiting the generalisability of the results. 
 
-As a first step to removing related individuals we perform pruning, which removes highly correlated SNPs:
-```bash
-plink \
-    --bfile EUR \
-    --keep EUR.QC.fam \
-    --extract EUR.QC.snplist \
-    --indep-pairwise 200 50 0.25 \
-    --out EUR.QC
-```
-
-This will generate two files 1) **EUR.QC.prune.in** and 2) **EUR.QC.prune.out**
-All SNPs within **EUR.QC.prune.in** have a pairwise $r^2 < 0.25$
-
+Before calculating the relatedness, pruning should be performed (see [here](target.md#35-standard-gwas-qc)).
 Individuals that have a first or second degree relative in the sample ($\text{pi-hat} > 0.125$) can be removed with the following command:
 
 ```bash
 plink \
-    --bfile EUR \
+    --bfile EUR.QC.flipped \
     --extract EUR.QC.prune.in \
-    --keep EUR.QC.fam \
     --rel-cutoff 0.125 \
     --out EUR.QC
 ```
@@ -362,13 +381,8 @@ plink \
 After performing the full analysis, you can generate a QC'ed data set with the following command:
 ```bash
 plink \
-    --bfile EUR \
+    --bfile EUR.QC.flipped \
     --make-bed \
     --out EUR.QC \
-    --keep EUR.QC.valid \
     --extract EUR.QC.snplist
 ```
-
-!!! note
-    For some software, the **EUR.QC.valid** and **EUR.QC.snplist** can be passed as a parameter to perform the 
-    extraction directly. For those software (e.g. PRSice-2, lassosum, etc), this step is not required.

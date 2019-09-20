@@ -16,21 +16,6 @@ In the previous sections, we have generated the following files:
 |**EUR.covariate**| This file contains the covariates of the samples |
 
 
-# Remove Ambiguous SNPs
-If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. 
-
-Ambiguous SNPs can be obtained by examining the bim file:
-```bash
-awk '!( ($5=="A" && $6=="T") || \
-        ($5=="T" && $6=="A") || \
-        ($5=="G" && $6=="C") || \
-        ($5=="C" && $6=="G")) {print}' \
-        EUR.QC.bim > EUR.unambig.snp 
-```
-
-??? note "How many ambiguous SNPs were there?"
-    There are `330,818` ambiguous SNPs
-
 # Strand Flipping
 In addition, when there are non-ambiguous mismatches in allele 
 coding between the data sets, such as A/C in the base
