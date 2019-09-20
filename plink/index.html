@@ -89,9 +89,6 @@
     <li class="toctree-l3"><a href="#required-data">Required Data</a></li>
     
 
-    <li class="toctree-l3"><a href="#strand-flipping">Strand Flipping</a></li>
-    
-
     <li class="toctree-l3"><a href="#update-effect-size">Update Effect Size</a></li>
     
 
@@ -210,173 +207,18 @@
 </tr>
 </tbody>
 </table>
-<h1 id="strand-flipping">Strand Flipping<a class="headerlink" href="#strand-flipping" title="Permanent link">&para;</a></h1>
-<p>In addition, when there are non-ambiguous mismatches in allele 
-coding between the data sets, such as A/C in the base
-and G/T in the target data, then this can be resolved by 
-‘flipping’ the alleles in the target data to their complementary alleles. 
-This can be achieved with the following steps: </p>
-<ol>
-<li>Get the correct A1 alleles for the bim file</li>
-</ol>
-<div class="superfences-tabs">
-<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
-<label for="__tab_1_0">Without data.table</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>bim <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.QC.bim&quot;</span><span class="p">,</span> header <span class="o">=</span> <span class="bp">F</span><span class="p">,</span> stringsAsFactors <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
-<span class="kp">colnames</span><span class="p">(</span>bim<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CM&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">,</span> <span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span>
-height <span class="o">&lt;-</span>
-    read.table<span class="p">(</span><span class="kp">gzfile</span><span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">),</span>
-               header <span class="o">=</span> <span class="bp">T</span><span class="p">,</span>
-               stringsAsFactors <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
-<span class="c1"># Change all alleles to upper case for easy comparison</span>
-height<span class="o">$</span>A1 <span class="o">&lt;-</span> <span class="kp">toupper</span><span class="p">(</span>height<span class="o">$</span>A1<span class="p">)</span>
-height<span class="o">$</span>A2 <span class="o">&lt;-</span> <span class="kp">toupper</span><span class="p">(</span>height<span class="o">$</span>A2<span class="p">)</span>
-bim<span class="o">$</span>B.A1 <span class="o">&lt;-</span> <span class="kp">toupper</span><span class="p">(</span>bim<span class="o">$</span>B.A1<span class="p">)</span>
-bim<span class="o">$</span>B.A2 <span class="o">&lt;-</span> <span class="kp">toupper</span><span class="p">(</span>bim<span class="o">$</span>B.A2<span class="p">)</span>
-info <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>bim<span class="p">,</span> height<span class="p">,</span> by <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">))</span>
-
-<span class="c1"># Function for finding the complementary allele</span>
-complement <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">)</span> <span class="p">{</span>
-    <span class="kr">switch</span> <span class="p">(</span>
-        x<span class="p">,</span>
-        <span class="s">&quot;A&quot;</span> <span class="o">=</span> <span class="s">&quot;T&quot;</span><span class="p">,</span>
-        <span class="s">&quot;C&quot;</span> <span class="o">=</span> <span class="s">&quot;G&quot;</span><span class="p">,</span>
-        <span class="s">&quot;T&quot;</span> <span class="o">=</span> <span class="s">&quot;A&quot;</span><span class="p">,</span>
-        <span class="s">&quot;G&quot;</span> <span class="o">=</span> <span class="s">&quot;C&quot;</span><span class="p">,</span>
-        <span class="kr">return</span><span class="p">(</span><span class="kc">NA</span><span class="p">)</span>
-    <span class="p">)</span>
-<span class="p">}</span>
-<span class="c1"># Get SNPs that have the same alleles across base and target</span>
-info.match <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>info<span class="p">,</span> A1 <span class="o">==</span> B.A1 <span class="o">&amp;</span> A2 <span class="o">==</span> B.A2<span class="p">)</span>
-<span class="c1"># Identify SNPs that are complementary between base and target</span>
-info<span class="o">$</span>C.A1 <span class="o">&lt;-</span> <span class="kp">sapply</span><span class="p">(</span>info<span class="o">$</span>B.A1<span class="p">,</span> complement<span class="p">)</span>
-info<span class="o">$</span>C.A2 <span class="o">&lt;-</span> <span class="kp">sapply</span><span class="p">(</span>info<span class="o">$</span>B.A2<span class="p">,</span> complement<span class="p">)</span>
-info.complement <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>info<span class="p">,</span> A1 <span class="o">==</span> C.A1 <span class="o">&amp;</span> A2 <span class="o">==</span> C.A2<span class="p">)</span>
-<span class="c1"># Update these allele coding in the bim file</span>
-bim<span class="p">[</span>bim<span class="o">$</span>SNP <span class="o">%in%</span> info.complement<span class="o">$</span>SNP<span class="p">,]</span><span class="o">$</span>B.A1 <span class="o">&lt;-</span>
-    <span class="kp">sapply</span><span class="p">(</span>bim<span class="p">[</span>bim<span class="o">$</span>SNP <span class="o">%in%</span> info.complement<span class="o">$</span>SNP<span class="p">,]</span><span class="o">$</span>B.A1<span class="p">,</span> complement<span class="p">)</span>
-bim<span class="p">[</span>bim<span class="o">$</span>SNP <span class="o">%in%</span> info.complement<span class="o">$</span>SNP<span class="p">,]</span><span class="o">$</span>B.A2 <span class="o">&lt;-</span>
-    <span class="kp">sapply</span><span class="p">(</span>bim<span class="p">[</span>bim<span class="o">$</span>SNP <span class="o">%in%</span> info.complement<span class="o">$</span>SNP<span class="p">,]</span><span class="o">$</span>B.A2<span class="p">,</span> complement<span class="p">)</span>
-<span class="c1"># identify SNPs that need flipping</span>
-info.flip <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>info<span class="p">,</span> A1 <span class="o">==</span> B.A2 <span class="o">&amp;</span> A2 <span class="o">==</span> B.A1<span class="p">)</span>
-<span class="c1"># identify SNPs that need flipping &amp; complement</span>
-info.cflip <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>info<span class="p">,</span> A1 <span class="o">==</span> C.A2 <span class="o">&amp;</span> A2 <span class="o">==</span> C.A1<span class="p">)</span>
-<span class="c1"># Update these allele coding in the bim file</span>
-com.snps <span class="o">&lt;-</span> bim<span class="o">$</span>SNP <span class="o">%in%</span> info.cflip<span class="o">$</span>SNP
-bim<span class="p">[</span>com.snps<span class="p">,]</span><span class="o">$</span>B.A1 <span class="o">&lt;-</span> <span class="kp">sapply</span><span class="p">(</span>bim<span class="p">[</span>com.snps<span class="p">,]</span><span class="o">$</span>B.A1<span class="p">,</span> complement<span class="p">)</span>
-bim<span class="p">[</span>com.snps<span class="p">,]</span><span class="o">$</span>B.A2 <span class="o">&lt;-</span> <span class="kp">sapply</span><span class="p">(</span>bim<span class="p">[</span>com.snps<span class="p">,]</span><span class="o">$</span>B.A2<span class="p">,</span> complement<span class="p">)</span>
-<span class="c1"># Get list of SNPs that need to change the A1 encoding</span>
-flip <span class="o">&lt;-</span> <span class="kp">rbind</span><span class="p">(</span>info.flip<span class="p">,</span> info.cflip<span class="p">)</span>
-flip.snp <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>SNP <span class="o">=</span> flip<span class="o">$</span>SNP<span class="p">,</span> A1 <span class="o">=</span> flip<span class="o">$</span>A1<span class="p">)</span>
-write.table<span class="p">(</span>flip.snp<span class="p">,</span>
-            <span class="s">&quot;EUR.update.a1&quot;</span><span class="p">,</span>
-            quote <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
-            row.names <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
-write.table<span class="p">(</span>
-    bim<span class="p">,</span>
-    <span class="s">&quot;EUR.QC.adj.bim&quot;</span><span class="p">,</span>
-    quote <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
-    row.names <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
-    col.names <span class="o">=</span> <span class="bp">F</span>
-<span class="p">)</span>
-<span class="c1"># And we want to remove any SNPs that do not match with the base data</span>
-mismatch <span class="o">&lt;-</span>
-    bim<span class="o">$</span>SNP<span class="p">[</span><span class="o">!</span><span class="p">(</span>bim<span class="o">$</span>SNP <span class="o">%in%</span> info.match<span class="o">$</span>SNP <span class="o">|</span>
-                  bim<span class="o">$</span>SNP <span class="o">%in%</span> info.complement<span class="o">$</span>SNP <span class="o">|</span> 
-                  bim<span class="o">$</span>SNP <span class="o">%in%</span> flip<span class="o">$</span>SNP<span class="p">)]</span>
-write.table<span class="p">(</span>
-    mismatch<span class="p">,</span>
-    <span class="s">&quot;EUR.mismatch&quot;</span><span class="p">,</span>
-    quote <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
-    row.names <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
-    col.names <span class="o">=</span> <span class="bp">F</span>
-<span class="p">)</span>
-</pre></div></div>
-<input name="__tabs_1" type="radio" id="__tab_1_1" />
-<label for="__tab_1_1">With data.table</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
-bim <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.QC.bim&quot;</span><span class="p">)</span>
-bim.col <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CM&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">,</span> <span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span>
-setnames<span class="p">(</span>bim<span class="p">,</span> <span class="kp">colnames</span><span class="p">(</span>bim<span class="p">),</span> bim.col<span class="p">)</span>
-height <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">)</span>
-<span class="c1"># Change all alleles to upper case for easy comparison</span>
-height<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;A1&quot;</span><span class="p">,</span><span class="s">&quot;A2&quot;</span><span class="p">)</span><span class="o">:=</span><span class="kt">list</span><span class="p">(</span><span class="kp">toupper</span><span class="p">(</span>A1<span class="p">),</span> <span class="kp">toupper</span><span class="p">(</span>A2<span class="p">))]</span>
-bim<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;B.A1&quot;</span><span class="p">,</span><span class="s">&quot;B.A2&quot;</span><span class="p">)</span><span class="o">:=</span><span class="kt">list</span><span class="p">(</span><span class="kp">toupper</span><span class="p">(</span>B.A1<span class="p">),</span> <span class="kp">toupper</span><span class="p">(</span>B.A2<span class="p">))]</span>
-info <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>bim<span class="p">,</span> height<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">))</span>
-<span class="c1"># Function for calculating the complementary allele</span>
-complement <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">){</span>
-    <span class="kr">switch</span> <span class="p">(</span>x<span class="p">,</span>
-        <span class="s">&quot;A&quot;</span> <span class="o">=</span> <span class="s">&quot;T&quot;</span><span class="p">,</span>
-        <span class="s">&quot;C&quot;</span> <span class="o">=</span> <span class="s">&quot;G&quot;</span><span class="p">,</span>
-        <span class="s">&quot;T&quot;</span> <span class="o">=</span> <span class="s">&quot;A&quot;</span><span class="p">,</span>
-        <span class="s">&quot;G&quot;</span> <span class="o">=</span> <span class="s">&quot;C&quot;</span><span class="p">,</span>
-        <span class="kr">return</span><span class="p">(</span><span class="kc">NA</span><span class="p">)</span>
-    <span class="p">)</span>
-<span class="p">}</span>
-<span class="c1"># Identify SNPs that are complementary between base and target</span>
-com.snps <span class="o">&lt;-</span> info<span class="p">[</span><span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">)</span> <span class="o">==</span> A1 <span class="o">&amp;</span>
-                     <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">)</span> <span class="o">==</span> A2<span class="p">,</span> SNP<span class="p">]</span>
-<span class="c1"># Now update the bim file</span>
-bim<span class="p">[</span>SNP <span class="o">%in%</span> com.snps<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span> <span class="o">:=</span>
-        <span class="kt">list</span><span class="p">(</span><span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">),</span>
-             <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">))]</span>
-<span class="c1"># identify SNPs that need flipping &amp; complement</span>
-com.flip <span class="o">&lt;-</span> info<span class="p">[</span><span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">)</span> <span class="o">==</span> A2 <span class="o">&amp;</span>
-                     <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">)</span> <span class="o">==</span> A1<span class="p">,</span> SNP<span class="p">]</span>
-<span class="c1"># Now update the bim file</span>
-bim<span class="p">[</span>SNP <span class="o">%in%</span> com.flip<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span> <span class="o">:=</span>
-        <span class="kt">list</span><span class="p">(</span><span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">),</span>
-             <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">))]</span>
-<span class="c1"># Obtain list of SNPs that require flipping</span>
-flip <span class="o">&lt;-</span> info<span class="p">[</span>B.A1<span class="o">==</span>A2 <span class="o">&amp;</span> B.A2<span class="o">==</span>A1<span class="p">]</span>
-<span class="c1"># Now generate file for PLINK </span>
-fwrite<span class="p">(</span>flip<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;A1&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.update.a1&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
-<span class="c1"># Write the updated bim file</span>
-fwrite<span class="p">(</span>bim<span class="p">,</span> <span class="s">&quot;EUR.QC.adj.bim&quot;</span><span class="p">,</span> col.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
-<span class="c1"># We can then remove all mismatch SNPs</span>
-matched <span class="o">&lt;-</span> info<span class="p">[(</span>A1 <span class="o">==</span> B.A1 <span class="o">&amp;</span> A2 <span class="o">==</span> B.A2<span class="p">)</span> <span class="o">|</span>
-                    <span class="p">(</span>A1 <span class="o">==</span> B.A2 <span class="o">&amp;</span> A2 <span class="o">==</span> B.A1<span class="p">)</span> <span class="o">|</span>
-                    <span class="p">(</span>A1 <span class="o">==</span> <span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">)</span> <span class="o">&amp;</span>
-                         A2 <span class="o">==</span> <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">))</span> <span class="o">|</span>
-                    <span class="p">(</span>A1 <span class="o">==</span> <span class="kp">sapply</span><span class="p">(</span>B.A2<span class="p">,</span> complement<span class="p">)</span> <span class="o">&amp;</span>
-                         A2 <span class="o">==</span> <span class="kp">sapply</span><span class="p">(</span>B.A1<span class="p">,</span> complement<span class="p">))]</span>
-mismatch <span class="o">&lt;-</span> bim<span class="p">[</span><span class="o">!</span>SNP<span class="o">%in%</span>matched<span class="o">$</span>SNP<span class="p">,</span> SNP<span class="p">]</span>
-write.table<span class="p">(</span>mismatch<span class="p">,</span> <span class="s">&quot;EUR.mismatch&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> col.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
-</pre></div></div>
-</div>
-<p>The above script will generate three files: <strong>EUR.QC.adj.bim</strong>, <strong>EUR.update.a1</strong> and <strong>EUR.mismatch</strong>. </p>
-<ol>
-<li>Replace <strong>EUR.QC.bim</strong> with <strong>EUR.QC.adj.bim</strong>:</li>
-</ol>
-<div class="codehilite"><pre><span></span><span class="c1"># Make a back up</span>
-mv EUR.QC.bim EUR.QC.bim.bk
-ln -s EUR.QC.adj.bim EUR.QC.bim
-</pre></div>
-
-<ol>
-<li>Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
-<div class="codehilite"><pre><span></span>plink <span class="se">\</span>
-    --bfile EUR.QC <span class="se">\</span>
-    --a1-allele EUR.update.a1 <span class="se">\</span>
-    --make-bed <span class="se">\</span>
-    --keep EUR.valid.sample <span class="se">\</span>
-    --extract EUR.unambig.snp <span class="se">\</span>
-    --exclude EUR.mismatch <span class="se">\</span>
-    --out EUR.QC.flipped
-</pre></div></li>
-</ol>
 <h1 id="update-effect-size">Update Effect Size<a class="headerlink" href="#update-effect-size" title="Permanent link">&para;</a></h1>
 <p>When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we usually take the natural logarithm of the OR so that the PRS can be computed using a simple summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with <code>R</code>:</p>
 <div class="superfences-tabs">
-<input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
-<label for="__tab_2_0">Without data.table</label>
+<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
+<label for="__tab_1_0">Without data.table</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span>dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="kp">gzfile</span><span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">),</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 dat<span class="o">$</span>OR <span class="o">&lt;-</span> <span class="kp">log</span><span class="p">(</span>dat<span class="o">$</span>OR<span class="p">)</span>
 write.table<span class="p">(</span>dat<span class="p">,</span> <span class="s">&quot;Height.QC.Transformed&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
 </pre></div></div>
-<input name="__tabs_2" type="radio" id="__tab_2_1" />
-<label for="__tab_2_1">With data.table</label>
+<input name="__tabs_1" type="radio" id="__tab_1_1" />
+<label for="__tab_1_1">With data.table</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
 dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">)</span>
 fwrite<span class="p">(</span>dat<span class="p">[,</span>OR<span class="o">:=</span><span class="kp">log</span><span class="p">(</span>OR<span class="p">)],</span> <span class="s">&quot;Height.QC.Transformed&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
@@ -580,8 +422,8 @@ plink <span class="se">\</span>
 To approximate the "best-fit" PRS, we can perform a regression between PRS calculated at a range of P-value thresholds and then select the PRS that explains the highest phenotypic variance (please see Section 4.6 of our paper on overfitting issues). 
 This can be achieved using <code>R</code> as follows:</p>
 <div class="superfences-tabs">
-<input name="__tabs_3" type="radio" id="__tab_3_0" checked="checked" />
-<label for="__tab_3_0">detail</label>
+<input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
+<label for="__tab_2_0">detail</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span>p.threshold <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">0.001</span><span class="p">,</span><span class="m">0.05</span><span class="p">,</span><span class="m">0.1</span><span class="p">,</span><span class="m">0.2</span><span class="p">,</span><span class="m">0.3</span><span class="p">,</span><span class="m">0.4</span><span class="p">,</span><span class="m">0.5</span><span class="p">)</span>
 <span class="c1"># Read in the phenotype file </span>
 phenotype <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
@@ -626,8 +468,8 @@ prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
 <span class="c1"># Best result is:</span>
 prs.result<span class="p">[</span><span class="kp">which.max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">),]</span>
 </pre></div></div>
-<input name="__tabs_3" type="radio" id="__tab_3_1" />
-<label for="__tab_3_1">quick</label>
+<input name="__tabs_2" type="radio" id="__tab_2_1" />
+<label for="__tab_2_1">quick</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span>p.threshold <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">0.001</span><span class="p">,</span><span class="m">0.05</span><span class="p">,</span><span class="m">0.1</span><span class="p">,</span><span class="m">0.2</span><span class="p">,</span><span class="m">0.3</span><span class="p">,</span><span class="m">0.4</span><span class="p">,</span><span class="m">0.5</span><span class="p">)</span>
 phenotype <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 pcs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
