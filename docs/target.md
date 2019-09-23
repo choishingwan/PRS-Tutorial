@@ -76,7 +76,7 @@ Each of the parameters corresponds to the following
     -  `872` SNPs were removed due to being out of Hardy-Weinberg Equilibrium
     - `242,459` SNPs were removed due to low minor allele frequency
 
-
+ 
 !!! note
     Normally, we can generate a new genotype file using the new sample list.
     However,  this will use up a lot of storage space. Using `plink`'s
@@ -154,7 +154,7 @@ plink \
     --out EUR.QC
 ```
 
-This will generate a file called **EUR.sexcheck** containing the F-statistics for each individual. Individuals are typically called as being biologically male if the F-statistic is > 0.8 and biologically female if F < 0.2.
+This will generate a file called **EUR.QC.sexcheck** containing the F-statistics for each individual. Individuals are typically called as being biologically male if the F-statistic is > 0.8 and biologically female if F < 0.2.
 
 ```R tab="Without library"
 # Read in file
@@ -183,7 +183,7 @@ and G/T in the target data, then this can be resolved by
 ‘flipping’ the alleles in the target data to their complementary alleles. 
 This can be achieved with the following steps: 
 
-1. Get the correct A1 alleles for the bim file
+1\. Get the correct A1 alleles for the bim file
 
 ```R tab="Without data.table"
 bim <- read.table("EUR.bim")
@@ -323,7 +323,7 @@ write.table(mismatch, "EUR.mismatch", quote=F, row.names=F, col.names=F)
 
 The above script will generate three files: **EUR.QC.adj.bim**, **EUR.update.a1** and **EUR.mismatch**. 
 
-2. Replace **EUR.QC.bim** with **EUR.QC.adj.bim**:
+2\. Replace **EUR.QC.bim** with **EUR.QC.adj.bim**:
 
 ```bash
 # Make a back up
@@ -331,7 +331,7 @@ mv EUR.bim EUR.bim.bk
 ln -s EUR.QC.adj.bim EUR.bim
 ```
 
-3. Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
+3\. Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
 ```bash
 plink \
     --bfile EUR \
