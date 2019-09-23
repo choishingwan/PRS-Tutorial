@@ -187,6 +187,14 @@
 <div class="codehilite"><pre><span></span>curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/GIANT.height.gz -L -O
 </pre></div></p>
 <p>which will create a file called <strong>GIANT.height.gz</strong> in your working directory. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you download the summary statistics without using the bash command, and are using a MAC machine, the gz file will be decompressed automatically, resulting in a <strong>GIANT.height</strong> file instead. </p>
+<p>To maintain consistency, we suggest compressing the <strong>GIANT.height</strong> file with 
+<div class="codehilite"><pre><span></span>gzip GIANT.height
+</pre></div>
+before starting the tutorial</p>
+</div>
 <h1 id="reading-the-base-data-file">Reading the base data file<a class="headerlink" href="#reading-the-base-data-file" title="Permanent link">&para;</a></h1>
 <p><strong>GIANT.height.gz</strong> is compressed. To read its content, you can type:</p>
 <div class="codehilite"><pre><span></span>gunzip -c GIANT.height.gz <span class="p">|</span> head
@@ -303,21 +311,26 @@ If a different string is generated, then the file is corrupted.</p>
 <h1 id="35-genome-build"># Genome build<a class="headerlink" href="#35-genome-build" title="Permanent link">&para;</a></h1>
 <p>These base data are on the same genome build as the target data that we will be using. You must check that your base and target data are on the same genome build, and if they are not then use a tool such as LiftOver to make the builds consistent across the data sets.</p>
 <h1 id="35-standard-gwas-qc"># Standard GWAS QC<a class="headerlink" href="#35-standard-gwas-qc" title="Permanent link">&para;</a></h1>
-<p>As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. If the base data have been obtained as summary statistics from a public source, then the typical QC steps that you will be able to perform on them are to filter the SNPs according to INFO score and MAF. SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). Therefore, SNPs with low MAF and INFO are typically removed before performing downstream analyses. We recommend removing SNPs with MAF &lt; 1% and INFO &lt; 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results). These SNP filters can be acheived using the following code:</p>
+<p>As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. 
+If the base data have been obtained as summary statistics from a public source, then the typical QC steps that you will be able to perform on them are to filter the SNPs according to INFO score and MAF. 
+SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). 
+Therefore, SNPs with low MAF and INFO are typically removed before performing downstream analyses.
+We recommend removing SNPs with MAF &lt; 1% and INFO &lt; 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results).
+These SNP filters can be acheived using the following code:</p>
 <div class="codehilite"><pre><span></span>gunzip -c GIANT.height.gz <span class="p">|</span><span class="se">\</span>
 awk <span class="s1">&#39;NR==1 || ($6 &gt; 0.01) &amp;&amp; ($10 &gt; 0.8) {print}&#39;</span> <span class="p">|</span><span class="se">\</span>
 gzip  &gt; Height.gz
 </pre></div>
 
 <p>The bash code above does the following:
-1. Decompresses and reads the <strong>Height.gz</strong> file
+1. Decompresses and reads the <strong>GIANT.height.gz</strong> file
 2. Prints the header line (<code>NR==1</code>)
 3. Prints any line with MAF above 0.05 (<code>$6</code> because the sixth column of the file contains the MAF information)
 4. Prints any line with INFO above 0.8 (<code>$10</code> because the tenth column of the file contains the INFO information)
-5. Compresses and writes the results to <strong>Height.QC.gz</strong></p>
+5. Compresses and writes the results to <strong>Height.gz</strong></p>
 <h1 id="35-ambiguous-snps"># Ambiguous SNPs<a class="headerlink" href="#35-ambiguous-snps" title="Permanent link">&para;</a></h1>
 <p>If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.</p>
-<p>Ambiguous SNPs can be obtained by examining the bim file:
+<p>Nonambiguous SNPs can be retained using the following:
 <div class="codehilite"><pre><span></span>gunzip -c Height.gz <span class="p">|</span><span class="se">\</span>
 awk <span class="s1">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) || \</span>
 <span class="s1">        ($4==&quot;T&quot; &amp;&amp; $5==&quot;A&quot;) || \</span>
@@ -325,7 +338,7 @@ awk <span class="s1">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) ||
 <span class="s1">        ($4==&quot;C&quot; &amp;&amp; $5==&quot;G&quot;)) {print}&#39;</span> <span class="p">|</span><span class="se">\</span>
     gzip &gt; Height.noambig.gz
 </pre></div></p>
-<details class="note"><summary>How many ambiguous SNPs were there?</summary><p>There are <code>36,683</code> ambiguous SNPs</p>
+<details class="note"><summary>How many non-ambiguous SNPs were there?</summary><p>There are <code>608,811</code> ambiguous SNPs</p>
 </details>
 <h1 id="35-mismatching-genotypes"># Mismatching genotypes<a class="headerlink" href="#35-mismatching-genotypes" title="Permanent link">&para;</a></h1>
 <p>If there is a non-ambiguous mismatch in allele coding between the base and target data sets, such as A/C in the base and G/T in the target data, then this can be resolved by ‘flipping’ the alleles in either data set to their complementary alleles. However, since we need the target data to know which SNPs have mismatching genotypes across the data sets, then we will perform this 'allele flipping' in the target data.</p>
