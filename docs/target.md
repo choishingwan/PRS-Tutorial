@@ -104,6 +104,7 @@ Heterozygosity rates can then be computed using `plink`:
 plink \
     --bfile EUR \
     --extract EUR.QC.prune.in \
+    --keep EUR.QC.fam \
     --het \
     --out EUR.QC
 ```
