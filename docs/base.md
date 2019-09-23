@@ -8,6 +8,17 @@ curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/GIANT.hei
 
 which will create a file called **GIANT.height.gz** in your working directory. 
 
+!!! warning
+    If you download the summary statistics without using the bash command, and are using a MAC machine, the gz file will be decompressed automatically, resulting in a **GIANT.height** file instead. 
+    
+    To maintain consistency, we suggest compressing the **GIANT.height** file with 
+    ```
+    gzip GIANT.height
+    ```
+    before starting the tutorial
+    
+
+
 # Reading the base data file
 **GIANT.height.gz** is compressed. To read its content, you can type:
 
@@ -83,7 +94,12 @@ If a different string is generated, then the file is corrupted.
 These base data are on the same genome build as the target data that we will be using. You must check that your base and target data are on the same genome build, and if they are not then use a tool such as LiftOver to make the builds consistent across the data sets.
 
 # \# Standard GWAS QC
-As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. If the base data have been obtained as summary statistics from a public source, then the typical QC steps that you will be able to perform on them are to filter the SNPs according to INFO score and MAF. SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). Therefore, SNPs with low MAF and INFO are typically removed before performing downstream analyses. We recommend removing SNPs with MAF < 1% and INFO < 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results). These SNP filters can be acheived using the following code:
+As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. 
+If the base data have been obtained as summary statistics from a public source, then the typical QC steps that you will be able to perform on them are to filter the SNPs according to INFO score and MAF. 
+SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). 
+Therefore, SNPs with low MAF and INFO are typically removed before performing downstream analyses.
+We recommend removing SNPs with MAF < 1% and INFO < 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results).
+These SNP filters can be acheived using the following code:
 
 ```bash
 gunzip -c GIANT.height.gz |\
@@ -92,16 +108,16 @@ gzip  > Height.gz
 ```
 
 The bash code above does the following:
-1. Decompresses and reads the **Height.gz** file
+1. Decompresses and reads the **GIANT.height.gz** file
 2. Prints the header line (`NR==1`)
 3. Prints any line with MAF above 0.05 (`$6` because the sixth column of the file contains the MAF information)
 4. Prints any line with INFO above 0.8 (`$10` because the tenth column of the file contains the INFO information)
-5. Compresses and writes the results to **Height.QC.gz**
+5. Compresses and writes the results to **Height.gz**
 
 # \# Ambiguous SNPs
 If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.
 
-Ambiguous SNPs can be obtained by examining the bim file:
+Nonambiguous SNPs can be retained using the following:
 ```bash
 gunzip -c Height.gz |\
 awk '!( ($4=="A" && $5=="T") || \
@@ -111,8 +127,8 @@ awk '!( ($4=="A" && $5=="T") || \
     gzip > Height.noambig.gz
 ```
 
-??? note "How many ambiguous SNPs were there?"
-    There are `36,683` ambiguous SNPs
+??? note "How many non-ambiguous SNPs were there?"
+    There are `608,811` ambiguous SNPs
 
 
 # \# Mismatching genotypes
