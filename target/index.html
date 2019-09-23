@@ -375,7 +375,7 @@ A sex check can then easily be conducted using <code>plink</code>
     --check-sex <span class="se">\</span>
     --out EUR.QC
 </pre></div></p>
-<p>This will generate a file called <strong>EUR.sexcheck</strong> containing the F-statistics for each individual. Individuals are typically called as being biologically male if the F-statistic is &gt; 0.8 and biologically female if F &lt; 0.2.</p>
+<p>This will generate a file called <strong>EUR.QC.sexcheck</strong> containing the F-statistics for each individual. Individuals are typically called as being biologically male if the F-statistic is &gt; 0.8 and biologically female if F &lt; 0.2.</p>
 <div class="superfences-tabs">
 <input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
 <label for="__tab_2_0">Without library</label>
@@ -404,9 +404,7 @@ coding between the data sets, such as A/C in the base
 and G/T in the target data, then this can be resolved by 
 ‘flipping’ the alleles in the target data to their complementary alleles. 
 This can be achieved with the following steps: </p>
-<ol>
-<li>Get the correct A1 alleles for the bim file</li>
-</ol>
+<p>1. Get the correct A1 alleles for the bim file</p>
 <div class="superfences-tabs">
 <input name="__tabs_3" type="radio" id="__tab_3_0" checked="checked" />
 <label for="__tab_3_0">Without data.table</label>
@@ -546,16 +544,13 @@ write.table<span class="p">(</span>mismatch<span class="p">,</span> <span class=
 </pre></div></div>
 </div>
 <p>The above script will generate three files: <strong>EUR.QC.adj.bim</strong>, <strong>EUR.update.a1</strong> and <strong>EUR.mismatch</strong>. </p>
-<ol>
-<li>Replace <strong>EUR.QC.bim</strong> with <strong>EUR.QC.adj.bim</strong>:</li>
-</ol>
+<p>2. Replace <strong>EUR.QC.bim</strong> with <strong>EUR.QC.adj.bim</strong>:</p>
 <div class="codehilite"><pre><span></span><span class="c1"># Make a back up</span>
 mv EUR.bim EUR.bim.bk
 ln -s EUR.QC.adj.bim EUR.bim
 </pre></div>
 
-<ol>
-<li>Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
+<p>3. Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
     --a1-allele EUR.update.a1 <span class="se">\</span>
@@ -563,8 +558,7 @@ ln -s EUR.QC.adj.bim EUR.bim
     --keep EUR.QC.valid <span class="se">\</span>
     --exclude EUR.mismatch <span class="se">\</span>
     --out EUR.QC.flipped
-</pre></div></li>
-</ol>
+</pre></div></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Most PRS software will perform flipping automatically, thus this step is usually not required.</p>
