@@ -183,12 +183,15 @@ and G/T in the target data, then this can be resolved by
 ‘flipping’ the alleles in the target data to their complementary alleles. 
 This can be achieved with the following steps: 
 
-1\. Get the correct A1 alleles for the bim file
+1\. Load the bim file, the GIANT summary statistic and the QC SNP list into R
 
 ```R tab="Without data.table"
+# Read in bim file
 bim <- read.table("EUR.bim")
 colnames(bim) <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
+# Read in QCed SNPs
 qc <- read.table("EUR.QC.snplist", header = F, stringsAsFactors = F)
+# Read in GIANT data
 height <-
     read.table(gzfile("Height.QC.gz"),
                header = T,
@@ -199,7 +202,29 @@ height$A1 <- toupper(height$A1)
 height$A2 <- toupper(height$A2)
 bim$B.A1 <- toupper(bim$B.A1)
 bim$B.A2 <- toupper(bim$B.A2)
+```
+
+```R tab="With data.table"
+library(data.table)
+# Read in bim file 
+bim <- fread("EUR.bim")
+setnames(bim, colnames(bim), c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2"))
+# Read in GIANT data (require data.table v1.12.0+)
+height <- fread("Height.QC.gz")
+# Change all alleles to upper case for easy comparison
+height[,c("A1","A2"):=list(toupper(A1), toupper(A2))]
+bim[,c("B.A1","B.A2"):=list(toupper(B.A1), toupper(B.A2))]
+# Read in QCed SNPs
+qc <- fread("EUR.QC.snplist", header=F)
+```
+
+
+2\. Identify SNPs that require strand flipping 
+
+```R tab="Without data.table"
+# Merge GIANT with target
 info <- merge(bim, height, by = c("SNP", "CHR", "BP"))
+# Filter QCed SNPs
 info <- info[info$SNP %in% qc$V1,]
 # Function for finding the complementary allele
 complement <- function(x) {
@@ -223,53 +248,10 @@ bim[bim$SNP %in% info.complement$SNP,]$B.A1 <-
     sapply(bim[bim$SNP %in% info.complement$SNP,]$B.A1, complement)
 bim[bim$SNP %in% info.complement$SNP,]$B.A2 <-
     sapply(bim[bim$SNP %in% info.complement$SNP,]$B.A2, complement)
-# identify SNPs that need flipping
-info.flip <- subset(info, A1 == B.A2 & A2 == B.A1)
-# identify SNPs that need flipping & complement
-info.cflip <- subset(info, A1 == C.A2 & A2 == C.A1)
-# Update these allele coding in the bim file
-# Note that we don't flip the SNP here. We will let PLINK do that. 
-com.snps <- bim$SNP %in% info.cflip$SNP
-bim[com.snps,]$B.A1 <- sapply(bim[com.snps,]$B.A1, complement)
-bim[com.snps,]$B.A2 <- sapply(bim[com.snps,]$B.A2, complement)
-# Get list of SNPs that need to change the A1 encoding
-flip <- rbind(info.flip, info.cflip)
-flip.snp <- data.frame(SNP = flip$SNP, A1 = flip$A1)
-write.table(flip.snp,
-            "EUR.update.a1",
-            quote = F,
-            row.names = F)
-write.table(
-    bim,
-    "EUR.QC.adj.bim",
-    quote = F,
-    row.names = F,
-    col.names = F
-)
-# And we want to remove any SNPs that do not match with the base data
-mismatch <-
-    bim$SNP[!(bim$SNP %in% info.match$SNP |
-                  bim$SNP %in% info.complement$SNP | 
-                  bim$SNP %in% flip$SNP)]
-write.table(
-    mismatch,
-    "EUR.mismatch",
-    quote = F,
-    row.names = F,
-    col.names = F
-)
 ```
 
 ```R tab="With data.table"
-library(data.table)
-bim <- fread("EUR.bim")
-bim.col <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
-setnames(bim, colnames(bim), bim.col)
-qc <- fread("EUR.QC.snplist", header=F)
-height <- fread("Height.QC.gz")
-# Change all alleles to upper case for easy comparison
-height[,c("A1","A2"):=list(toupper(A1), toupper(A2))]
-bim[,c("B.A1","B.A2"):=list(toupper(B.A1), toupper(B.A2))]
+# Merge GIANT with target
 info <- merge(bim, height, by=c("SNP", "CHR", "BP"))
 info <- info[SNP %in% qc$V1]
 # Function for calculating the complementary allele
@@ -293,53 +275,79 @@ bim[SNP %in% com.snps, c("B.A1", "B.A2") :=
 info[SNP %in% com.snps, c("B.A1", "B.A2") :=
         list(sapply(B.A1, complement),
              sapply(B.A2, complement))]
-# identify SNPs that need flipping & complement
-com.flip <- info[sapply(B.A1, complement) == A2 &
+```
+
+
+3\. Identify SNPs that require recoding in the target (to ensure the coding allele in the target data is the effective allele in the base summary statistic)
+
+```R tab="Without data.table"
+# identify SNPs that need recoding
+info.recode <- subset(info, A1 == B.A2 & A2 == B.A1)
+# identify SNPs that need recoding & complement
+info.crecode <- subset(info, A1 == C.A2 & A2 == C.A1)
+# Update these allele coding in the bim file
+com.snps <- bim$SNP %in% info.crecode$SNP
+tmp <- bim[com.snps,]$B.A1
+bim[com.snps,]$B.A1 <- as.character(sapply(bim[com.snps,]$B.A2, complement))
+bim[com.snps,]$B.A2 <- as.character(sapply(tmp, complement))
+# Output updated bim file
+write.table(
+    bim,
+    "EUR.QC.adj.bim",
+    quote = F,
+    row.names = F,
+    col.names = F
+)
+```
+
+```R tab="With data.table"
+# identify SNPs that need recoding & complement
+com.recode <- info[sapply(B.A1, complement) == A2 &
                      sapply(B.A2, complement) == A1, SNP]
 # Now update the bim file
-bim[SNP %in% com.flip, c("B.A1", "B.A2") :=
-        list(sapply(B.A1, complement),
-             sapply(B.A2, complement))]
+bim[SNP %in% com.recode, c("B.A1", "B.A2") :=
+        list(sapply(B.A2, complement),
+             sapply(B.A1, complement))]
 # And update the info structure
-info[SNP %in% com.flip, c("B.A1", "B.A2") :=
-        list(sapply(B.A1, complement),
-             sapply(B.A2, complement))]
-# Obtain list of SNPs that require flipping
-flip <- info[B.A1==A2 & B.A2==A1]
-# Now generate file for PLINK 
-fwrite(flip[,c("SNP", "A1")], "EUR.update.a1", sep="\t")
+info[SNP %in% com.recode, c("B.A1", "B.A2") :=
+        list(sapply(B.A2, complement),
+             sapply(B.A1, complement))]
 # Write the updated bim file
 fwrite(bim, "EUR.QC.adj.bim", col.names=F, sep="\t")
-# We can then remove all mismatch SNPs
+```
+
+
+4\. Identify SNPs that have different allele in base and target (usually due to difference in genome build or Indel)
+
+```R tab="Without data.table"
+mismatch <-
+    bim$SNP[!(bim$SNP %in% info.match$SNP |
+                  bim$SNP %in% info.complement$SNP | 
+                  bim$SNP %in% info.recode$SNP |
+                  bim$SNP %in% info.crecode$SNP)]
+write.table(
+    mismatch,
+    "EUR.mismatch",
+    quote = F,
+    row.names = F,
+    col.names = F
+)
+```
+
+``` R tab="With data.table"
 matched <- info[(A1 == B.A1 & A2 == B.A2) |
-                    (A1 == B.A2 & A2 == B.A1) |
-                    (A1 == sapply(B.A1, complement) &
-                         A2 == sapply(B.A2, complement)) |
-                    (A1 == sapply(B.A2, complement) &
-                         A2 == sapply(B.A1, complement))]
+                    (A1 == B.A2 & A2 == B.A1)]
 mismatch <- bim[!SNP%in%matched$SNP, SNP]
 write.table(mismatch, "EUR.mismatch", quote=F, row.names=F, col.names=F)
 ```
 
-The above script will generate three files: **EUR.QC.adj.bim**, **EUR.update.a1** and **EUR.mismatch**. 
 
-2\. Replace **EUR.QC.bim** with **EUR.QC.adj.bim**:
+5\. Replace **EUR.bim** with **EUR.QC.adj.bim**:
 
 ```bash
 # Make a back up
 mv EUR.bim EUR.bim.bk
 ln -s EUR.QC.adj.bim EUR.bim
-```
-
-3\. Generate a new genotype file with the alleles flipped so that the alleles in the base and target data match:
-```bash
-plink \
-    --bfile EUR \
-    --a1-allele EUR.update.a1 \
-    --make-bed \
-    --keep EUR.QC.valid \
-    --exclude EUR.mismatch \
-    --out EUR.QC.flipped
 ```
 
 !!! note
@@ -351,18 +359,19 @@ Make sure to remove any duplicate SNPs in your target data (these target data we
 
 
 # \# Sample overlap
-Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper] (https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). 
+Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper](https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). 
 
 # \# Relatedness
 Closely related individuals in the target data may lead to overfitted results, limiting the generalisability of the results. 
 
 Before calculating the relatedness, pruning should be performed (see [here](target.md#35-standard-gwas-qc)).
-Individuals that have a first or second degree relative in the sample ($\text{pi-hat} > 0.125$) can be removed with the following command:
+Individuals that have a first or second degree relative in the sample ($\hat{\pi} > 0.125$) can be removed with the following command:
 
 ```bash
 plink \
-    --bfile EUR.QC.flipped \
+    --bfile EUR \
     --extract EUR.QC.prune.in \
+    --keep EUR.QC.valid \
     --rel-cutoff 0.125 \
     --out EUR.QC
 ```
@@ -382,8 +391,9 @@ plink \
 After performing the full analysis, you can generate a QC'ed data set with the following command:
 ```bash
 plink \
-    --bfile EUR.QC.flipped \
+    --bfile EUR \
     --make-bed \
+    --keep EUR.QC.rel.id \
     --out EUR.QC \
     --extract EUR.QC.snplist
 ```

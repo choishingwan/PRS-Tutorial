@@ -87,7 +87,7 @@ md5 GIANT.height.gz
 ```
 
 
-if the file is intact, then `md5sum` generates a string of characters, which in this case should be: `88413472f72823ee294f0916a36505d9`. 
+if the file is intact, then `md5sum` generates a string of characters, which in this case should be: `80e48168416a2fdbe88d68cdfebd4ca2`. 
 If a different string is generated, then the file is corrupted.
 
 # \# Genome build

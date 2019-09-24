@@ -11,7 +11,7 @@ In the previous sections, we have generated the following files:
 |**EUR.QC.bed**| The genotype file after performing some basic filtering |
 |**EUR.QC.bim**| This file contains the SNPs that passed the basic filtering |
 |**EUR.QC.fam**| This file contains the samples that passed the basic filtering |
-|**EUR.valid.sample**| This file contains the samples that passed all the QC |
+|**EUR.QC.valid**| This file contains the samples that passed all the QC |
 |**EUR.height**| This file contains the phenotype of the samples |
 |**EUR.covariate**| This file contains the covariates of the samples |
 
@@ -43,7 +43,7 @@ Linkage disequilibrium, which corresponds to the correlation between the genotyp
 
 ```bash
 plink \
-    --bfile EUR.QC.flipped \
+    --bfile EUR.QC \
     --clump-p1 1 \
     --clump-r2 0.1 \
     --clump-kb 250 \
@@ -117,10 +117,10 @@ We can then calculate the PRS with the following `plink` command:
 
 ```bash
 plink \
-    --bfile EUR.QC.flipped \
-    --extract EUR.valid.snp \
+    --bfile EUR.QC \
     --score Height.QC.Transformed 1 4 11 header \
     --q-score-range range_list SNP.pvalue \
+    --extract EUR.valid.snp \
     --out EUR
 ```
 The meaning of the new parameters are as follows:
@@ -157,13 +157,12 @@ Again, we can calculate the PCs using `plink`:
 ```bash
 # First, we need to perform prunning
 plink \
-    --bfile EUR.QC.flipped \
-    --extract EUR.valid.snp \
+    --bfile EUR.QC \
     --indep-pairwise 200 50 0.25 \
     --out EUR
 # Then we calculate the first 6 PCs
 plink \
-    --bfile EUR.QC.flipped \
+    --bfile EUR.QC \
     --extract EUR.prune.in \
     --pca 6 \
     --out EUR
@@ -257,7 +256,7 @@ print(prs.result[which.max(prs.result$R2),])
 ```
 
 ??? note "Which P-value threshold generates the "best-fit" PRS?"
-    0.05
+    0.2 
 
 ??? note "How much phenotypic variation does the "best-fit" PRS explain?"
-    0.03921047
+    0.04003232

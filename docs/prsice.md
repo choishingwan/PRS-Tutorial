@@ -43,13 +43,14 @@ PRSice-2 can then be run to obtain the PRS results as follows:
 Rscript PRSice.R \
     --prsice PRSice_linux \
     --base Height.QC.gz \
-    --target EUR.QC \
-    --keep EUR.valid.sample \
+    --target EUR \
+    --keep EUR.QC.rel.id \
+    --extract EUR.QC.snplist \
     --binary-target F \
-    --pheno-file EUR.height \
-    --cov-file EUR.cov \
-    --maf-base MAF,0.05 \
-    --info-base INFO,0.8 \
+    --pheno EUR.height \
+    --cov EUR.cov \
+    --base-maf MAF,0.01 \
+    --base-info INFO,0.8 \
     --out EUR
 ```
 
@@ -58,13 +59,14 @@ Rscript PRSice.R \
 Rscript PRSice.R \
     --prsice PRSice_mac \
     --base Height.QC.gz \
-    --target EUR.QC \
-    --keep EUR.valid.sample \
+    --target EUR \
+    --keep EUR.QC.rel.id \
+    --extract EUR.QC.snplist \
     --binary-target F \
-    --pheno-file EUR.height \
-    --cov-file EUR.cov \
-    --maf-base MAF,0.05 \
-    --info-base INFO,0.8 \
+    --pheno EUR.height \
+    --cov EUR.cov \
+    --base-maf MAF,0.01 \
+    --base-info INFO,0.8 \
     --out EUR
 ```
 
@@ -72,13 +74,14 @@ Rscript PRSice.R \
 Rscript PRSice.R ^
     --prsice PRSice_win64.exe ^
     --base Height.QC.gz ^
-    --target EUR.QC ^
-    --keep EUR.valid.sample ^
+    --target EUR ^
+    --keep EUR.QC.rel.id ^
+    --extract EUR.QC.snplist ^
     --binary-target F ^
-    --pheno-file EUR.height ^
-    --cov-file EUR.cov ^
-    --maf-base MAF,0.05 ^
-    --info-base INFO,0.8 ^
+    --pheno EUR.height ^
+    --cov EUR.cov ^
+    --base-maf MAF,0.05 ^
+    --base-info INFO,0.8 ^
     --out EUR
 ```
 
