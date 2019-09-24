@@ -8,7 +8,7 @@
   
   <meta name="author" content="Shing Wan CHOI">
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>1. QC of Summary Statistics - Basic Tutorial for Polygenic Risk Score Analyses</title>
+  <title>1. QC of Base Data - Basic Tutorial for Polygenic Risk Score Analyses</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
@@ -18,7 +18,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "1. QC of Summary Statistics";
+    var mkdocs_page_name = "1. QC of Base Data";
     var mkdocs_page_input_path = "base.md";
     var mkdocs_page_url = null;
   </script>
@@ -66,7 +66,7 @@
           
             <li class="toctree-l1 current">
 		
-    <a class="current" href="./">1. QC of Summary Statistics</a>
+    <a class="current" href="./">1. QC of Base Data</a>
     <ul class="subnav">
             
     <li class="toctree-l2"><a href="#obtaining-the-base-data-file">Obtaining the base data file</a></li>
@@ -116,12 +116,12 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../target/">2. Target Genotype QC</a>
+    <a class="" href="../target/">2. QC of Target Data</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <span class="caption-text">3. Running PRS</span>
+    <span class="caption-text">3. Calculating and analysing PRS</span>
     <ul class="subnav">
                 <li class="">
                     
@@ -144,7 +144,7 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../plink_visual/">4. Visualizing PRS</a>
+    <a class="" href="../plink_visual/">4. Visualizing PRS Results</a>
 	    </li>
           
         </ul>
@@ -169,7 +169,7 @@
     
       
     
-    <li>1. QC of Summary Statistics</li>
+    <li>1. QC of Base Data</li>
     <li class="wy-breadcrumbs-aside">
       
         <a href="https://github.com/choishingwan/PRS-Tutorial/edit/master/docs/base.md"
@@ -306,7 +306,7 @@ The following command performs this <code>md5sum</code> check: </p>
 <div class="superfences-content"><div class="codehilite"><pre><span></span>md5 GIANT.height.gz
 </pre></div></div>
 </div>
-<p>if the file is intact, then <code>md5sum</code> generates a string of characters, which in this case should be: <code>88413472f72823ee294f0916a36505d9</code>. 
+<p>if the file is intact, then <code>md5sum</code> generates a string of characters, which in this case should be: <code>80e48168416a2fdbe88d68cdfebd4ca2</code>. 
 If a different string is generated, then the file is corrupted.</p>
 <h1 id="35-genome-build"># Genome build<a class="headerlink" href="#35-genome-build" title="Permanent link">&para;</a></h1>
 <p>These base data are on the same genome build as the target data that we will be using. You must check that your base and target data are on the same genome build, and if they are not then use a tool such as LiftOver to make the builds consistent across the data sets.</p>
@@ -385,7 +385,7 @@ gzip - &gt; Height.QC.gz
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../target/" class="btn btn-neutral float-right" title="2. Target Genotype QC">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../target/" class="btn btn-neutral float-right" title="2. QC of Target Data">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href=".." class="btn btn-neutral" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>

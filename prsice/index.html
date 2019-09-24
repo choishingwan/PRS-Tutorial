@@ -66,17 +66,17 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../base/">1. QC of Summary Statistics</a>
+    <a class="" href="../base/">1. QC of Base Data</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="../target/">2. Target Genotype QC</a>
+    <a class="" href="../target/">2. QC of Target Data</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <span class="caption-text">3. Running PRS</span>
+    <span class="caption-text">3. Calculating and analysing PRS</span>
     <ul class="subnav">
                 <li class="">
                     
@@ -105,7 +105,7 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../plink_visual/">4. Visualizing PRS</a>
+    <a class="" href="../plink_visual/">4. Visualizing PRS Results</a>
 	    </li>
           
         </ul>
@@ -130,7 +130,7 @@
     
       
         
-          <li>3. Running PRS &raquo;</li>
+          <li>3. Calculating and analysing PRS &raquo;</li>
         
       
     
@@ -236,13 +236,14 @@ write.table<span class="p">(</span>cov<span class="p">,</span><span class="s">&q
 <div class="superfences-content"><div class="codehilite"><pre><span></span>Rscript PRSice.R <span class="se">\</span>
     --prsice PRSice_linux <span class="se">\</span>
     --base Height.QC.gz <span class="se">\</span>
-    --target EUR.QC <span class="se">\</span>
-    --keep EUR.valid.sample <span class="se">\</span>
+    --target EUR <span class="se">\</span>
+    --keep EUR.QC.rel.id <span class="se">\</span>
+    --extract EUR.QC.snplist <span class="se">\</span>
     --binary-target F <span class="se">\</span>
-    --pheno-file EUR.height <span class="se">\</span>
-    --cov-file EUR.cov <span class="se">\</span>
-    --maf-base MAF,0.05 <span class="se">\</span>
-    --info-base INFO,0.8 <span class="se">\</span>
+    --pheno EUR.height <span class="se">\</span>
+    --cov EUR.cov <span class="se">\</span>
+    --base-maf MAF,0.01 <span class="se">\</span>
+    --base-info INFO,0.8 <span class="se">\</span>
     --out EUR
 </pre></div></div>
 <input name="__tabs_1" type="radio" id="__tab_1_1" />
@@ -250,13 +251,14 @@ write.table<span class="p">(</span>cov<span class="p">,</span><span class="s">&q
 <div class="superfences-content"><div class="codehilite"><pre><span></span>Rscript PRSice.R <span class="se">\</span>
     --prsice PRSice_mac <span class="se">\</span>
     --base Height.QC.gz <span class="se">\</span>
-    --target EUR.QC <span class="se">\</span>
-    --keep EUR.valid.sample <span class="se">\</span>
+    --target EUR <span class="se">\</span>
+    --keep EUR.QC.rel.id <span class="se">\</span>
+    --extract EUR.QC.snplist <span class="se">\</span>
     --binary-target F <span class="se">\</span>
-    --pheno-file EUR.height <span class="se">\</span>
-    --cov-file EUR.cov <span class="se">\</span>
-    --maf-base MAF,0.05 <span class="se">\</span>
-    --info-base INFO,0.8 <span class="se">\</span>
+    --pheno EUR.height <span class="se">\</span>
+    --cov EUR.cov <span class="se">\</span>
+    --base-maf MAF,0.01 <span class="se">\</span>
+    --base-info INFO,0.8 <span class="se">\</span>
     --out EUR
 </pre></div></div>
 <input name="__tabs_1" type="radio" id="__tab_1_2" />
@@ -264,13 +266,14 @@ write.table<span class="p">(</span>cov<span class="p">,</span><span class="s">&q
 <div class="superfences-content"><div class="codehilite"><pre><span></span>Rscript PRSice.R ^
     --prsice PRSice_win64.exe ^
     --base Height.QC.gz ^
-    --target EUR.QC ^
-    --keep EUR.valid.sample ^
+    --target EUR ^
+    --keep EUR.QC.rel.id ^
+    --extract EUR.QC.snplist ^
     --binary-target F ^
-    --pheno-file EUR.height ^
-    --cov-file EUR.cov ^
-    --maf-base MAF,0.05 ^
-    --info-base INFO,0.8 ^
+    --pheno EUR.height ^
+    --cov EUR.cov ^
+    --base-maf MAF,0.05 ^
+    --base-info INFO,0.8 ^
     --out EUR
 </pre></div></div>
 </div>

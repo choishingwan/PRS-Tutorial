@@ -66,17 +66,17 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../base/">1. QC of Summary Statistics</a>
+    <a class="" href="../base/">1. QC of Base Data</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="../target/">2. Target Genotype QC</a>
+    <a class="" href="../target/">2. QC of Target Data</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <span class="caption-text">3. Running PRS</span>
+    <span class="caption-text">3. Calculating and analysing PRS</span>
     <ul class="subnav">
                 <li class=" current">
                     
@@ -123,7 +123,7 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../plink_visual/">4. Visualizing PRS</a>
+    <a class="" href="../plink_visual/">4. Visualizing PRS Results</a>
 	    </li>
           
         </ul>
@@ -148,7 +148,7 @@
     
       
         
-          <li>3. Running PRS &raquo;</li>
+          <li>3. Calculating and analysing PRS &raquo;</li>
         
       
     
@@ -194,7 +194,7 @@
 <td align="center">This file contains the samples that passed the basic filtering</td>
 </tr>
 <tr>
-<td align="center"><strong>EUR.valid.sample</strong></td>
+<td align="center"><strong>EUR.QC.valid</strong></td>
 <td align="center">This file contains the samples that passed all the QC</td>
 </tr>
 <tr>
@@ -233,7 +233,7 @@ may be obtained. Therefore, we recommend performing the transformation in <code>
 <h1 id="clumping">Clumping<a class="headerlink" href="#clumping" title="Permanent link">&para;</a></h1>
 <p>Linkage disequilibrium, which corresponds to the correlation between the genotypes of genetic variants across the genome, makes identifying the contribution from causal independent genetic variants extremely challenging. One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in such a way that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. Clumping can be performed using the following command in <code>plink</code>: </p>
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
-    --bfile EUR.QC.flipped <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
     --clump-p1 <span class="m">1</span> <span class="se">\</span>
     --clump-r2 <span class="m">0</span>.1 <span class="se">\</span>
     --clump-kb <span class="m">250</span> <span class="se">\</span>
@@ -345,10 +345,10 @@ The format of the <strong>range_list</strong> file should be as follows:</li>
 </div>
 <p>We can then calculate the PRS with the following <code>plink</code> command:</p>
 <p><div class="codehilite"><pre><span></span>plink <span class="se">\</span>
-    --bfile EUR.QC.flipped <span class="se">\</span>
-    --extract EUR.valid.snp <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
     --score Height.QC.Transformed <span class="m">1</span> <span class="m">4</span> <span class="m">11</span> header <span class="se">\</span>
     --q-score-range range_list SNP.pvalue <span class="se">\</span>
+    --extract EUR.valid.snp <span class="se">\</span>
     --out EUR
 </pre></div>
 The meaning of the new parameters are as follows:</p>
@@ -396,13 +396,12 @@ PRS_j =\frac{ \sum_i^NS_i*G_{ij}}{P*M_j}
 <p>Again, we can calculate the PCs using <code>plink</code>: 
 <div class="codehilite"><pre><span></span><span class="c1"># First, we need to perform prunning</span>
 plink <span class="se">\</span>
-    --bfile EUR.QC.flipped <span class="se">\</span>
-    --extract EUR.valid.snp <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
     --indep-pairwise <span class="m">200</span> <span class="m">50</span> <span class="m">0</span>.25 <span class="se">\</span>
     --out EUR
 <span class="c1"># Then we calculate the first 6 PCs</span>
 plink <span class="se">\</span>
-    --bfile EUR.QC.flipped <span class="se">\</span>
+    --bfile EUR.QC <span class="se">\</span>
     --extract EUR.prune.in <span class="se">\</span>
     --pca <span class="m">6</span> <span class="se">\</span>
     --out EUR
@@ -495,9 +494,9 @@ prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
 <span class="kp">print</span><span class="p">(</span>prs.result<span class="p">[</span><span class="kp">which.max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">),])</span>
 </pre></div></div>
 </div>
-<details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.05</p>
+<details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.2 </p>
 </details>
-<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.03921047</p>
+<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.04003232</p>
 </details>
               
             </div>
@@ -509,7 +508,7 @@ prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
         <a href="../prsice/" class="btn btn-neutral float-right" title="PRSice-2">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../target/" class="btn btn-neutral" title="2. Target Genotype QC"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../target/" class="btn btn-neutral" title="2. QC of Target Data"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
