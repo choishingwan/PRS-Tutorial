@@ -338,7 +338,7 @@ awk <span class="s1">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) ||
 <span class="s1">        ($4==&quot;C&quot; &amp;&amp; $5==&quot;G&quot;)) {print}&#39;</span> <span class="p">|</span><span class="se">\</span>
     gzip &gt; Height.noambig.gz
 </pre></div></p>
-<details class="note"><summary>How many non-ambiguous SNPs were there?</summary><p>There are <code>608,811</code> ambiguous SNPs</p>
+<details class="note"><summary>How many non-ambiguous SNPs were there?</summary><p>There are <code>609,041</code> ambiguous SNPs</p>
 </details>
 <h1 id="35-mismatching-genotypes"># Mismatching genotypes<a class="headerlink" href="#35-mismatching-genotypes" title="Permanent link">&para;</a></h1>
 <p>If there is a non-ambiguous mismatch in allele coding between the base and target data sets, such as A/C in the base and G/T in the target data, then this can be resolved by ‘flipping’ the alleles in either data set to their complementary alleles. However, since we need the target data to know which SNPs have mismatching genotypes across the data sets, then we will perform this 'allele flipping' in the target data.</p>
