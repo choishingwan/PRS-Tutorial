@@ -128,7 +128,7 @@ awk '!( ($4=="A" && $5=="T") || \
 ```
 
 ??? note "How many non-ambiguous SNPs were there?"
-    There are `608,811` ambiguous SNPs
+    There are `609,041` ambiguous SNPs
 
 
 # \# Mismatching genotypes
