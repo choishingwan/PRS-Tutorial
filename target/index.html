@@ -344,6 +344,7 @@ m <span class="o">&lt;-</span> <span class="kp">mean</span><span class="p">(</sp
 s <span class="o">&lt;-</span> sd<span class="p">(</span>dat<span class="o">$</span><span class="bp">F</span><span class="p">)</span> <span class="c1"># Calculate the SD</span>
 valid <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> <span class="bp">F</span> <span class="o">&lt;=</span> m<span class="m">+3</span><span class="o">*</span>s <span class="o">&amp;</span> <span class="bp">F</span> <span class="o">&gt;=</span> m<span class="m">-3</span><span class="o">*</span>s<span class="p">)</span> <span class="c1"># Get any samples with F coefficient within 3 SD of the population mean</span>
 write.table<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">)],</span> <span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span> <span class="c1"># print FID and IID for valid samples</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 <input name="__tabs_1" type="radio" id="__tab_1_1" />
 <label for="__tab_1_1">With data.table</label>
@@ -354,6 +355,7 @@ dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&q
 valid <span class="o">&lt;-</span> dat<span class="p">[</span><span class="bp">F</span><span class="o">&lt;=</span><span class="kp">mean</span><span class="p">(</span><span class="bp">F</span><span class="p">)</span><span class="m">+3</span><span class="o">*</span>sd<span class="p">(</span><span class="bp">F</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">F</span><span class="o">&gt;=</span><span class="kp">mean</span><span class="p">(</span><span class="bp">F</span><span class="p">)</span><span class="m">-3</span><span class="o">*</span>sd<span class="p">(</span><span class="bp">F</span><span class="p">)]</span> 
 <span class="c1"># print FID and IID for valid samples</span>
 fwrite<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span> 
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 </div>
 <details class="note"><summary>How many samples were excluded due to high heterozygosity rate?</summary><ul>
@@ -384,6 +386,7 @@ valid <span class="o">&lt;-</span> read.table<span class="p">(</span><span class
 dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.QC.sexcheck&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 valid <span class="o">&lt;-</span> <span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> STATUS<span class="o">==</span><span class="s">&quot;OK&quot;</span> <span class="o">&amp;</span> FID <span class="o">%in%</span> valid<span class="o">$</span>FID<span class="p">)</span>
 write.table<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.QC.valid&quot;</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> col.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">)</span> 
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 <input name="__tabs_2" type="radio" id="__tab_2_1" />
 <label for="__tab_2_1">With data.table</label>
@@ -392,6 +395,7 @@ write.table<span class="p">(</span>valid<span class="p">[,</span><span class="kt
 valid <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">)</span>
 dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.QC.sexcheck&quot;</span><span class="p">)[</span>FID<span class="o">%in%</span>valid<span class="o">$</span>FID<span class="p">]</span>
 fwrite<span class="p">(</span>dat<span class="p">[</span>STATUS<span class="o">==</span><span class="s">&quot;OK&quot;</span><span class="p">,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)],</span> <span class="s">&quot;EUR.QC.valid&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span> 
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 </div>
 <details class="note"><summary>How many samples were excluded due mismatched Sex information?</summary><ul>
@@ -554,6 +558,7 @@ write.table<span class="p">(</span>
     row.names <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
     col.names <span class="o">=</span> <span class="bp">F</span>
 <span class="p">)</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 <input name="__tabs_6" type="radio" id="__tab_6_1" />
 <label for="__tab_6_1">With data.table</label>
@@ -561,6 +566,7 @@ write.table<span class="p">(</span>
                     <span class="p">(</span>A1 <span class="o">==</span> B.A2 <span class="o">&amp;</span> A2 <span class="o">==</span> B.A1<span class="p">)]</span>
 mismatch <span class="o">&lt;-</span> bim<span class="p">[</span><span class="o">!</span>SNP<span class="o">%in%</span>matched<span class="o">$</span>SNP<span class="p">,</span> SNP<span class="p">]</span>
 write.table<span class="p">(</span>mismatch<span class="p">,</span> <span class="s">&quot;EUR.mismatch&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">,</span> col.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 </div>
 <p>5. Replace <strong>EUR.bim</strong> with <strong>EUR.QC.adj.bim</strong>:</p>

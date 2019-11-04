@@ -211,6 +211,7 @@ title<span class="p">(</span><span class="kp">bquote</span><span class="p">(</sp
           line<span class="o">=</span><span class="m">2</span><span class="p">,</span> cex<span class="o">=</span><span class="m">1.5</span><span class="p">,</span> font<span class="o">=</span><span class="m">2</span><span class="p">,</span> adj<span class="o">=</span><span class="m">0</span><span class="p">)</span>
 <span class="c1"># write the plot to file</span>
 dev.off<span class="p">()</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 <input name="__tabs_1" type="radio" id="__tab_1_1" />
 <label for="__tab_1_1">ggplot2</label>
@@ -261,6 +262,7 @@ ggplot<span class="p">(</span>data <span class="o">=</span> prs.result<span clas
     <span class="p">)</span>
 <span class="c1"># save the plot</span>
 ggsave<span class="p">(</span><span class="s">&quot;EUR.height.bar.png&quot;</span><span class="p">,</span> height <span class="o">=</span> <span class="m">7</span><span class="p">,</span> width <span class="o">=</span> <span class="m">7</span><span class="p">)</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 </div>
 <p><img alt="Example Bar Plot" src="../img/EUR.height.bar.png" /></p>
@@ -285,6 +287,7 @@ plot<span class="p">(</span>x<span class="o">=</span>dat<span class="o">$</span>
     xlab<span class="o">=</span><span class="s">&quot;Polygenic Score&quot;</span><span class="p">,</span> ylab<span class="o">=</span><span class="s">&quot;Height&quot;</span><span class="p">)</span>
 <span class="kp">with</span><span class="p">(</span><span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> Sex<span class="o">==</span><span class="s">&quot;Male&quot;</span><span class="p">),</span> points<span class="p">(</span>x<span class="o">=</span>SCORE<span class="p">,</span> y<span class="o">=</span>Height<span class="p">,</span> col<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">))</span>
 <span class="kp">with</span><span class="p">(</span><span class="kp">subset</span><span class="p">(</span>dat<span class="p">,</span> Sex<span class="o">==</span><span class="s">&quot;Female&quot;</span><span class="p">),</span> points<span class="p">(</span>x<span class="o">=</span>SCORE<span class="p">,</span> y<span class="o">=</span>Height<span class="p">,</span> col<span class="o">=</span><span class="s">&quot;blue&quot;</span><span class="p">))</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 <input name="__tabs_2" type="radio" id="__tab_2_1" />
 <label for="__tab_2_1">ggplot2</label>
@@ -303,6 +306,7 @@ ggplot<span class="p">(</span>dat<span class="p">,</span> aes<span class="p">(</
     geom_point<span class="p">()</span><span class="o">+</span>
     theme_classic<span class="p">()</span><span class="o">+</span>
     labs<span class="p">(</span>x<span class="o">=</span><span class="s">&quot;Polygenic Score&quot;</span><span class="p">,</span> y<span class="o">=</span><span class="s">&quot;Height&quot;</span><span class="p">)</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 </div>
 <p><img alt="Example Scatter Plot" src="../img/EUR.height.scatter.png" /></p>

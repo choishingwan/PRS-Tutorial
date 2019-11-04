@@ -216,12 +216,14 @@ We can obtain the transformed summary statistics with <code>R</code>:</p>
 <div class="superfences-content"><div class="codehilite"><pre><span></span>dat <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="kp">gzfile</span><span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">),</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 dat<span class="o">$</span>OR <span class="o">&lt;-</span> <span class="kp">log</span><span class="p">(</span>dat<span class="o">$</span>OR<span class="p">)</span>
 write.table<span class="p">(</span>dat<span class="p">,</span> <span class="s">&quot;Height.QC.Transformed&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 <input name="__tabs_1" type="radio" id="__tab_1_1" />
 <label for="__tab_1_1">With data.table</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
 dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">)</span>
 fwrite<span class="p">(</span>dat<span class="p">[,</span>OR<span class="o">:=</span><span class="kp">log</span><span class="p">(</span>OR<span class="p">)],</span> <span class="s">&quot;Height.QC.Transformed&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 </div>
 <div class="admonition warning">
@@ -466,6 +468,7 @@ prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
 <span class="p">}</span>
 <span class="c1"># Best result is:</span>
 prs.result<span class="p">[</span><span class="kp">which.max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">),]</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 <input name="__tabs_2" type="radio" id="__tab_2_1" />
 <label for="__tab_2_1">quick</label>
@@ -492,6 +495,7 @@ prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
                     SE<span class="o">=</span><span class="kp">as.numeric</span><span class="p">(</span>prs.coef<span class="p">[</span><span class="m">2</span><span class="p">])))</span>
 <span class="p">}</span>
 <span class="kp">print</span><span class="p">(</span>prs.result<span class="p">[</span><span class="kp">which.max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">),])</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 </div>
 <details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.2 </p>
