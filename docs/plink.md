@@ -24,12 +24,14 @@ We can obtain the transformed summary statistics with `R`:
 dat <- read.table(gzfile("Height.QC.gz"), header=T)
 dat$OR <- log(dat$OR)
 write.table(dat, "Height.QC.Transformed", quote=F, row.names=F)
+q() # exit R
 ```
 
 ```R tab="With data.table"
 library(data.table)
 dat <- fread("Height.QC.gz")
 fwrite(dat[,OR:=log(OR)], "Height.QC.Transformed", sep="\t")
+q() # exit R
 ```
 
 
@@ -227,6 +229,7 @@ for(i in p.threshold){
 }
 # Best result is:
 prs.result[which.max(prs.result$R2),]
+q() # exit R
 ```
 
 ```R tab="quick"
@@ -253,6 +256,7 @@ for(i in p.threshold){
                     SE=as.numeric(prs.coef[2])))
 }
 print(prs.result[which.max(prs.result$R2),])
+q() # exit R
 ```
 
 ??? note "Which P-value threshold generates the "best-fit" PRS?"

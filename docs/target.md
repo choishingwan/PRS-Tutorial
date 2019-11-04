@@ -118,6 +118,7 @@ m <- mean(dat$F) # Calculate the mean
 s <- sd(dat$F) # Calculate the SD
 valid <- subset(dat, F <= m+3*s & F >= m-3*s) # Get any samples with F coefficient within 3 SD of the population mean
 write.table(valid[,c(1,2)], "EUR.valid.sample", quote=F, row.names=F) # print FID and IID for valid samples
+q() # exit R
 ```
 
 ```R tab="With data.table"
@@ -128,6 +129,7 @@ dat <- fread("EUR.QC.het")
 valid <- dat[F<=mean(F)+3*sd(F) & F>=mean(F)-3*sd(F)] 
 # print FID and IID for valid samples
 fwrite(valid[,c("FID","IID")], "EUR.valid.sample", sep="\t") 
+q() # exit R
 ```
 
 ??? note "How many samples were excluded due to high heterozygosity rate?"
@@ -162,6 +164,7 @@ valid <- read.table("EUR.valid.sample", header=T)
 dat <- read.table("EUR.QC.sexcheck", header=T)
 valid <- subset(dat, STATUS=="OK" & FID %in% valid$FID)
 write.table(valid[,c("FID", "IID")], "EUR.QC.valid", row.names=F, col.names=F, sep="\t", quote=F) 
+q() # exit R
 ```
 
 ```R tab="With data.table"
@@ -170,6 +173,7 @@ library(data.table)
 valid <- fread("EUR.valid.sample")
 dat <- fread("EUR.QC.sexcheck")[FID%in%valid$FID]
 fwrite(dat[STATUS=="OK",c("FID","IID")], "EUR.QC.valid", sep="\t") 
+q() # exit R
 ```
 
 ??? note "How many samples were excluded due mismatched Sex information?"
@@ -332,6 +336,7 @@ write.table(
     row.names = F,
     col.names = F
 )
+q() # exit R
 ```
 
 ``` R tab="With data.table"
@@ -339,6 +344,7 @@ matched <- info[(A1 == B.A1 & A2 == B.A2) |
                     (A1 == B.A2 & A2 == B.A1)]
 mismatch <- bim[!SNP%in%matched$SNP, SNP]
 write.table(mismatch, "EUR.mismatch", quote=F, row.names=F, col.names=F)
+q() # exit R
 ```
 
 

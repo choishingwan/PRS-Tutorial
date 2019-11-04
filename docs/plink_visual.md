@@ -65,6 +65,7 @@ title(bquote(atop(-log[10] ~ model, italic(P) - value), ),
           line=2, cex=1.5, font=2, adj=0)
 # write the plot to file
 dev.off()
+q() # exit R
 ```
 
 ```R tab="ggplot2"
@@ -115,6 +116,7 @@ ggplot(data = prs.result, aes(x = factor(Threshold), y = R2)) +
     )
 # save the plot
 ggsave("EUR.height.bar.png", height = 7, width = 7)
+q() # exit R
 ```
 
 ![Example Bar Plot](img/EUR.height.bar.png)
@@ -137,6 +139,7 @@ plot(x=dat$SCORE, y=dat$Height, col="white",
     xlab="Polygenic Score", ylab="Height")
 with(subset(dat, Sex=="Male"), points(x=SCORE, y=Height, col="red"))
 with(subset(dat, Sex=="Female"), points(x=SCORE, y=Height, col="blue"))
+q() # exit R
 ```
 
 ```R tab="ggplot2"
@@ -155,6 +158,7 @@ ggplot(dat, aes(x=SCORE, y=Height, color=Sex))+
     geom_point()+
     theme_classic()+
     labs(x="Polygenic Score", y="Height")
+q() # exit R
 ```
 
 ![Example Scatter Plot](img/EUR.height.scatter.png)
