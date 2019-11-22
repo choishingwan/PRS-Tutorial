@@ -49,7 +49,7 @@ plink \
     --clump-p1 1 \
     --clump-r2 0.1 \
     --clump-kb 250 \
-    --clump Height.QC.transformed \
+    --clump Height.QC.Transformed \
     --clump-snp-field SNP \
     --clump-field P \
     --out EUR
@@ -62,7 +62,7 @@ Each of the new parameters corresponds to the following
 | clump-p1 | 1 | P-value threshold for a SNP to be included as an index SNP. 1 is selected such that all SNPs are include for clumping|
 | clump-r2 | 0.1 | SNPs having $r^2$ higher than 0.1 with the index SNPs will be removed |
 | clump-kb | 250 | SNPs within 250k of the index SNP are considered for clumping|
-| clump | Height.QC.transformed | Base data (summary statistic) file containing the P-value information|
+| clump | Height.QC.Transformed | Base data (summary statistic) file containing the P-value information|
 | clump-snp-field | SNP | Specifies that the column `SNP` contains the SNP IDs |
 | clump-field | P | Specifies that the column `P` contains the P-value information |
 
