@@ -136,7 +136,7 @@ q() # exit R
     - `7` samples were excluded
 
 # \# Ambiguous SNPs
-There were removed during the base data QC
+They were removed during the base data QC
 
 
 # \# Sex chromosomes 
