@@ -149,7 +149,7 @@ The above command and range_list will generate 7 files:
     PRS_j =\frac{ \sum_i^NS_i*G_{ij}}{P*M_j}
     $$
 
-    where the effect size of SNP $i$ is $S_i$;  the number of effect alleles observed in sample $j$ is $G_{ij}$; the ploidy of the sample is $P$ (is generally 2 for humans); the number of samples included in the PRS is $N$; and the number of non-missing SNPs observed in sample $j$ is $M_j$. If the sample has a missing genotype for SNP $i$, then the population minor allele frequency multiplied by the ploidy ($MAF_i*P$) is used instead of $G_{ij}$.
+    where the effect size of SNP $i$ is $S_i$;  the number of effect alleles observed in sample $j$ is $G_{ij}$; the ploidy of the sample is $P$ (is generally 2 for humans); the total number of SNPs included in the PRS is $N$; and the number of non-missing SNPs observed in sample $j$ is $M_j$. If the sample has a missing genotype for SNP $i$, then the population minor allele frequency multiplied by the ploidy ($MAF_i*P$) is used instead of $G_{ij}$.
 
 # Accounting for Population Stratification
 
