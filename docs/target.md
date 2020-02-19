@@ -390,5 +390,6 @@ plink \
     --make-bed \
     --keep EUR.QC.rel.id \
     --out EUR.QC \
-    --extract EUR.QC.snplist
+    --extract EUR.QC.snplist \
+    --exclude EUR.mismatch
 ```
