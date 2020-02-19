@@ -55,7 +55,7 @@ The column headers correspond to the following:
 
 # QC checklist: Base data
 
-Below we perform QC on these base data according to the 'QC checklist' in our guide paper, which we recommend that users follow each time they perform a PRS analysis:
+Below we perform QC on these base data according to the 'QC checklist' in our [guide paper](https://doi.org/10.1101/416545), which we recommend that users follow while going through this tutorial and when performing PRS analyses:
 
 # \# Heritability check
 We recommend that PRS analyses are performed on base data with a chip-heritability estimate $h_{snp}^{2} > 0.05$. The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). Our GIANT height GWAS data are known to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. 
@@ -174,13 +174,13 @@ The above script does the following:
 3. Compresses and writes the results to **Height.QC.gz**
 
 # \# Sex chromosomes 
-Previously performed QC on these data removed individuals with mismatching (inferred) biological and reported sex, while the sex chromosomes are not included. Please refer to the corresponding section in the paper for details on QC performed in relation to the sex chromosomes. 
+Sometimes sample mislabelling can occur, which may lead to invalid results. One indication of a mislabelled sample is a difference between reported sex and that indicated by the sex chromosomes. While this may be due to a difference in sex and gender identity, it could also reflect mislabeling of samples or misreporting and, thus, individuals in which there is a mismatch between biological and reported sex are typically removed. See the Target Data section in which a sex-check is performed.
 
 # \# Sample overlap
-In this tutorial the target data are simulated and thus there must be no sample overlap. However, users should ensure that the possibility of sample overlap between the base and target data is minimised (see paper for details). 
+Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper](https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). 
 
 # \# Relatedness
-In this tutorial the target data are simulated and thus there must be no closely related individuals across the base and target data. However, users should ensure that the possibility of closely related individuals between the base and target data is minimised (see paper for details). 
+Closely related individuals within and between the base and the target data may lead to overfitted results, limiting the generalisability of the results (see the relevant sections of [the paper](https://doi.org/10.1101/416545)). Relatedness within the target data is tested in the Target Data section.
 
 The **Height.QC.gz** base data are now ready for using in downstream analyses.
 
