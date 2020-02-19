@@ -134,9 +134,9 @@ awk '!( ($4=="A" && $5=="T") || \
 
 
 # \# Mismatching SNPs
-SNPs that have mismatching alleles reported in the base and target data are either resolvable by strand-flipping the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target, or non-resolvable, such as for a SNP with C/G in the base and C/T in the target. Most polygenic score software perform strand-flipping automatically for SNPs that are resolvable, and remove non-resolvable mismatching SNPs.
+SNPs that have mismatching alleles reported in the base and target data are either resolvable by "strand-flipping" the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target, or non-resolvable, such as for a SNP with C/G in the base and C/T in the target. Most polygenic score software perform strand-flipping automatically for SNPs that are resolvable, and remove non-resolvable mismatching SNPs.
 
-Since we need the target data to know which SNPs have mismatching alleles, then we will perform this 'allele flipping' in the target data.
+Since we need the target data to know which SNPs have mismatching alleles, then we will perform this strand-flipping in the target data.
 
 # \# Duplicate SNPs
 If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
