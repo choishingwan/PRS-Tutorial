@@ -55,7 +55,7 @@ The column headers correspond to the following:
 
 # QC checklist: Base data
 
-Below we perform QC on these base data according to the 'QC checklist' in the guide paper, which we recommend that users follow each time they perform a PRS analysis:
+Below we perform QC on these base data according to the 'QC checklist' in our guide paper, which we recommend that users follow each time they perform a PRS analysis:
 
 # \# Heritability check
 We recommend that PRS analyses are performed on base data with a chip-heritability estimate $h_{snp}^{2} > 0.05$. The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). Our GIANT height GWAS data are known to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. 
@@ -64,7 +64,7 @@ We recommend that PRS analyses are performed on base data with a chip-heritabili
 The GIANT consortium report which is the effect allele and which is the non-effect allele in their results, critical for PRS association results to be in the correction direction.
 
 !!! Important
-    Some GWAS results files do not make clear which allele is the effect allele and which the non-effect allele.
+    Some GWAS results files do not make clear which allele is the effect allele and which is the non-effect allele.
     If the incorrect assumption is made in computing the PRS, then the effect of the PRS in the target data will be in the wrong direction.
 
     To avoid misleading conclusions the effect allele from the base (GWAS) data must be known.
@@ -115,7 +115,9 @@ The bash code above does the following:
 5. Compresses and writes the results to **Height.gz**
 
 # \# Ambiguous SNPs
-If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) for either is unknown, then it is not possible to match ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.
+If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) that was used for either is unknown, then it is not possible to pair-up the alleles of ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T SNPs) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. While allele frequencies could be used to infer which alleles are on the same strand, the accuracy of this could be low for SNPs with MAF close to 50% or when the base and target data are from different populations. Therefore, we recommend removing all ambiguous SNPs to avoid introducing this potential source of systematic error.
+
+Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.
 
 Nonambiguous SNPs can be retained using the following:
 ```bash
@@ -131,8 +133,10 @@ awk '!( ($4=="A" && $5=="T") || \
     There are `609,041` ambiguous SNPs
 
 
-# \# Mismatching genotypes
-If there is a non-ambiguous mismatch in allele coding between the base and target data sets, such as A/C in the base and G/T in the target data, then this can be resolved by ‘flipping’ the alleles in either data set to their complementary alleles. However, since we need the target data to know which SNPs have mismatching genotypes across the data sets, then we will perform this 'allele flipping' in the target data.
+# \# Mismatching SNPs
+SNPs that have mismatching alleles reported in the base and target data are either resolvable by strand-flipping the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target, or non-resolvable, such as for a SNP with C/G in the base and C/T in the target. Most polygenic score software perform strand-flipping automatically for SNPs that are resolvable, and remove non-resolvable mismatching SNPs.
+
+Since we need the target data to know which SNPs have mismatching alleles, then we will perform this 'allele flipping' in the target data.
 
 # \# Duplicate SNPs
 If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
@@ -170,13 +174,13 @@ The above script does the following:
 3. Compresses and writes the results to **Height.QC.gz**
 
 # \# Sex chromosomes 
-Previously performed QC on these data removed individuals with mismatching (inferred) biological and reported sex, while the sex chromosomes are not included. Please refer to the corresponding section in the paper for details relating QC performed in relation to the sex chromosomes. 
+Previously performed QC on these data removed individuals with mismatching (inferred) biological and reported sex, while the sex chromosomes are not included. Please refer to the corresponding section in the paper for details on QC performed in relation to the sex chromosomes. 
 
 # \# Sample overlap
-In this tutorial the target data are simulated and thus there must be no sample overlap. However, users should ensure that the possibility of sample overlap between the base and target data is minimised. 
+In this tutorial the target data are simulated and thus there must be no sample overlap. However, users should ensure that the possibility of sample overlap between the base and target data is minimised (see paper for details). 
 
 # \# Relatedness
-In this tutorial the target data are simulated and thus there must be no closely related individuals across the base and target data. However, users should ensure that the possibility of closely related individuals between the base and target data is minimised. 
+In this tutorial the target data are simulated and thus there must be no closely related individuals across the base and target data. However, users should ensure that the possibility of closely related individuals between the base and target data is minimised (see paper for details). 
 
 The **Height.QC.gz** base data are now ready for using in downstream analyses.
 
