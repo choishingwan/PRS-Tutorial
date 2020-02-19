@@ -279,7 +279,7 @@ before starting the tutorial</p>
 <li><strong>OR</strong>: The effect size estimate of the SNP, if the outcome is binary/case-control. If the outcome is continuous or treated as continuous then this will be the BETA</li>
 </ul>
 <h1 id="qc-checklist-base-data">QC checklist: Base data<a class="headerlink" href="#qc-checklist-base-data" title="Permanent link">&para;</a></h1>
-<p>Below we perform QC on these base data according to the 'QC checklist' in our guide paper, which we recommend that users follow each time they perform a PRS analysis:</p>
+<p>Below we perform QC on these base data according to the 'QC checklist' in our <a href="https://doi.org/10.1101/416545">guide paper</a>, which we recommend that users follow while going through this tutorial and when performing PRS analyses:</p>
 <h1 id="35-heritability-check"># Heritability check<a class="headerlink" href="#35-heritability-check" title="Permanent link">&para;</a></h1>
 <p>We recommend that PRS analyses are performed on base data with a chip-heritability estimate <span class="arithmatex">\(h_{snp}^{2} &gt; 0.05\)</span>. The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). Our GIANT height GWAS data are known to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. </p>
 <h1 id="35-effect-allele"># Effect allele<a class="headerlink" href="#35-effect-allele" title="Permanent link">&para;</a></h1>
@@ -374,11 +374,11 @@ gzip - &gt; Height.QC.gz
 <li>Compresses and writes the results to <strong>Height.QC.gz</strong></li>
 </ol>
 <h1 id="35-sex-chromosomes"># Sex chromosomes<a class="headerlink" href="#35-sex-chromosomes" title="Permanent link">&para;</a></h1>
-<p>Previously performed QC on these data removed individuals with mismatching (inferred) biological and reported sex, while the sex chromosomes are not included. Please refer to the corresponding section in the paper for details on QC performed in relation to the sex chromosomes. </p>
+<p>Sometimes sample mislabelling can occur, which may lead to invalid results. One indication of a mislabelled sample is a difference between reported sex and that indicated by the sex chromosomes. While this may be due to a difference in sex and gender identity, it could also reflect mislabeling of samples or misreporting and, thus, individuals in which there is a mismatch between biological and reported sex are typically removed. See the Target Data section in which a sex-check is performed.</p>
 <h1 id="35-sample-overlap"># Sample overlap<a class="headerlink" href="#35-sample-overlap" title="Permanent link">&para;</a></h1>
-<p>In this tutorial the target data are simulated and thus there must be no sample overlap. However, users should ensure that the possibility of sample overlap between the base and target data is minimised (see paper for details). </p>
+<p>Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of <a href="https://doi.org/10.1101/416545">the paper</a> for discussion of the importance of avoiding sample overlap). </p>
 <h1 id="35-relatedness"># Relatedness<a class="headerlink" href="#35-relatedness" title="Permanent link">&para;</a></h1>
-<p>In this tutorial the target data are simulated and thus there must be no closely related individuals across the base and target data. However, users should ensure that the possibility of closely related individuals between the base and target data is minimised (see paper for details). </p>
+<p>Closely related individuals within and between the base and the target data may lead to overfitted results, limiting the generalisability of the results (see the relevant sections of <a href="https://doi.org/10.1101/416545">the paper</a>). Relatedness within the target data is tested in the Target Data section.</p>
 <p>The <strong>Height.QC.gz</strong> base data are now ready for using in downstream analyses.</p>
               
             </div>
