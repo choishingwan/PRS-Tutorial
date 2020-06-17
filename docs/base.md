@@ -58,7 +58,9 @@ The column headers correspond to the following:
 Below we perform QC on these base data according to the 'QC checklist' in our [guide paper](https://doi.org/10.1101/416545), which we recommend that users follow while going through this tutorial and when performing PRS analyses:
 
 # \# Heritability check
-We recommend that PRS analyses are performed on base data with a chip-heritability estimate $h_{snp}^{2} > 0.05$. The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). Our GIANT height GWAS data are known to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. 
+We recommend that PRS analyses are performed on base data with a chip-heritability estimate $h_{snp}^{2} > 0.05$. 
+The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). 
+Our GIANT height GWAS data are known to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. 
 
 # \# Effect allele
 The GIANT consortium report which is the effect allele and which is the non-effect allele in their results, critical for PRS association results to be in the correction direction.
@@ -72,9 +74,10 @@ The GIANT consortium report which is the effect allele and which is the non-effe
 
 # \# File transfer
 
-A common problem is that the downloaded base data file becomes 
+A common problem is that the downloaded base data file can be
 corrupted during download, which can cause PRS software to crash 
-or to produce errors in results. However, a `md5sum` hash is 
+or to produce errors in results. 
+However, a `md5sum` hash is 
 generally included in files so that file integrity can be checked. 
 The following command performs this `md5sum` check: 
 
@@ -91,7 +94,8 @@ if the file is intact, then `md5sum` generates a string of characters, which in 
 If a different string is generated, then the file is corrupted.
 
 # \# Genome build
-These base data are on the same genome build as the target data that we will be using. You must check that your base and target data are on the same genome build, and if they are not then use a tool such as LiftOver to make the builds consistent across the data sets.
+The GIANT summary statistic are on the same genome build as the target data that we will be using. 
+You must check that your base and target data are on the same genome build, and if they are not then use a tool such as [LiftOver](https://genome.ucsc.edu/cgi-bin/hgLiftOver) to make the builds consistent across the data sets.
 
 # \# Standard GWAS QC
 As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. 
@@ -99,7 +103,7 @@ If the base data have been obtained as summary statistics from a public source, 
 SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). 
 Therefore, SNPs with low MAF and INFO are typically removed before performing downstream analyses.
 We recommend removing SNPs with MAF < 1% and INFO < 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results).
-These SNP filters can be acheived using the following code:
+These SNP filters can be achieved using the following code:
 
 ```bash
 gunzip -c GIANT.height.gz |\
@@ -108,6 +112,7 @@ gzip  > Height.gz
 ```
 
 The bash code above does the following:
+
 1. Decompresses and reads the **GIANT.height.gz** file
 2. Prints the header line (`NR==1`)
 3. Prints any line with MAF above 0.01 (`$6` because the sixth column of the file contains the MAF information)
@@ -134,9 +139,10 @@ awk '!( ($4=="A" && $5=="T") || \
 
 
 # \# Mismatching SNPs
-SNPs that have mismatching alleles reported in the base and target data are either resolvable by "strand-flipping" the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target, or non-resolvable, such as for a SNP with C/G in the base and C/T in the target. Most polygenic score software perform strand-flipping automatically for SNPs that are resolvable, and remove non-resolvable mismatching SNPs.
+SNPs that have mismatching alleles reported in the base and target data are either resolvable by "strand-flipping" the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target, or non-resolvable, such as for a SNP with C/G in the base and C/T in the target. 
+Most polygenic score software perform strand-flipping automatically for SNPs that are resolvable, and remove non-resolvable mismatching SNPs.
 
-Since we need the target data to know which SNPs have mismatching alleles, then we will perform this strand-flipping in the target data.
+Since we need the target data to know which SNPs have mismatching alleles, we will perform this strand-flipping in the target data.
 
 # \# Duplicate SNPs
 If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
@@ -167,10 +173,10 @@ grep -vf duplicated.snp |\
 gzip - > Height.QC.gz
 ```
 
-The above script does the following:
+The above command does the following:
 
-1. Decompresses and reads the **Height.noambig.gz** file 
-2. Establishes whether any row contains entries observed in `duplicated.snp` and removes them if so
+1. Decompresses and reads the **Height.noambig.gz** file
+2. From the file, remove (`-v`) any lines contains string within the **duplicated.snp** file (`-f`)
 3. Compresses and writes the results to **Height.QC.gz**
 
 # \# Sex chromosomes 
@@ -180,7 +186,7 @@ Sometimes sample mislabelling can occur, which may lead to invalid results. One 
 Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper](https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). 
 
 # \# Relatedness
-Closely related individuals within and between the base and the target data may lead to overfitted results, limiting the generalisability of the results (see the relevant sections of [the paper](https://doi.org/10.1101/416545)). Relatedness within the target data is tested in the Target Data section.
+Closely related individuals within and between the base and the target data may lead to overfitted results, limiting the generalizability of the results (see the relevant sections of [the paper](https://doi.org/10.1101/416545)). Relatedness within the target data is tested in the Target Data section.
 
 The **Height.QC.gz** base data are now ready for using in downstream analyses.
 

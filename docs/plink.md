@@ -1,5 +1,7 @@
 # Background
-In this section of the tutorial you will use four different software programs to compute PRS from the base and target data that you QC'ed in the previous two sections. On this page, you will compute PRS using the popular genetic analyses tool `plink` - while `plink` is not a dedicated PRS software, each of the steps required to compute PRS using the C+T standard approach can be performed in `plink` and carrying out this multi-step process can be a good way to learn the processes involved in computing PRS (which are typically performed automatically by PRS software). 
+In this section of the tutorial you will use four different software programs to compute PRS from the base and target data that you QC'ed in the previous two sections. 
+On this page, you will compute PRS using the popular genetic analyses tool `plink` - while `plink` is not a dedicated PRS software, you can perform every required steps of the C+T approach with `plink`. 
+This multi-step process is a good way to learn the processes involved in computing PRS, which are typically performed automatically by PRS software.
 
 # Required Data
 
@@ -11,13 +13,12 @@ In the previous sections, we have generated the following files:
 |**EUR.QC.bed**| The genotype file after performing some basic filtering |
 |**EUR.QC.bim**| This file contains the SNPs that passed the basic filtering |
 |**EUR.QC.fam**| This file contains the samples that passed the basic filtering |
-|**EUR.QC.valid**| This file contains the samples that passed all the QC |
 |**EUR.height**| This file contains the phenotype of the samples |
 |**EUR.covariate**| This file contains the covariates of the samples |
 
 
 # Update Effect Size
-When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we usually take the natural logarithm of the OR so that the PRS can be computed using a simple summation instead (which can be back-transformed afterwards). 
+When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we take the natural logarithm of the OR so that the PRS can be computed using summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with `R`:
 
 ```R tab="Without data.table"
@@ -36,16 +37,16 @@ q() # exit R
 
 
 !!! warning
-    It may be tempting to perform the log transofrmation using `awk`.
-    However, due to rounding of values performed in `awk`, less accurate results
-    may be obtained. Therefore, we recommend performing the transformation in `R` or allow the PRS software to perform the transformation directly.
+    Due to rounding of values, using `awk` to log transform OR can lead to less accurate results. Therefore, we recommend performing the transformation in `R` or allow the PRS software to perform the transformation directly.
 
 # Clumping
-Linkage disequilibrium, which corresponds to the correlation between the genotypes of genetic variants across the genome, makes identifying the contribution from causal independent genetic variants extremely challenging. One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in such a way that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. Clumping can be performed using the following command in `plink`: 
+Linkage disequilibrium, which corresponds to the correlation between the genotypes of genetic variants across the genome, makes identifying the contribution from causal independent genetic variants extremely challenging. 
+One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in ways that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. 
+Clumping can be performed using the following command in `plink`: 
 
 ```bash
 plink \
-    --bfile EUR.QC \
+    --bfile EUR.QC 
     --clump-p1 1 \
     --clump-r2 0.1 \
     --clump-kb 250 \
@@ -259,8 +260,42 @@ print(prs.result[which.max(prs.result$R2),])
 q() # exit R
 ```
 
+
+```R tab="with data.table and  magrittr"
+library(data.table)
+library(magrittr)
+p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
+phenotype <- fread("EUR.height")
+pcs <- fread("EUR.eigenvec", header=F) %>%
+    setnames(., colnames(.), c("FID", "IID", paste0("PC",1:6)) )
+covariate <- fread("EUR.covariate")
+pheno <- merge(phenotype, covariate) %>%
+        merge(., pcs)
+null.r2 <- summary(lm(Height~., data=pheno[,-c("FID", "IID")]))$r.squared
+prs.result <- NULL
+for(i in p.threshold){
+    pheno.prs <- paste0("EUR.", i, ".profile") %>%
+        fread(.) %>%
+        .[,c("FID", "IID", "SCORE")] %>%
+        merge(., pheno, by=c("FID", "IID"))
+
+    model <- lm(Height~., data=pheno.prs[,-c("FID","IID")]) %>%
+            summary
+    model.r2 <- model$r.squared
+    prs.r2 <- model.r2-null.r2
+    prs.coef <- model$coeff["SCORE",]
+    prs.result %<>% rbind(.,
+        data.frame(Threshold=i, R2=prs.r2, 
+                    P=as.numeric(prs.coef[4]), 
+                    BETA=as.numeric(prs.coef[1]),
+                    SE=as.numeric(prs.coef[2])))
+}
+print(prs.result[which.max(prs.result$R2),])
+q() # exit R
+```
+
 ??? note "Which P-value threshold generates the "best-fit" PRS?"
-    0.2 
+    0.1
 
 ??? note "How much phenotypic variation does the "best-fit" PRS explain?"
-    0.04003232
+    0.04776492

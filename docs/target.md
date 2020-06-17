@@ -1,9 +1,9 @@
 # Obtaining the target data
 Target data consist of individual-level genotype-phenotype data, usually generated within your lab/department/collaboration. For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
-You can download the data [here](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip) or you can download the data using the following command:
+You can download the data [here](https://www.dropbox.com/s/xkx4bjxvb3jjw7g/EUR.zip?dl=0) or you can download the data using the following command:
 
 ```bash
-curl https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip -L -O
+curl -L -o EUR.zip https://www.dropbox.com/s/xkx4bjxvb3jjw7g/EUR.zip?dl=1
 ```
 
 Unzip the data as follow:
@@ -34,7 +34,7 @@ Usually we do not need to download and transfer the target data file because it 
     |**EUR.bim**           |a528020cc2448aa04a7499f13bf9f16a|
     |**EUR.covariate**     |afff13f8f9e15815f2237a62b8bec00b|
     |**EUR.fam**           |17e8184fb03c690db6980bb7499d4982|
-    |**EUR.height**        |052beb4cae32ac7673f1d6b9e854c85b|
+    |**EUR.height**        |de68203f7f35744e987981ec5ffad35e|
 
 # \# Genome build
 As stated in the base data section, the genome build for our base and target data is the same, as it should be.
@@ -343,6 +343,10 @@ q() # exit R
 mv EUR.bim EUR.bim.bk
 ln -s EUR.QC.adj.bim EUR.bim
 ```
+The above commands do the following:
+
+1. Rename **EUR.bim** to **EUR.bim.bk**
+2. Soft linking (`ln -s`) **EUR.QC.adj.bim** as **EUR.bim**
 
 !!! note
     Most PRS software will perform strand-flipping automatically, thus this step is usually not required.

@@ -12,6 +12,8 @@ Here we use another PRS program, [LDpred](https://github.com/bvilhjal/ldpred), t
 !!! note
     The script used here is based on LDpred version 1.0.6
 
+    Due to current update in LDpred, this tutorial is likely outdated. We will try to update it once we've tested the new version.
+
 We assume that you have the following files:
 
 |File Name | Description|
@@ -20,25 +22,12 @@ We assume that you have the following files:
 |**EUR.QC.bed**| The genotype file after performing some basic filtering |
 |**EUR.QC.bim**| This file contains the SNPs that passed the basic filtering |
 |**EUR.QC.fam**| This file contains the samples that passed the basic filtering |
-|**EUR.valid.sample**| This file contains the samples that passed all the QC |
 |**EUR.height**| This file contains the phenotype of the samples |
 |**EUR.covariate**| This file contains the covariates of the samples |
 |**EUR.eigenvec**| This file contains the PCs of the samples |
 
 
 # Running PRS analysis
-LDpred does not support filtering of samples and SNPs, so therefore we must generate a new QC'ed genotype file using `plink`:
-
-``` bash
-# We also add the height phenotype for convenience
-plink \
-    --bfile EUR.QC \
-    --pheno EUR.height \
-    --keep EUR.valid.sample \
-    --make-bed \
-    --out EUR.ldpred
-```
-
 LDpred can then perform PRS analysis in three steps:
 
 1. Preprocessing the base data file:
@@ -56,7 +45,7 @@ python LDpred.py coord \
     --N 253288 \
     --ssf Height.QC.gz \
     --out EUR.coord \
-    --gf EUR.ldpred
+    --gf EUR.QC
 ```
 
 2. Adjust the effect size estimates:

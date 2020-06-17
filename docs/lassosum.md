@@ -1,5 +1,9 @@
 Here we use another PRS program, `lassosum`, which is an `R` package that uses penalised regression (LASSO) in its approach to PRS calculation.
 
+!!! note
+    The script used here is based on lassosum version 0.4.4
+
+
 You can install `lassosum` and its dependencies in `R` with the following command:
 
 ```R
@@ -16,7 +20,6 @@ Again, we assume that we have the following files:
 |**EUR.QC.bed**| The genotype file after performing some basic filtering |
 |**EUR.QC.bim**| This file contains the SNPs that passed the basic filtering |
 |**EUR.QC.fam**| This file contains the samples that passed the basic filtering |
-|**EUR.valid.sample**| This file contains the samples that passed all the QC |
 |**EUR.height**| This file contains the phenotype of the samples |
 |**EUR.covariate**| This file contains the covariates of the samples |
 |**EUR.eigenvec**| This file contains the PCs of the samples |
@@ -30,17 +33,16 @@ library(lassosum)
 # Prefer to work with data.table as it speeds up file reading
 library(data.table)
 library(methods)
-# We like to use dplyr for it makes codes much more readable
-library(dplyr)
+library(magrittr)
 sum.stat <- "Height.QC.gz"
 bfile <- "EUR.QC"
 # Read in and process the covariates
 covariate <- fread("EUR.covariate")
-pcs <- fread("EUR.eigenvec")
-colnames(pcs) <- c("FID","IID", paste0("PC",1:6))
+pcs <- fread("EUR.eigenvec") %>%
+    setnames(., colnames(.), c("FID","IID", paste0("PC",1:6)))
 # Need as.data.frame here as lassosum doesn't handle data.table 
 # covariates very well
-cov <- as.data.frame(merge(covariate, pcs, by=c("FID", "IID")))
+cov <- merge(covariate, pcs)
 
 # We will need the EUR.hg19 file provided by lassosum 
 # which are LD regions defined in Berisa and Pickrell (2015) for the European population and the hg19 genome.
@@ -48,7 +50,7 @@ ld.file <- system.file("data", "Berisa.EUR.hg19.bed",package="lassosum")
 # output prefix
 prefix <- "EUR"
 # Read in the target phenotype file
-target.pheno <- as.data.frame(fread("EUR.height")[,c("FID", "IID", "Height")])
+target.pheno <- fread("EUR.height")[,c("FID", "IID", "Height")]
 # Read in samples to include in the analysis
 target.keep <- fread("EUR.valid.sample")[,c("FID", "IID")]
 # Read in the summary statistics
@@ -82,11 +84,14 @@ out <- lassosum.pipeline(
     keep.ref = keep,
     test.bfile = bfile,
     keep.test = keep,
-    LDblocks = ld,
-    trace = 2
+    LDblocks = ld
 )
 # Store the R2 results
 target.res <- validate(out, pheno = target.pheno, covar=cov)
 # Get the maximum R2
 r2 <- max(target.res$validation.table$value)^2
 ```
+
+
+??? note "How much phenotypic variation does the "best-fit" PRS explain?"
+    0.03818004
