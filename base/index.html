@@ -281,7 +281,9 @@ before starting the tutorial</p>
 <h1 id="qc-checklist-base-data">QC checklist: Base data<a class="headerlink" href="#qc-checklist-base-data" title="Permanent link">&para;</a></h1>
 <p>Below we perform QC on these base data according to the 'QC checklist' in our <a href="https://doi.org/10.1101/416545">guide paper</a>, which we recommend that users follow while going through this tutorial and when performing PRS analyses:</p>
 <h1 id="35-heritability-check"># Heritability check<a class="headerlink" href="#35-heritability-check" title="Permanent link">&para;</a></h1>
-<p>We recommend that PRS analyses are performed on base data with a chip-heritability estimate <span class="arithmatex">\(h_{snp}^{2} &gt; 0.05\)</span>. The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). Our GIANT height GWAS data are known to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. </p>
+<p>We recommend that PRS analyses are performed on base data with a chip-heritability estimate <span class="arithmatex">\(h_{snp}^{2} &gt; 0.05\)</span>. 
+The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). 
+Our GIANT height GWAS data are known to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. </p>
 <h1 id="35-effect-allele"># Effect allele<a class="headerlink" href="#35-effect-allele" title="Permanent link">&para;</a></h1>
 <p>The GIANT consortium report which is the effect allele and which is the non-effect allele in their results, critical for PRS association results to be in the correction direction.</p>
 <div class="admonition important">
@@ -291,9 +293,10 @@ If the incorrect assumption is made in computing the PRS, then the effect of the
 <p>To avoid misleading conclusions the effect allele from the base (GWAS) data must be known.</p>
 </div>
 <h1 id="35-file-transfer"># File transfer<a class="headerlink" href="#35-file-transfer" title="Permanent link">&para;</a></h1>
-<p>A common problem is that the downloaded base data file becomes 
+<p>A common problem is that the downloaded base data file can be
 corrupted during download, which can cause PRS software to crash 
-or to produce errors in results. However, a <code>md5sum</code> hash is 
+or to produce errors in results. 
+However, a <code>md5sum</code> hash is 
 generally included in files so that file integrity can be checked. 
 The following command performs this <code>md5sum</code> check: </p>
 <div class="superfences-tabs">
@@ -309,25 +312,28 @@ The following command performs this <code>md5sum</code> check: </p>
 <p>if the file is intact, then <code>md5sum</code> generates a string of characters, which in this case should be: <code>80e48168416a2fdbe88d68cdfebd4ca2</code>. 
 If a different string is generated, then the file is corrupted.</p>
 <h1 id="35-genome-build"># Genome build<a class="headerlink" href="#35-genome-build" title="Permanent link">&para;</a></h1>
-<p>These base data are on the same genome build as the target data that we will be using. You must check that your base and target data are on the same genome build, and if they are not then use a tool such as LiftOver to make the builds consistent across the data sets.</p>
+<p>The GIANT summary statistic are on the same genome build as the target data that we will be using. 
+You must check that your base and target data are on the same genome build, and if they are not then use a tool such as <a href="https://genome.ucsc.edu/cgi-bin/hgLiftOver">LiftOver</a> to make the builds consistent across the data sets.</p>
 <h1 id="35-standard-gwas-qc"># Standard GWAS QC<a class="headerlink" href="#35-standard-gwas-qc" title="Permanent link">&para;</a></h1>
 <p>As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. 
 If the base data have been obtained as summary statistics from a public source, then the typical QC steps that you will be able to perform on them are to filter the SNPs according to INFO score and MAF. 
 SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). 
 Therefore, SNPs with low MAF and INFO are typically removed before performing downstream analyses.
 We recommend removing SNPs with MAF &lt; 1% and INFO &lt; 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results).
-These SNP filters can be acheived using the following code:</p>
+These SNP filters can be achieved using the following code:</p>
 <div class="codehilite"><pre><span></span>gunzip -c GIANT.height.gz <span class="p">|</span><span class="se">\</span>
 awk <span class="s1">&#39;NR==1 || ($6 &gt; 0.01) &amp;&amp; ($10 &gt; 0.8) {print}&#39;</span> <span class="p">|</span><span class="se">\</span>
 gzip  &gt; Height.gz
 </pre></div>
 
-<p>The bash code above does the following:
-1. Decompresses and reads the <strong>GIANT.height.gz</strong> file
-2. Prints the header line (<code>NR==1</code>)
-3. Prints any line with MAF above 0.01 (<code>$6</code> because the sixth column of the file contains the MAF information)
-4. Prints any line with INFO above 0.8 (<code>$10</code> because the tenth column of the file contains the INFO information)
-5. Compresses and writes the results to <strong>Height.gz</strong></p>
+<p>The bash code above does the following:</p>
+<ol>
+<li>Decompresses and reads the <strong>GIANT.height.gz</strong> file</li>
+<li>Prints the header line (<code>NR==1</code>)</li>
+<li>Prints any line with MAF above 0.01 (<code>$6</code> because the sixth column of the file contains the MAF information)</li>
+<li>Prints any line with INFO above 0.8 (<code>$10</code> because the tenth column of the file contains the INFO information)</li>
+<li>Compresses and writes the results to <strong>Height.gz</strong></li>
+</ol>
 <h1 id="35-ambiguous-snps"># Ambiguous SNPs<a class="headerlink" href="#35-ambiguous-snps" title="Permanent link">&para;</a></h1>
 <p>If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) that was used for either is unknown, then it is not possible to pair-up the alleles of ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T SNPs) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. While allele frequencies could be used to infer which alleles are on the same strand, the accuracy of this could be low for SNPs with MAF close to 50% or when the base and target data are from different populations. Therefore, we recommend removing all ambiguous SNPs to avoid introducing this potential source of systematic error.</p>
 <p>Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.</p>
@@ -342,8 +348,9 @@ awk <span class="s1">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) ||
 <details class="note"><summary>How many non-ambiguous SNPs were there?</summary><p>There are <code>609,041</code> ambiguous SNPs</p>
 </details>
 <h1 id="35-mismatching-snps"># Mismatching SNPs<a class="headerlink" href="#35-mismatching-snps" title="Permanent link">&para;</a></h1>
-<p>SNPs that have mismatching alleles reported in the base and target data are either resolvable by "strand-flipping" the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target, or non-resolvable, such as for a SNP with C/G in the base and C/T in the target. Most polygenic score software perform strand-flipping automatically for SNPs that are resolvable, and remove non-resolvable mismatching SNPs.</p>
-<p>Since we need the target data to know which SNPs have mismatching alleles, then we will perform this strand-flipping in the target data.</p>
+<p>SNPs that have mismatching alleles reported in the base and target data are either resolvable by "strand-flipping" the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target, or non-resolvable, such as for a SNP with C/G in the base and C/T in the target. 
+Most polygenic score software perform strand-flipping automatically for SNPs that are resolvable, and remove non-resolvable mismatching SNPs.</p>
+<p>Since we need the target data to know which SNPs have mismatching alleles, we will perform this strand-flipping in the target data.</p>
 <h1 id="35-duplicate-snps"># Duplicate SNPs<a class="headerlink" href="#35-duplicate-snps" title="Permanent link">&para;</a></h1>
 <p>If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
 Most PRS software do not allow duplicated SNPs in the base data input and thus they should be removed, using a command such as the one below: </p>
@@ -367,10 +374,10 @@ uniq -d &gt; duplicated.snp
 grep -vf duplicated.snp <span class="p">|</span><span class="se">\</span>
 gzip - &gt; Height.QC.gz
 </pre></div></p>
-<p>The above script does the following:</p>
+<p>The above command does the following:</p>
 <ol>
-<li>Decompresses and reads the <strong>Height.noambig.gz</strong> file </li>
-<li>Establishes whether any row contains entries observed in <code>duplicated.snp</code> and removes them if so</li>
+<li>Decompresses and reads the <strong>Height.noambig.gz</strong> file</li>
+<li>From the file, remove (<code>-v</code>) any lines contains string within the <strong>duplicated.snp</strong> file (<code>-f</code>)</li>
 <li>Compresses and writes the results to <strong>Height.QC.gz</strong></li>
 </ol>
 <h1 id="35-sex-chromosomes"># Sex chromosomes<a class="headerlink" href="#35-sex-chromosomes" title="Permanent link">&para;</a></h1>
@@ -378,7 +385,7 @@ gzip - &gt; Height.QC.gz
 <h1 id="35-sample-overlap"># Sample overlap<a class="headerlink" href="#35-sample-overlap" title="Permanent link">&para;</a></h1>
 <p>Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of <a href="https://doi.org/10.1101/416545">the paper</a> for discussion of the importance of avoiding sample overlap). </p>
 <h1 id="35-relatedness"># Relatedness<a class="headerlink" href="#35-relatedness" title="Permanent link">&para;</a></h1>
-<p>Closely related individuals within and between the base and the target data may lead to overfitted results, limiting the generalisability of the results (see the relevant sections of <a href="https://doi.org/10.1101/416545">the paper</a>). Relatedness within the target data is tested in the Target Data section.</p>
+<p>Closely related individuals within and between the base and the target data may lead to overfitted results, limiting the generalizability of the results (see the relevant sections of <a href="https://doi.org/10.1101/416545">the paper</a>). Relatedness within the target data is tested in the Target Data section.</p>
 <p>The <strong>Height.QC.gz</strong> base data are now ready for using in downstream analyses.</p>
               
             </div>

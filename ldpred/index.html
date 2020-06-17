@@ -159,6 +159,7 @@ Please refer to their website for installation instructions.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The script used here is based on LDpred version 1.0.6</p>
+<p>Due to current update in LDpred, this tutorial is likely outdated. We will try to update it once we've tested the new version.</p>
 </div>
 <p>We assume that you have the following files:</p>
 <table>
@@ -186,10 +187,6 @@ Please refer to their website for installation instructions.</p>
 <td align="center">This file contains the samples that passed the basic filtering</td>
 </tr>
 <tr>
-<td align="center"><strong>EUR.valid.sample</strong></td>
-<td align="center">This file contains the samples that passed all the QC</td>
-</tr>
-<tr>
 <td align="center"><strong>EUR.height</strong></td>
 <td align="center">This file contains the phenotype of the samples</td>
 </tr>
@@ -204,16 +201,6 @@ Please refer to their website for installation instructions.</p>
 </tbody>
 </table>
 <h1 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h1>
-<p>LDpred does not support filtering of samples and SNPs, so therefore we must generate a new QC'ed genotype file using <code>plink</code>:</p>
-<div class="codehilite"><pre><span></span><span class="c1"># We also add the height phenotype for convenience</span>
-plink <span class="se">\</span>
-    --bfile EUR.QC <span class="se">\</span>
-    --pheno EUR.height <span class="se">\</span>
-    --keep EUR.valid.sample <span class="se">\</span>
-    --make-bed <span class="se">\</span>
-    --out EUR.ldpred
-</pre></div>
-
 <p>LDpred can then perform PRS analysis in three steps:</p>
 <ol>
 <li>
@@ -231,7 +218,7 @@ python LDpred.py coord <span class="se">\</span>
     --N <span class="m">253288</span> <span class="se">\</span>
     --ssf Height.QC.gz <span class="se">\</span>
     --out EUR.coord <span class="se">\</span>
-    --gf EUR.ldpred
+    --gf EUR.QC
 </pre></div></p>
 </li>
 <li>

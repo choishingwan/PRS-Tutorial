@@ -148,6 +148,10 @@
             <div class="section">
               
                 <p>Here we use another PRS program, <code>lassosum</code>, which is an <code>R</code> package that uses penalised regression (LASSO) in its approach to PRS calculation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The script used here is based on lassosum version 0.4.4</p>
+</div>
 <p>You can install <code>lassosum</code> and its dependencies in <code>R</code> with the following command:</p>
 <div class="codehilite"><pre><span></span>install.packages<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;devtools&quot;</span><span class="p">,</span><span class="s">&quot;RcppArmadillo&quot;</span><span class="p">,</span> <span class="s">&quot;data.table&quot;</span><span class="p">,</span> <span class="s">&quot;Matrix&quot;</span><span class="p">),</span> dependencies<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
 <span class="kn">library</span><span class="p">(</span>devtools<span class="p">)</span>
@@ -180,10 +184,6 @@ install_github<span class="p">(</span><span class="s">&quot;tshmak/lassosum&quot
 <td align="center">This file contains the samples that passed the basic filtering</td>
 </tr>
 <tr>
-<td align="center"><strong>EUR.valid.sample</strong></td>
-<td align="center">This file contains the samples that passed all the QC</td>
-</tr>
-<tr>
 <td align="center"><strong>EUR.height</strong></td>
 <td align="center">This file contains the phenotype of the samples</td>
 </tr>
@@ -203,17 +203,16 @@ install_github<span class="p">(</span><span class="s">&quot;tshmak/lassosum&quot
 <span class="c1"># Prefer to work with data.table as it speeds up file reading</span>
 <span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
 <span class="kn">library</span><span class="p">(</span>methods<span class="p">)</span>
-<span class="c1"># We like to use dplyr for it makes codes much more readable</span>
-<span class="kn">library</span><span class="p">(</span>dplyr<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>magrittr<span class="p">)</span>
 sum.stat <span class="o">&lt;-</span> <span class="s">&quot;Height.QC.gz&quot;</span>
 bfile <span class="o">&lt;-</span> <span class="s">&quot;EUR.QC&quot;</span>
 <span class="c1"># Read in and process the covariates</span>
 covariate <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">)</span>
-pcs <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">)</span>
-<span class="kp">colnames</span><span class="p">(</span>pcs<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span>
+pcs <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    setnames<span class="p">(</span><span class="m">.</span><span class="p">,</span> <span class="kp">colnames</span><span class="p">(</span><span class="m">.</span><span class="p">),</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">)))</span>
 <span class="c1"># Need as.data.frame here as lassosum doesn&#39;t handle data.table </span>
 <span class="c1"># covariates very well</span>
-cov <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span><span class="kp">merge</span><span class="p">(</span>covariate<span class="p">,</span> pcs<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)))</span>
+cov <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>covariate<span class="p">,</span> pcs<span class="p">)</span>
 
 <span class="c1"># We will need the EUR.hg19 file provided by lassosum </span>
 <span class="c1"># which are LD regions defined in Berisa and Pickrell (2015) for the European population and the hg19 genome.</span>
@@ -221,7 +220,7 @@ ld.file <span class="o">&lt;-</span> <span class="kp">system.file</span><span cl
 <span class="c1"># output prefix</span>
 prefix <span class="o">&lt;-</span> <span class="s">&quot;EUR&quot;</span>
 <span class="c1"># Read in the target phenotype file</span>
-target.pheno <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>fread<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">)[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="s">&quot;Height&quot;</span><span class="p">)])</span>
+target.pheno <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">)[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="s">&quot;Height&quot;</span><span class="p">)]</span>
 <span class="c1"># Read in samples to include in the analysis</span>
 target.keep <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">)[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)]</span>
 <span class="c1"># Read in the summary statistics</span>
@@ -255,14 +254,16 @@ out <span class="o">&lt;-</span> lassosum.pipeline<span class="p">(</span>
     keep.ref <span class="o">=</span> keep<span class="p">,</span>
     test.bfile <span class="o">=</span> bfile<span class="p">,</span>
     keep.test <span class="o">=</span> keep<span class="p">,</span>
-    LDblocks <span class="o">=</span> ld<span class="p">,</span>
-    trace <span class="o">=</span> <span class="m">2</span>
+    LDblocks <span class="o">=</span> ld
 <span class="p">)</span>
 <span class="c1"># Store the R2 results</span>
 target.res <span class="o">&lt;-</span> validate<span class="p">(</span>out<span class="p">,</span> pheno <span class="o">=</span> target.pheno<span class="p">,</span> covar<span class="o">=</span>cov<span class="p">)</span>
 <span class="c1"># Get the maximum R2</span>
 r2 <span class="o">&lt;-</span> <span class="kp">max</span><span class="p">(</span>target.res<span class="o">$</span>validation.table<span class="o">$</span>value<span class="p">)</span><span class="o">^</span><span class="m">2</span>
 </pre></div>
+
+<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.03818004</p>
+</details>
               
             </div>
           </div>

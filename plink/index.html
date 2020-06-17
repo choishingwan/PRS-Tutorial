@@ -166,7 +166,9 @@
             <div class="section">
               
                 <h1 id="background">Background<a class="headerlink" href="#background" title="Permanent link">&para;</a></h1>
-<p>In this section of the tutorial you will use four different software programs to compute PRS from the base and target data that you QC'ed in the previous two sections. On this page, you will compute PRS using the popular genetic analyses tool <code>plink</code> - while <code>plink</code> is not a dedicated PRS software, each of the steps required to compute PRS using the C+T standard approach can be performed in <code>plink</code> and carrying out this multi-step process can be a good way to learn the processes involved in computing PRS (which are typically performed automatically by PRS software). </p>
+<p>In this section of the tutorial you will use four different software programs to compute PRS from the base and target data that you QC'ed in the previous two sections. 
+On this page, you will compute PRS using the popular genetic analyses tool <code>plink</code> - while <code>plink</code> is not a dedicated PRS software, you can perform every required steps of the C+T approach with <code>plink</code>. 
+This multi-step process is a good way to learn the processes involved in computing PRS, which are typically performed automatically by PRS software.</p>
 <h1 id="required-data">Required Data<a class="headerlink" href="#required-data" title="Permanent link">&para;</a></h1>
 <p>In the previous sections, we have generated the following files:</p>
 <table>
@@ -194,10 +196,6 @@
 <td align="center">This file contains the samples that passed the basic filtering</td>
 </tr>
 <tr>
-<td align="center"><strong>EUR.QC.valid</strong></td>
-<td align="center">This file contains the samples that passed all the QC</td>
-</tr>
-<tr>
 <td align="center"><strong>EUR.height</strong></td>
 <td align="center">This file contains the phenotype of the samples</td>
 </tr>
@@ -208,7 +206,7 @@
 </tbody>
 </table>
 <h1 id="update-effect-size">Update Effect Size<a class="headerlink" href="#update-effect-size" title="Permanent link">&para;</a></h1>
-<p>When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we usually take the natural logarithm of the OR so that the PRS can be computed using a simple summation instead (which can be back-transformed afterwards). 
+<p>When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we take the natural logarithm of the OR so that the PRS can be computed using summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with <code>R</code>:</p>
 <div class="superfences-tabs">
 <input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
@@ -228,14 +226,14 @@ fwrite<span class="p">(</span>dat<span class="p">[,</span>OR<span class="o">:=</
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>It may be tempting to perform the log transofrmation using <code>awk</code>.
-However, due to rounding of values performed in <code>awk</code>, less accurate results
-may be obtained. Therefore, we recommend performing the transformation in <code>R</code> or allow the PRS software to perform the transformation directly.</p>
+<p>Due to rounding of values, using <code>awk</code> to log transform OR can lead to less accurate results. Therefore, we recommend performing the transformation in <code>R</code> or allow the PRS software to perform the transformation directly.</p>
 </div>
 <h1 id="clumping">Clumping<a class="headerlink" href="#clumping" title="Permanent link">&para;</a></h1>
-<p>Linkage disequilibrium, which corresponds to the correlation between the genotypes of genetic variants across the genome, makes identifying the contribution from causal independent genetic variants extremely challenging. One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in such a way that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. Clumping can be performed using the following command in <code>plink</code>: </p>
+<p>Linkage disequilibrium, which corresponds to the correlation between the genotypes of genetic variants across the genome, makes identifying the contribution from causal independent genetic variants extremely challenging. 
+One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in ways that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. 
+Clumping can be performed using the following command in <code>plink</code>: </p>
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
-    --bfile EUR.QC <span class="se">\</span>
+    --bfile EUR.QC 
     --clump-p1 <span class="m">1</span> <span class="se">\</span>
     --clump-r2 <span class="m">0</span>.1 <span class="se">\</span>
     --clump-kb <span class="m">250</span> <span class="se">\</span>
@@ -497,10 +495,43 @@ prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
 <span class="kp">print</span><span class="p">(</span>prs.result<span class="p">[</span><span class="kp">which.max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">),])</span>
 <span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
+<input name="__tabs_2" type="radio" id="__tab_2_2" />
+<label for="__tab_2_2">with data.table and  magrittr</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>magrittr<span class="p">)</span>
+p.threshold <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="m">0.001</span><span class="p">,</span><span class="m">0.05</span><span class="p">,</span><span class="m">0.1</span><span class="p">,</span><span class="m">0.2</span><span class="p">,</span><span class="m">0.3</span><span class="p">,</span><span class="m">0.4</span><span class="p">,</span><span class="m">0.5</span><span class="p">)</span>
+phenotype <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">)</span>
+pcs <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    setnames<span class="p">(</span><span class="m">.</span><span class="p">,</span> <span class="kp">colnames</span><span class="p">(</span><span class="m">.</span><span class="p">),</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span> <span class="p">)</span>
+covariate <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">)</span>
+pheno <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>phenotype<span class="p">,</span> covariate<span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="kp">merge</span><span class="p">(</span><span class="m">.</span><span class="p">,</span> pcs<span class="p">)</span>
+null.r2 <span class="o">&lt;-</span> <span class="kp">summary</span><span class="p">(</span>lm<span class="p">(</span>Height<span class="o">~</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>pheno<span class="p">[,</span><span class="o">-</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)]))</span><span class="o">$</span>r.squared
+prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
+<span class="kr">for</span><span class="p">(</span>i <span class="kr">in</span> p.threshold<span class="p">){</span>
+    pheno.prs <span class="o">&lt;-</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;EUR.&quot;</span><span class="p">,</span> i<span class="p">,</span> <span class="s">&quot;.profile&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+        fread<span class="p">(</span><span class="m">.</span><span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="m">.</span><span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="s">&quot;SCORE&quot;</span><span class="p">)]</span> <span class="o">%&gt;%</span>
+        <span class="kp">merge</span><span class="p">(</span><span class="m">.</span><span class="p">,</span> pheno<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">))</span>
+
+    model <span class="o">&lt;-</span> lm<span class="p">(</span>Height<span class="o">~</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>pheno.prs<span class="p">[,</span><span class="o">-</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)])</span> <span class="o">%&gt;%</span>
+            <span class="kp">summary</span>
+    model.r2 <span class="o">&lt;-</span> model<span class="o">$</span>r.squared
+    prs.r2 <span class="o">&lt;-</span> model.r2<span class="o">-</span>null.r2
+    prs.coef <span class="o">&lt;-</span> model<span class="o">$</span>coeff<span class="p">[</span><span class="s">&quot;SCORE&quot;</span><span class="p">,]</span>
+    prs.result <span class="o">%&lt;&gt;%</span> <span class="kp">rbind</span><span class="p">(</span><span class="m">.</span><span class="p">,</span>
+        <span class="kt">data.frame</span><span class="p">(</span>Threshold<span class="o">=</span>i<span class="p">,</span> R2<span class="o">=</span>prs.r2<span class="p">,</span> 
+                    P<span class="o">=</span><span class="kp">as.numeric</span><span class="p">(</span>prs.coef<span class="p">[</span><span class="m">4</span><span class="p">]),</span> 
+                    BETA<span class="o">=</span><span class="kp">as.numeric</span><span class="p">(</span>prs.coef<span class="p">[</span><span class="m">1</span><span class="p">]),</span>
+                    SE<span class="o">=</span><span class="kp">as.numeric</span><span class="p">(</span>prs.coef<span class="p">[</span><span class="m">2</span><span class="p">])))</span>
+<span class="p">}</span>
+<span class="kp">print</span><span class="p">(</span>prs.result<span class="p">[</span><span class="kp">which.max</span><span class="p">(</span>prs.result<span class="o">$</span>R2<span class="p">),])</span>
+<span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
+</pre></div></div>
 </div>
-<details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.2 </p>
+<details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.1</p>
 </details>
-<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.04003232</p>
+<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.04776492</p>
 </details>
               
             </div>
