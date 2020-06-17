@@ -13,7 +13,9 @@ unzip EUR.zip
 ```
 
 !!! note
-    Install the program PLINK and include its location in your PATH directory, which allows us to use `plink` instead of `./plink` in the commands below. If PLINK is not in your PATH directory and is instead in your working directory, then replace all instances of `plink` in the tutorial with `./plink`.
+    You will need `plink` in this section, which can be download from [here](https://www.cog-genomics.org/plink/1.9/).
+
+    Install the program `plink` and include its location in your PATH directory, which allows us to use `plink` instead of `./plink` in the commands below. If PLINK is not in your PATH directory and is instead in your working directory, replace all instances of `plink` in the tutorial with `./plink`.
 
 # QC checklist: Target data
 Below are the QC steps that comprise the QC checklist for the target data.
@@ -57,6 +59,7 @@ plink \
     --make-just-fam \
     --out EUR.QC
 ```
+
 Each of the parameters corresponds to the following
 
 | Paramter | Value | Description|
@@ -68,7 +71,7 @@ Each of the parameters corresponds to the following
 | mind | 0.01 | Excludes individuals who have a high rate of genotype missingness, since this may indicate problems in the DNA sample or processing. (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/) for more details).|
 | make-just-fam | - | Informs `plink` to only generate the QC'ed sample name to avoid generating the .bed file.  |
 | write-snplist | - | Informs `plink` to only generate the QC'ed SNP list to avoid generating the .bed file. |
-| out | EUR | Informs `plink` that all output should have a prefix of `EUR` |
+| out | EUR.QC | Informs `plink` that all output should have a prefix of `EUR.QC` |
 
 ??? note "How many SNPs and samples were filtered?"
     - `5` samples were removed due to a high rate of genotype missingness
@@ -76,7 +79,6 @@ Each of the parameters corresponds to the following
     -  `872` SNPs were removed due to being out of Hardy-Weinberg Equilibrium
     - `242,459` SNPs were removed due to low minor allele frequency
 
- 
 !!! note
     Normally, we can generate a new genotype file using the new sample list.
     However,  this will use up a lot of storage space. Using `plink`'s
@@ -96,7 +98,18 @@ plink \
     --out EUR.QC
 ```
 
-This will generate two files 1) **EUR.QC.prune.in** and 2) **EUR.QC.prune.out**.All SNPs within **EUR.QC.prune.in** have a pairwise $r^2 < 0.25$. 
+Each of the parameters corresponds to the following
+
+| Paramter | Value | Description|
+|:-:|:-:|:-|
+| bfile | EUR | Informs `plink` that the input genotype files should have a prefix of `EUR` |
+| keep | EUR.QC.fam | Informs `plink` that we only want to use samples in `EUR.QC.fam` in the analysis |
+| extract | EUR.QC.snplist | Informs `plink` that we only want to use SNPs in `EUR.QC.snplist` in the analysis |
+|indep-pairwise| 200 50 0.25 | Informs `plink` that we wish to perform prunning with a window size of 200kb, sliding across the genome with step size of 50 variants at a time, and filter out any SNPs with LD $r^2$ higher than 0.25|
+| out | EUR.QC | Informs `plink` that all output should have a prefix of `EUR.QC` |
+
+
+This will generate two files 1) **EUR.QC.prune.in** and 2) **EUR.QC.prune.out**. All SNPs within **EUR.QC.prune.in** have a pairwise $r^2 < 0.25$. 
 
 
 Heterozygosity rates can then be computed using `plink`:
@@ -162,16 +175,24 @@ bim$B.A1 <- toupper(bim$B.A1)
 bim$B.A2 <- toupper(bim$B.A2)
 ```
 
-```R tab="With data.table"
+```R tab="With data.table and magrittr"
+# magrittr allow us to do piping, which help to reduce the 
+# amount of intermediate data types
 library(data.table)
+library(magrittr)
 # Read in bim file 
-bim <- fread("EUR.bim")
-setnames(bim, colnames(bim), c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2"))
+bim <- fread("EUR.bim") %>%
+    # Note: . represents the output from previous step
+    # The syntax here means, setnames of the data read from
+    # the bim file, and replace the original column names by 
+    # the new names
+    setnames(., colnames(.), c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")) %>%
+    # And immediately change the alleles to upper cases
+    .[,c("B.A1","B.A2"):=list(toupper(B.A1), toupper(B.A2))]
 # Read in GIANT data (require data.table v1.12.0+)
-height <- fread("Height.QC.gz")
-# Change all alleles to upper case for easy comparison
-height[,c("A1","A2"):=list(toupper(A1), toupper(A2))]
-bim[,c("B.A1","B.A2"):=list(toupper(B.A1), toupper(B.A2))]
+height <- fread("Height.QC.gz") %>%
+    # And immediately change the alleles to upper cases
+    .[,c("A1","A2"):=list(toupper(A1), toupper(A2))]
 # Read in QCed SNPs
 qc <- fread("EUR.QC.snplist", header=F)
 ```
@@ -201,17 +222,21 @@ info.match <- subset(info, A1 == B.A1 & A2 == B.A2)
 info$C.A1 <- sapply(info$B.A1, complement)
 info$C.A2 <- sapply(info$B.A2, complement)
 info.complement <- subset(info, A1 == C.A1 & A2 == C.A2)
-# Update these allele coding in the bim file
-bim[bim$SNP %in% info.complement$SNP,]$B.A1 <-
-    sapply(bim[bim$SNP %in% info.complement$SNP,]$B.A1, complement)
-bim[bim$SNP %in% info.complement$SNP,]$B.A2 <-
-    sapply(bim[bim$SNP %in% info.complement$SNP,]$B.A2, complement)
+# Update the complementary alleles in the bim file
+# This allow us to match the allele in subsequent analysis
+complement.snps <- bim$SNP %in% info.complement$SNP
+bim[complement.snps,]$B.A1 <-
+    sapply(bim[complement.snps,]$B.A1, complement)
+bim[complement.snps,]$B.A2 <-
+    sapply(bim[complement.snps,]$B.A2, complement)
 ```
 
-```R tab="With data.table"
+```R tab="With data.table and magrittr"
 # Merge GIANT with target
-info <- merge(bim, height, by=c("SNP", "CHR", "BP"))
-info <- info[SNP %in% qc$V1]
+info <- merge(bim, height, by=c("SNP", "CHR", "BP")) %>%
+    # And filter out QCed SNPs
+    .[SNP %in% qc[,V1]]
+
 # Function for calculating the complementary allele
 complement <- function(x){
     switch (x,
@@ -221,16 +246,14 @@ complement <- function(x){
         "G" = "C",
         return(NA)
     )
-}
+} 
+# Get SNPs that have the same alleles across base and target
+info.match <- info[A1 == B.A1 & A2 == B.A2, SNP]
 # Identify SNPs that are complementary between base and target
 com.snps <- info[sapply(B.A1, complement) == A1 &
                      sapply(B.A2, complement) == A2, SNP]
 # Now update the bim file
 bim[SNP %in% com.snps, c("B.A1", "B.A2") :=
-        list(sapply(B.A1, complement),
-             sapply(B.A2, complement))]
-# And update the info structure
-info[SNP %in% com.snps, c("B.A1", "B.A2") :=
         list(sapply(B.A1, complement),
              sapply(B.A2, complement))]
 ```
@@ -241,33 +264,43 @@ info[SNP %in% com.snps, c("B.A1", "B.A2") :=
 ```R tab="Without data.table"
 # identify SNPs that need recoding
 info.recode <- subset(info, A1 == B.A2 & A2 == B.A1)
+# Update the recode SNPs
+recode.snps <- bim$SNP %in% info.recode$SNP
+tmp <- bim[recode.snps,]$B.A1
+bim[recode.snps,]$B.A1 <- bim[recode.snps,]$B.A2
+bim[recode.snps,]$B.A2 <- tmp
+
 # identify SNPs that need recoding & complement
 info.crecode <- subset(info, A1 == C.A2 & A2 == C.A1)
-# Update these allele coding in the bim file
+# Update the recode + strand flip SNPs
 com.snps <- bim$SNP %in% info.crecode$SNP
 tmp <- bim[com.snps,]$B.A1
 bim[com.snps,]$B.A1 <- as.character(sapply(bim[com.snps,]$B.A2, complement))
 bim[com.snps,]$B.A2 <- as.character(sapply(tmp, complement))
+
 # Output updated bim file
 write.table(
     bim,
     "EUR.QC.adj.bim",
     quote = F,
     row.names = F,
-    col.names = F
+    col.names = F,
+    sep="\t"
 )
 ```
 
-```R tab="With data.table"
+```R tab="With data.table  and magrittr"
+# identify SNPs that need recoding
+recode.snps <- info[B.A1==A2 & B.A2==A1, SNP]
+# Update the bim file
+bim[SNP %in% recode.snps, c("B.A1", "B.A2") :=
+        list(B.A2, B.A1)]
+
 # identify SNPs that need recoding & complement
 com.recode <- info[sapply(B.A1, complement) == A2 &
                      sapply(B.A2, complement) == A1, SNP]
 # Now update the bim file
 bim[SNP %in% com.recode, c("B.A1", "B.A2") :=
-        list(sapply(B.A2, complement),
-             sapply(B.A1, complement))]
-# And update the info structure
-info[SNP %in% com.recode, c("B.A1", "B.A2") :=
         list(sapply(B.A2, complement),
              sapply(B.A1, complement))]
 # Write the updated bim file
@@ -294,9 +327,10 @@ q() # exit R
 ```
 
 ``` R tab="With data.table"
-matched <- info[(A1 == B.A1 & A2 == B.A2) |
-                    (A1 == B.A2 & A2 == B.A1)]
-mismatch <- bim[!SNP%in%matched$SNP, SNP]
+mismatch <- bim[!(SNP %in% info.match |
+                    SNP %in% com.snps |
+                    SNP %in% recode.snps |
+                    SNP %in% com.recode), SNP]
 write.table(mismatch, "EUR.mismatch", quote=F, row.names=F, col.names=F)
 q() # exit R
 ```
