@@ -1,9 +1,9 @@
 # Obtaining the target data
 Target data consist of individual-level genotype-phenotype data, usually generated within your lab/department/collaboration. For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
-You can download the data [here](https://www.dropbox.com/s/xkx4bjxvb3jjw7g/EUR.zip?dl=0) or you can download the data using the following command:
+You can download the data [here](https://www.dropbox.com/s/ay6gmxhaxdu5n07/EUR.zip?dl=0) or you can download the data using the following command:
 
 ```bash
-curl -L -o EUR.zip https://www.dropbox.com/s/xkx4bjxvb3jjw7g/EUR.zip?dl=1
+curl -L -o EUR.zip https://www.dropbox.com/s/ay6gmxhaxdu5n07/EUR.zip?dl=1
 ```
 
 Unzip the data as follow:
