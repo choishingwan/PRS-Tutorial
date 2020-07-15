@@ -3,6 +3,8 @@ Here we use another PRS program, `lassosum`, which is an `R` package that uses p
 !!! note
     The script used here is based on lassosum version 0.4.4
 
+!!! note
+    For more details, please refer to [lassosum's homepage](https://github.com/tshmak/lassosum/)
 
 You can install `lassosum` and its dependencies in `R` with the following command:
 
