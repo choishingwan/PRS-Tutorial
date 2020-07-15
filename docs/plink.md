@@ -46,7 +46,7 @@ Clumping can be performed using the following command in `plink`:
 
 ```bash
 plink \
-    --bfile EUR.QC 
+    --bfile EUR.QC \
     --clump-p1 1 \
     --clump-r2 0.1 \
     --clump-kb 250 \
