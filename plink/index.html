@@ -233,7 +233,7 @@ fwrite<span class="p">(</span>dat<span class="p">[,</span>OR<span class="o">:=</
 One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in ways that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. 
 Clumping can be performed using the following command in <code>plink</code>: </p>
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
-    --bfile EUR.QC 
+    --bfile EUR.QC <span class="se">\</span>
     --clump-p1 <span class="m">1</span> <span class="se">\</span>
     --clump-r2 <span class="m">0</span>.1 <span class="se">\</span>
     --clump-kb <span class="m">250</span> <span class="se">\</span>
