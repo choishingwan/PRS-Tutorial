@@ -10,9 +10,9 @@ Here we use another PRS program, [LDpred](https://github.com/bvilhjal/ldpred), t
 You can install `LDpred` and its dependencies in `R` with the following command:
 
 ```R
-install.packages("devtools")
-library(devtools)
-install_github("privefl/bigsnpr")
+install.packages("remotes")
+library(remotes)
+remotes::install_github("https://github.com/privefl/bigsnpr.git")
 ```
 
 !!! note
@@ -112,7 +112,10 @@ reg.formula <- paste("PC",1:6, sep="", collapse="+") %>%
 y[,Inf.est:=0]
 y[,auto:=0]
 y[,grid:=0]
+# add progress bar
+pb = txtProgressBar(min = 0, max = 22, initial = 0) 
 for(chr in 1:22){
+    setTxtProgressBar(pb,chr)
     chr.idx <- which(info_snp$chr == chr)
     df_beta <- info_snp[chr.idx, 
                 c("beta", "beta_se", "n_eff")]
@@ -132,7 +135,11 @@ for(chr in 1:22){
     multi_auto <- snp_ldpred2_auto(corr, df_beta, h2_init = h2_est,
                                vec_p_init = seq_log(1e-4, 0.9, length.out = NCORES),
                                ncores = NCORES)
-    beta_auto <- sapply(multi_auto, function(auto) auto$beta_est)
+    pred_auto <- big_prodMat(genotype, beta_auto, ind.row = ind.val, ind.col = ind.chr2)
+    # scale the PRS generated from AUTO
+    pred_scaled <- apply(pred_auto, 2, sd)
+    final_beta_auto <- rowMeans(beta_auto[, abs(sc - median(sc)) < 3 * mad(sc)])
+    pred_auto <- big_prodMat(genotype, final_beta_auto, ind.row = ind.val, ind.col = ind.chr2)
     # Get infinitesimal PRS
     pred_inf <- big_prodVec(genotype, beta_inf, ind.row = ind.test, ind.col = ind.chr)
     # Get the grid PRSs
@@ -173,6 +180,7 @@ for(chr in 1:22){
     # add up the calculated grid PRS
     y[,auto:=auto+pred_auto[,max.auto.id]]
 }
+print("Completed")
 ```
 
 5. Get the final performance of the LDpred models
