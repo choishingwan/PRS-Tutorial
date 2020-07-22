@@ -14,7 +14,7 @@ library(devtools)
 install_github("tshmak/lassosum")
 ```
 
-Again, we assume that we have the following files: 
+Again, we assume that we have the following files (or you can download it from [here](https://drive.google.com/file/d/1_ujJhCFAAHp_fA2U291pBUPTeF_FQLyu/view?usp=sharing)): 
 
 |File Name | Description|
 |:-:|:-:|
@@ -53,8 +53,6 @@ ld.file <- system.file("data", "Berisa.EUR.hg19.bed",package="lassosum")
 prefix <- "EUR"
 # Read in the target phenotype file
 target.pheno <- fread("EUR.height")[,c("FID", "IID", "Height")]
-# Read in samples to include in the analysis
-target.keep <- fread("EUR.valid.sample")[,c("FID", "IID")]
 # Read in the summary statistics
 ss <- fread(sum.stat)
 # Number of sample in base
@@ -68,13 +66,9 @@ cor <- p2cor(p = ss$P,
         n = size,
         sign = log(ss$OR)
         )
-# Because FID of our samples are all 0, we might encounter problem with lassosum
-# we need to provide a T/F vector instead of the target.keep file
-target.keep[, ID:=do.call(paste, c(.SD, sep=":")),.SDcols=c(1:2)]
 fam <- fread(paste0(bfile, ".fam"))
 fam[,ID:=do.call(paste, c(.SD, sep=":")),.SDcols=c(1:2)]
 
-keep <- fam$ID %in% target.keep$ID
 # Run the lassosum pipeline
 out <- lassosum.pipeline(
     cor = cor,
@@ -83,9 +77,7 @@ out <- lassosum.pipeline(
     A1 = ss$A1,
     A2 = ss$A2,
     ref.bfile = bfile,
-    keep.ref = keep,
     test.bfile = bfile,
-    keep.test = keep,
     LDblocks = ld
 )
 # Store the R2 results

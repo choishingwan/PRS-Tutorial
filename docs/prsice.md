@@ -1,7 +1,7 @@
 Over the following three pages you can run three dedicated PRS programs, which automate many of the steps from the previous page that used a sequence of PLINK functions (plus some QC steps). 
 On this page you will run a PRS analysis using PRSice-2, which implements the standard C+T method.
 
-This analysis assumes that you have the following files: 
+This analysis assumes that you have the following files (or you can download it from [here](https://drive.google.com/file/d/1_ujJhCFAAHp_fA2U291pBUPTeF_FQLyu/view?usp=sharing)): 
 
 |File Name | Description|
 |:-:|:-:|
@@ -17,8 +17,8 @@ And `PRSice-2`, which can be downloaded from:
 
 | Operating System | Link |
 | -----------------|:----:|
-| Linux 64-bit | [v2.3.1.e](https://github.com/choishingwan/PRSice/releases/download/2.3.1/PRSice_linux.231e.zip) |
-| OS X 64-bit | [v2.3.1.e](https://github.com/choishingwan/PRSice/releases/download/2.3.1/PRSice_mac.231e.zip) |
+| Linux 64-bit | [v2.3.2](https://github.com/choishingwan/PRSice/releases/download/2.3.2/PRSice_linux.zip) |
+| OS X 64-bit | [v2.3.2](https://github.com/choishingwan/PRSice/releases/download/2.3.2/PRSice_mac.zip) |
 
 In this tutorial, you will only need `PRSice.R` and `PRSice_XXX` where XXX is the operation system
 

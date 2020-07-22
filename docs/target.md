@@ -1,10 +1,6 @@
 # Obtaining the target data
 Target data consist of individual-level genotype-phenotype data, usually generated within your lab/department/collaboration. For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
-You can download the data [here](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip) or you can download the data using the following command:
-
-```bash
-curl -L -o EUR.zip https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip
-```
+You can download the data [here](https://drive.google.com/file/d/1uhJR_3sn7RA8U5iYQbcmTp6vFdQiF4F2/view?usp=sharing)
 
 Unzip the data as follow:
 

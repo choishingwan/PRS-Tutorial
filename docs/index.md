@@ -13,6 +13,9 @@ the first two sections on QC correspond to Section 2 of the paper and constitute
 We will be referring to our [guide paper](https://doi.org/10.1101/416545) in each section and so you may find it helpful to have the paper open as you go through the tutorial.
 
 If you are only interested in how to perform PRS on previously QC'ed data then you can skip to [Step 3](plink.md). Links to download the required data are provided under each section.
+!!! warning
+
+    Data used in this tutorial are simulated and is intended for demonstration purposes only. Result from this tutorial will not reflect the true performance of different software. 
 
 !!! note
 
@@ -32,8 +35,8 @@ If you are only interested in how to perform PRS on previously QC'ed data then y
 
     You can click on the tab to change to an alternative code (eg. to a different operation system)
 # Datasets
-1. [Base data](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/GIANT.height.gz): Modified summary statistics file from the GIANT consortium study on height
-2. [Target data](https://github.com/choishingwan/PRS-Tutorial/raw/master/resources/EUR.zip): Simulated data based on the 1000 Genomes Project European samples
+1. [Base data](https://drive.google.com/file/d/1uatSVQweDuKkNI3EVStHCBVQbrjnCnWY/view?usp=sharing): Modified summary statistics file from the GIANT consortium study on height
+2. [Target data](https://drive.google.com/file/d/1uhJR_3sn7RA8U5iYQbcmTp6vFdQiF4F2/view?usp=sharing): Simulated data based on the 1000 Genomes Project European samples
 
 # Requirements
 To follow the tutorial, you will need the following programs installed:

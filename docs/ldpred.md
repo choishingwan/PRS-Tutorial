@@ -19,7 +19,7 @@ remotes::install_github("https://github.com/privefl/bigsnpr.git")
     For mac users, you might need to follow the guide [here](https://thecoatlessprofessor.com/programming/cpp/openmp-in-r-on-os-x/) to be able to install LDpred2
 
 
-We assume that you have the following files:
+We assume that you have the following files (or you can download it from [here](https://drive.google.com/file/d/1_ujJhCFAAHp_fA2U291pBUPTeF_FQLyu/view?usp=sharing)):
 
 |File Name | Description|
 |:-:|:-:|
