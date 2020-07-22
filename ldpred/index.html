@@ -150,18 +150,23 @@
                 <p>Here we use another PRS program, <a href="https://github.com/bvilhjal/ldpred">LDpred</a>, that uses a Bayesian approach to polygenic risk scoring.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Python 3 and other packages need to be installed before running LDpred. 
-Please refer to their website for installation instructions.</p>
-<p>If you have Python installed, you should be able to install LDpred with the following command:
-<div class="codehilite"><pre><span></span>pip install ldpred
-</pre></div></p>
+<p>The script used here is based on LDpred 2 implemented under bigsnpr version 1.4.7</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The script used here is based on LDpred version 1.0.6</p>
-<p>Due to current update in LDpred, this tutorial is likely outdated. We will try to update it once we've tested the new version.</p>
+<p>For more details, please refer to <a href="https://privefl.github.io/bigsnpr/articles/LDpred2.html">LDpred 2's homepage</a></p>
 </div>
-<p>We assume that you have the following files:</p>
+<p>You can install <code>LDpred</code> and its dependencies in <code>R</code> with the following command:</p>
+<div class="codehilite"><pre><span></span>install.packages<span class="p">(</span><span class="s">&quot;remotes&quot;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>remotes<span class="p">)</span>
+remotes<span class="o">::</span>install_github<span class="p">(</span><span class="s">&quot;https://github.com/privefl/bigsnpr.git&quot;</span><span class="p">)</span>
+</pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For mac users, you might need to follow the guide <a href="https://thecoatlessprofessor.com/programming/cpp/openmp-in-r-on-os-x/">here</a> to be able to install LDpred2</p>
+</div>
+<p>We assume that you have the following files (or you can download it from <a href="https://drive.google.com/file/d/1_ujJhCFAAHp_fA2U291pBUPTeF_FQLyu/view?usp=sharing">here</a>):</p>
 <table>
 <thead>
 <tr>
@@ -201,53 +206,182 @@ Please refer to their website for installation instructions.</p>
 </tbody>
 </table>
 <h1 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h1>
-<p>LDpred can then perform PRS analysis in three steps:</p>
 <ol>
+<li>Read in the phenotype and covariate files
+<div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>magrittr<span class="p">)</span>
+phenotype <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">)</span>
+covariate <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">)</span>
+pcs <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">)</span>
+<span class="c1"># rename columns</span>
+<span class="kp">colnames</span><span class="p">(</span>pcs<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span>
+<span class="c1"># generate required table</span>
+pheno <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>phenotype<span class="p">,</span> covariate<span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="kp">merge</span><span class="p">(</span><span class="m">.</span><span class="p">,</span> pcs<span class="p">)</span>
+</pre></div></li>
 <li>
-<p>Preprocessing the base data file:
-<div class="codehilite"><pre><span></span><span class="c1"># There are 253,288 samples in the Height GWAS</span>
-python LDpred.py coord <span class="se">\</span>
-    --rs SNP <span class="se">\</span>
-    --A1 A1 <span class="se">\</span>
-    --A2 A2 <span class="se">\</span>
-    --pos BP <span class="se">\</span>
-    --chr CHR <span class="se">\</span>
-    --pval P <span class="se">\</span>
-    --eff OR <span class="se">\</span>
-    --ssf-format CUSTOM <span class="se">\</span>
-    --N <span class="m">253288</span> <span class="se">\</span>
-    --ssf Height.QC.gz <span class="se">\</span>
-    --out EUR.coord <span class="se">\</span>
-    --gf EUR.QC
+<p>Load in the genotype and summary statistic file using bigsnpr
+<div class="codehilite"><pre><span></span><span class="c1"># load the library</span>
+<span class="kn">library</span><span class="p">(</span>bigsnpr<span class="p">)</span>
+<span class="c1"># now preprocess the bed file. Only need to do once for each data set</span>
+snp_readBed<span class="p">(</span><span class="s">&quot;EUR.QC.bed&quot;</span><span class="p">)</span>
+<span class="c1"># now attach the genotype object</span>
+obj.bigSNP <span class="o">&lt;-</span> snp_attach<span class="p">(</span><span class="s">&quot;EUR.QC.rds&quot;</span><span class="p">)</span>
+<span class="c1"># Next, read in the summary statistic file</span>
+sumstats <span class="o">&lt;-</span> bigreadr<span class="o">::</span>fread2<span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">)</span>
 </pre></div></p>
 </li>
 <li>
-<p>Adjust the effect size estimates:
-<div class="codehilite"><pre><span></span><span class="c1"># LDpred recommend radius to be Total number of SNPs in target / 3000</span>
- python LDpred.py gibbs <span class="se">\</span>
-    --cf EUR.coord <span class="se">\</span>
-    --ldr <span class="m">183</span> <span class="se">\</span>
-    --ldf EUR.ld <span class="se">\</span>
-    --out EUR.weight <span class="se">\</span>
-    --N <span class="m">253288</span>
+<p>Reformat data in preparation of LDpred2
+<div class="codehilite"><pre><span></span><span class="c1"># LDpred 2 require the header to follow the exact naming</span>
+<span class="kp">names</span><span class="p">(</span>sumstats<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;rsid&quot;</span><span class="p">,</span> <span class="s">&quot;chr&quot;</span><span class="p">,</span> <span class="s">&quot;pos&quot;</span><span class="p">,</span> <span class="s">&quot;a1&quot;</span><span class="p">,</span> <span class="s">&quot;a0&quot;</span><span class="p">,</span> <span class="s">&quot;MAF&quot;</span><span class="p">,</span> <span class="s">&quot;beta_se&quot;</span><span class="p">,</span> <span class="s">&quot;p&quot;</span><span class="p">,</span> <span class="s">&quot;n_eff&quot;</span><span class="p">,</span> <span class="s">&quot;INFO&quot;</span><span class="p">,</span> <span class="s">&quot;OR&quot;</span><span class="p">)</span>
+<span class="c1"># Transform the OR into log(OR)</span>
+<span class="c1"># Our SE is the SE of beta. </span>
+<span class="c1"># If the SE is the SE of OR, you will need to transform it (which we will not go into)</span>
+sumstats<span class="o">$</span>beta <span class="o">&lt;-</span> <span class="kp">log</span><span class="p">(</span>sumstats<span class="o">$</span>OR<span class="p">)</span>
+<span class="c1"># extract the SNP information from the genotype</span>
+map <span class="o">&lt;-</span> obj.bigSNP<span class="o">$</span>map<span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="m">2</span><span class="o">:</span><span class="m">3</span><span class="p">)]</span>
+<span class="kp">names</span><span class="p">(</span>map<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;chr&quot;</span><span class="p">,</span> <span class="s">&quot;pos&quot;</span><span class="p">,</span> <span class="s">&quot;a1&quot;</span><span class="p">,</span> <span class="s">&quot;a0&quot;</span><span class="p">)</span>
+<span class="c1"># perform SNP matching</span>
+info_snp <span class="o">&lt;-</span> snp_match<span class="p">(</span>sumstats<span class="p">,</span> map<span class="p">)</span>
+
+<span class="c1"># Rename the data structures</span>
+CHR <span class="o">&lt;-</span> obj.bigSNP<span class="o">$</span>map<span class="o">$</span>chromosome
+POS <span class="o">&lt;-</span> obj.bigSNP<span class="o">$</span>map<span class="o">$</span>physical.pos
+<span class="c1"># get the CM information from 1000 Genome, will download the 1000G file</span>
+POS2 <span class="o">&lt;-</span> snp_asGeneticPos<span class="p">(</span>CHR<span class="p">,</span> POS<span class="p">,</span> dir <span class="o">=</span> <span class="s">&quot;.&quot;</span><span class="p">)</span>
+<span class="c1"># Reformat the phenotype information to match the fam order</span>
+fam.order <span class="o">&lt;-</span> as.data.table<span class="p">(</span>obj.bigSNP<span class="o">$</span>fam<span class="p">)</span>
+setnames<span class="p">(</span>fam.order<span class="p">,</span> 
+            <span class="kt">c</span><span class="p">(</span><span class="s">&quot;family.ID&quot;</span><span class="p">,</span> <span class="s">&quot;sample.ID&quot;</span><span class="p">),</span> 
+            <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">))</span>
+<span class="c1"># This will ensure our phenotype vector y is of the same order as the </span>
+<span class="c1"># family object generated by bigsnpr</span>
+y <span class="o">&lt;-</span> pheno<span class="p">[</span>fam.order<span class="p">,</span> on<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)]</span>
+genotype <span class="o">&lt;-</span> obj.bigSNP<span class="o">$</span>genotypes
+NCORES <span class="o">&lt;-</span> nb_cores<span class="p">()</span>
+<span class="c1"># Use all sample for test</span>
+ind.test <span class="o">&lt;-</span> <span class="m">1</span><span class="o">:</span><span class="kp">nrow</span><span class="p">(</span>genotype<span class="p">)</span>
+<span class="c1"># Prepare data for grid model</span>
+p_seq <span class="o">&lt;-</span> <span class="kp">signif</span><span class="p">(</span>seq_log<span class="p">(</span><span class="m">1e-4</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> length.out <span class="o">=</span> <span class="m">17</span><span class="p">),</span> <span class="m">2</span><span class="p">)</span>
+<span class="c1"># Calculate the null R2</span>
+<span class="c1"># use glm for binary trait (will also need the fmsb package to calculate the pseudo R2)</span>
+null.model <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> collapse<span class="o">=</span><span class="s">&quot;+&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+    <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;Height~Sex+&quot;</span><span class="p">,</span> <span class="m">.</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    as.formula <span class="o">%&gt;%</span>
+    lm<span class="p">(</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>y<span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="kp">summary</span>
+null.r2 <span class="o">&lt;-</span> null.model<span class="o">$</span>r.squared
+reg.formula <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> collapse<span class="o">=</span><span class="s">&quot;+&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+    <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;Height~PRS+Sex+&quot;</span><span class="p">,</span> <span class="m">.</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+    as.formula
 </pre></div></p>
 </li>
 <li>
-<p>Calculate the PRS:
-<div class="codehilite"><pre><span></span>python LDpred.py score <span class="se">\</span>
-    --gf EUR.ldpred <span class="se">\</span>
-    --rf EUR.weight <span class="se">\</span>
-    --out EUR.score <span class="se">\</span>
-    --pf EUR.height <span class="se">\</span>
-    --pf-format LSTANDARD 
+<p>Start running LDpred 2
+<div class="codehilite"><pre><span></span><span class="c1"># Start doing analysis on each chromosome</span>
+y<span class="p">[,</span>Inf.est<span class="o">:=</span><span class="m">0</span><span class="p">]</span>
+y<span class="p">[,</span>auto<span class="o">:=</span><span class="m">0</span><span class="p">]</span>
+y<span class="p">[,</span>grid<span class="o">:=</span><span class="m">0</span><span class="p">]</span>
+<span class="c1"># add progress bar</span>
+pb <span class="o">=</span> txtProgressBar<span class="p">(</span>min <span class="o">=</span> <span class="m">0</span><span class="p">,</span> max <span class="o">=</span> <span class="m">22</span><span class="p">,</span> initial <span class="o">=</span> <span class="m">0</span><span class="p">)</span> 
+<span class="kr">for</span><span class="p">(</span>chr <span class="kr">in</span> <span class="m">1</span><span class="o">:</span><span class="m">22</span><span class="p">){</span>
+    setTxtProgressBar<span class="p">(</span>pb<span class="p">,</span>chr<span class="p">)</span>
+    chr.idx <span class="o">&lt;-</span> <span class="kp">which</span><span class="p">(</span>info_snp<span class="o">$</span>chr <span class="o">==</span> chr<span class="p">)</span>
+    df_beta <span class="o">&lt;-</span> info_snp<span class="p">[</span>chr.idx<span class="p">,</span> 
+                <span class="kt">c</span><span class="p">(</span><span class="s">&quot;beta&quot;</span><span class="p">,</span> <span class="s">&quot;beta_se&quot;</span><span class="p">,</span> <span class="s">&quot;n_eff&quot;</span><span class="p">)]</span>
+    ind.chr <span class="o">&lt;-</span> info_snp<span class="o">$</span><span class="sb">`_NUM_ID_`</span><span class="p">[</span>chr.idx<span class="p">]</span>
+    corr0 <span class="o">&lt;-</span> snp_cor<span class="p">(</span>genotype<span class="p">,</span> ind.col <span class="o">=</span> ind.chr<span class="p">,</span> ncores <span class="o">=</span> NCORES<span class="p">,</span>
+                 infos.pos <span class="o">=</span> POS2<span class="p">[</span>ind.chr<span class="p">],</span> size <span class="o">=</span> <span class="m">3</span> <span class="o">/</span> <span class="m">1000</span><span class="p">)</span>
+    corr <span class="o">&lt;-</span> bigsparser<span class="o">::</span>as_SFBM<span class="p">(</span>as<span class="p">(</span>corr0<span class="p">,</span> <span class="s">&quot;dgCMatrix&quot;</span><span class="p">))</span>
+    ldsc <span class="o">&lt;-</span> snp_ldsc2<span class="p">(</span>corr0<span class="p">,</span> df_beta<span class="p">)</span>
+    h2_est <span class="o">&lt;-</span> ldsc<span class="p">[[</span><span class="s">&quot;h2&quot;</span><span class="p">]]</span>
+    h2_seq <span class="o">&lt;-</span> <span class="kp">round</span><span class="p">(</span>h2_est <span class="o">*</span> <span class="kt">c</span><span class="p">(</span><span class="m">0.7</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1.4</span><span class="p">),</span> <span class="m">4</span><span class="p">)</span>
+    grid.param <span class="o">&lt;-</span> <span class="kp">expand.grid</span><span class="p">(</span>p <span class="o">=</span> p_seq<span class="p">,</span> h2 <span class="o">=</span> h2_seq<span class="p">,</span> sparse <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="kc">FALSE</span><span class="p">,</span> <span class="kc">TRUE</span><span class="p">))</span>
+    <span class="c1"># Get adjusted beta from infinitesimal model</span>
+    beta_inf <span class="o">&lt;-</span> snp_ldpred2_inf<span class="p">(</span>corr<span class="p">,</span> df_beta<span class="p">,</span> h2 <span class="o">=</span> h2_est<span class="p">)</span>
+    <span class="c1"># Get adjusted beta from grid model</span>
+    beta_grid <span class="o">&lt;-</span> snp_ldpred2_grid<span class="p">(</span>corr<span class="p">,</span> df_beta<span class="p">,</span> grid.param<span class="p">,</span> ncores <span class="o">=</span> NCORES<span class="p">)</span>
+    <span class="c1"># Get adjusted beta from the auto model</span>
+    multi_auto <span class="o">&lt;-</span> snp_ldpred2_auto<span class="p">(</span>corr<span class="p">,</span> df_beta<span class="p">,</span> h2_init <span class="o">=</span> h2_est<span class="p">,</span>
+                               vec_p_init <span class="o">=</span> seq_log<span class="p">(</span><span class="m">1e-4</span><span class="p">,</span> <span class="m">0.9</span><span class="p">,</span> length.out <span class="o">=</span> NCORES<span class="p">),</span>
+                               ncores <span class="o">=</span> NCORES<span class="p">)</span>
+    pred_auto <span class="o">&lt;-</span> big_prodMat<span class="p">(</span>genotype<span class="p">,</span> beta_auto<span class="p">,</span> ind.row <span class="o">=</span> ind.val<span class="p">,</span> ind.col <span class="o">=</span> ind.chr2<span class="p">)</span>
+    <span class="c1"># scale the PRS generated from AUTO</span>
+    pred_scaled <span class="o">&lt;-</span> <span class="kp">apply</span><span class="p">(</span>pred_auto<span class="p">,</span> <span class="m">2</span><span class="p">,</span> sd<span class="p">)</span>
+    final_beta_auto <span class="o">&lt;-</span> <span class="kp">rowMeans</span><span class="p">(</span>beta_auto<span class="p">[,</span> <span class="kp">abs</span><span class="p">(</span>sc <span class="o">-</span> median<span class="p">(</span>sc<span class="p">))</span> <span class="o">&lt;</span> <span class="m">3</span> <span class="o">*</span> mad<span class="p">(</span>sc<span class="p">)])</span>
+    pred_auto <span class="o">&lt;-</span> big_prodMat<span class="p">(</span>genotype<span class="p">,</span> final_beta_auto<span class="p">,</span> ind.row <span class="o">=</span> ind.val<span class="p">,</span> ind.col <span class="o">=</span> ind.chr2<span class="p">)</span>
+    <span class="c1"># Get infinitesimal PRS</span>
+    pred_inf <span class="o">&lt;-</span> big_prodVec<span class="p">(</span>genotype<span class="p">,</span> beta_inf<span class="p">,</span> ind.row <span class="o">=</span> ind.test<span class="p">,</span> ind.col <span class="o">=</span> ind.chr<span class="p">)</span>
+    <span class="c1"># Get the grid PRSs</span>
+    pred_grid <span class="o">&lt;-</span> big_prodMat<span class="p">(</span>genotype<span class="p">,</span> beta_grid<span class="p">,</span> ind.col <span class="o">=</span> ind.chr<span class="p">)</span>
+    <span class="c1"># Get the Auto PRS</span>
+    pred_auto <span class="o">&lt;-</span> big_prodMat<span class="p">(</span>genotype<span class="p">,</span> beta_auto<span class="p">,</span> ind.row <span class="o">=</span> ind.test<span class="p">,</span> ind.col <span class="o">=</span> ind.chr<span class="p">)</span>
+    <span class="c1"># add up the calculated PRS</span>
+    y<span class="p">[,</span>Inf.est<span class="o">:=</span>Inf.est<span class="o">+</span>pred_inf<span class="p">]</span>
+    <span class="c1"># for auto and grid, we want to retain the &quot;best&quot; prs only?</span>
+    indep <span class="o">&lt;-</span> copy<span class="p">(</span>y<span class="p">)</span> 
+    max.grid.r2 <span class="o">&lt;-</span> <span class="m">0</span>
+    max.grid.id <span class="o">&lt;-</span> <span class="m">0</span>
+    <span class="kr">for</span><span class="p">(</span>i <span class="kr">in</span> <span class="m">1</span><span class="o">:</span><span class="kp">ncol</span><span class="p">(</span>pred_grid<span class="p">)){</span>
+        indep<span class="p">[,</span>PRS<span class="o">:=</span>pred_grid<span class="p">[,</span>i<span class="p">]]</span>
+        model <span class="o">&lt;-</span> lm<span class="p">(</span>reg.formula<span class="p">,</span> data<span class="o">=</span>indep<span class="p">)</span> <span class="o">%&gt;%</span>
+            <span class="kp">summary</span>
+        prs.r2 <span class="o">&lt;-</span> model<span class="o">$</span>r.squared <span class="o">-</span> null.r2
+        <span class="kr">if</span><span class="p">(</span>max.grid.r2 <span class="o">&lt;</span> prs.r2<span class="p">){</span>
+            max.grid.r2 <span class="o">&lt;-</span> prs.r2
+            max.grid.id <span class="o">&lt;-</span> i
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="c1"># add up the calculated grid PRS</span>
+    y<span class="p">[,</span>grid<span class="o">:=</span>grid<span class="o">+</span>pred_grid<span class="p">[,</span>max.grid.id<span class="p">]]</span>
+    <span class="c1"># Do the same for auto</span>
+    max.auto.r2 <span class="o">&lt;-</span> <span class="m">0</span>
+    max.auto.id <span class="o">&lt;-</span> <span class="m">0</span>
+    <span class="kr">for</span><span class="p">(</span>i <span class="kr">in</span> <span class="m">1</span><span class="o">:</span><span class="kp">ncol</span><span class="p">(</span>pred_auto<span class="p">)){</span>
+        indep<span class="p">[,</span>PRS<span class="o">:=</span>pred_auto<span class="p">[,</span>i<span class="p">]]</span>
+        model <span class="o">&lt;-</span> lm<span class="p">(</span>reg.formula<span class="p">,</span> data<span class="o">=</span>indep<span class="p">)</span> <span class="o">%&gt;%</span>
+            <span class="kp">summary</span>
+        prs.r2 <span class="o">&lt;-</span> model<span class="o">$</span>r.squared <span class="o">-</span> null.r2
+        <span class="kr">if</span><span class="p">(</span>max.auto.r2 <span class="o">&lt;</span> prs.r2<span class="p">){</span>
+            max.auto.r2 <span class="o">&lt;-</span> prs.r2
+            max.auto.id <span class="o">&lt;-</span> i
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="c1"># add up the calculated grid PRS</span>
+    y<span class="p">[,</span>auto<span class="o">:=</span>auto<span class="o">+</span>pred_auto<span class="p">[,</span>max.auto.id<span class="p">]]</span>
+<span class="p">}</span>
+<span class="kp">print</span><span class="p">(</span><span class="s">&quot;Completed&quot;</span><span class="p">)</span>
+</pre></div></p>
+</li>
+<li>
+<p>Get the final performance of the LDpred models
+<div class="codehilite"><pre><span></span>    <span class="c1"># there are 3 models: inf, auto and grid</span>
+    inf.model <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> collapse<span class="o">=</span><span class="s">&quot;+&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+        <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;Height~Inf.est+Sex+&quot;</span><span class="p">,</span> <span class="m">.</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+        as.formula <span class="o">%&gt;%</span>
+        lm<span class="p">(</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>y<span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="kp">summary</span>
+    auto.model <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> collapse<span class="o">=</span><span class="s">&quot;+&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+        <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;Height~auto+Sex+&quot;</span><span class="p">,</span> <span class="m">.</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+        as.formula <span class="o">%&gt;%</span>
+        lm<span class="p">(</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>y<span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="kp">summary</span>
+    grid.model <span class="o">&lt;-</span> <span class="kp">paste</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> collapse<span class="o">=</span><span class="s">&quot;+&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+        <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;Height~grid+Sex+&quot;</span><span class="p">,</span> <span class="m">.</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+        as.formula <span class="o">%&gt;%</span>
+        lm<span class="p">(</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>y<span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="kp">summary</span>
+
+    result <span class="o">&lt;-</span> data.table<span class="p">(</span>   
+                infinitesimal<span class="o">=</span>inf.model<span class="o">$</span>r.squared<span class="o">-</span>null.r2<span class="p">,</span>
+                grid<span class="o">=</span>grid.model<span class="o">$</span>r.squared<span class="o">-</span>null.r2<span class="p">,</span>
+                auto<span class="o">=</span>auto.model<span class="o">$</span>r.squared<span class="o">-</span>null.r2<span class="p">,</span>
+                null<span class="o">=</span>null.r2<span class="p">)</span>
+    <span class="kp">print</span><span class="p">(</span>result<span class="p">)</span>
 </pre></div></p>
 </li>
 </ol>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>To obtain the PRS <span class="arithmatex">\(R^2\)</span> according to the use of different parameters, and / or 
-to adjust for covariates, you may need to use <code>R</code> (see <a href="https://github.com/bvilhjal/ldpred/wiki/Q-and-A#im-having-trouble-with-covariates-can-you-help-me">here</a>).</p>
-</div>
               
             </div>
           </div>

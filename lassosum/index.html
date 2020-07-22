@@ -162,7 +162,7 @@
 install_github<span class="p">(</span><span class="s">&quot;tshmak/lassosum&quot;</span><span class="p">)</span>
 </pre></div>
 
-<p>Again, we assume that we have the following files: </p>
+<p>Again, we assume that we have the following files (or you can download it from <a href="https://drive.google.com/file/d/1_ujJhCFAAHp_fA2U291pBUPTeF_FQLyu/view?usp=sharing">here</a>): </p>
 <table>
 <thead>
 <tr>
@@ -225,8 +225,6 @@ ld.file <span class="o">&lt;-</span> <span class="kp">system.file</span><span cl
 prefix <span class="o">&lt;-</span> <span class="s">&quot;EUR&quot;</span>
 <span class="c1"># Read in the target phenotype file</span>
 target.pheno <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">)[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="s">&quot;Height&quot;</span><span class="p">)]</span>
-<span class="c1"># Read in samples to include in the analysis</span>
-target.keep <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.valid.sample&quot;</span><span class="p">)[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)]</span>
 <span class="c1"># Read in the summary statistics</span>
 ss <span class="o">&lt;-</span> fread<span class="p">(</span>sum.stat<span class="p">)</span>
 <span class="c1"># Number of sample in base</span>
@@ -240,13 +238,9 @@ cor <span class="o">&lt;-</span> p2cor<span class="p">(</span>p <span class="o">
         n <span class="o">=</span> size<span class="p">,</span>
         sign <span class="o">=</span> <span class="kp">log</span><span class="p">(</span>ss<span class="o">$</span>OR<span class="p">)</span>
         <span class="p">)</span>
-<span class="c1"># Because FID of our samples are all 0, we might encounter problem with lassosum</span>
-<span class="c1"># we need to provide a T/F vector instead of the target.keep file</span>
-target.keep<span class="p">[,</span> ID<span class="o">:=</span><span class="kp">do.call</span><span class="p">(</span><span class="kp">paste</span><span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="m">.</span>SD<span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;:&quot;</span><span class="p">)),</span><span class="m">.</span>SDcols<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">)]</span>
 fam <span class="o">&lt;-</span> fread<span class="p">(</span><span class="kp">paste0</span><span class="p">(</span>bfile<span class="p">,</span> <span class="s">&quot;.fam&quot;</span><span class="p">))</span>
 fam<span class="p">[,</span>ID<span class="o">:=</span><span class="kp">do.call</span><span class="p">(</span><span class="kp">paste</span><span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="m">.</span>SD<span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;:&quot;</span><span class="p">)),</span><span class="m">.</span>SDcols<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">)]</span>
 
-keep <span class="o">&lt;-</span> fam<span class="o">$</span>ID <span class="o">%in%</span> target.keep<span class="o">$</span>ID
 <span class="c1"># Run the lassosum pipeline</span>
 out <span class="o">&lt;-</span> lassosum.pipeline<span class="p">(</span>
     cor <span class="o">=</span> cor<span class="p">,</span>
@@ -255,9 +249,7 @@ out <span class="o">&lt;-</span> lassosum.pipeline<span class="p">(</span>
     A1 <span class="o">=</span> ss<span class="o">$</span>A1<span class="p">,</span>
     A2 <span class="o">=</span> ss<span class="o">$</span>A2<span class="p">,</span>
     ref.bfile <span class="o">=</span> bfile<span class="p">,</span>
-    keep.ref <span class="o">=</span> keep<span class="p">,</span>
     test.bfile <span class="o">=</span> bfile<span class="p">,</span>
-    keep.test <span class="o">=</span> keep<span class="p">,</span>
     LDblocks <span class="o">=</span> ld
 <span class="p">)</span>
 <span class="c1"># Store the R2 results</span>
