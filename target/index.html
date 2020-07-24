@@ -207,23 +207,23 @@ You can download the data <a href="https://drive.google.com/file/d/1uhJR_3sn7RA8
 <tbody>
 <tr>
 <td align="center"><strong>EUR.bed</strong></td>
-<td align="center">940f5a760b41270662eba6264b262a2d</td>
+<td align="center">98bcef133f683b1272d3ea5f97742e0e</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.bim</strong></td>
-<td align="center">a528020cc2448aa04a7499f13bf9f16a</td>
+<td align="center">6b286002904880055a9c94e01522f059</td>
 </tr>
 <tr>
-<td align="center"><strong>EUR.covariate</strong></td>
-<td align="center">afff13f8f9e15815f2237a62b8bec00b</td>
+<td align="center"><strong>EUR.cov</strong></td>
+<td align="center">85ed18288c708e095385418517e9c3bd</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.fam</strong></td>
-<td align="center">17e8184fb03c690db6980bb7499d4982</td>
+<td align="center">e7b856f0c7bcaffc8405926d08386e97</td>
 </tr>
 <tr>
 <td align="center"><strong>EUR.height</strong></td>
-<td align="center">de68203f7f35744e987981ec5ffad35e</td>
+<td align="center">dd445ce969a81cded20da5c88b82d4df</td>
 </tr>
 </tbody>
 </table>
@@ -239,7 +239,7 @@ individuals with low genotyping rate
 <p>The following <code>plink</code> command applies some of these QC metrics to the target data:</p>
 <div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR <span class="se">\</span>
-    --maf <span class="m">0</span>.05 <span class="se">\</span>
+    --maf <span class="m">0</span>.01 <span class="se">\</span>
     --hwe 1e-6 <span class="se">\</span>
     --geno <span class="m">0</span>.01 <span class="se">\</span>
     --mind <span class="m">0</span>.01 <span class="se">\</span>
@@ -265,7 +265,7 @@ individuals with low genotyping rate
 </tr>
 <tr>
 <td align="center">maf</td>
-<td align="center">0.05</td>
+<td align="center">0.01</td>
 <td align="left">Removes all SNPs with minor allele frequency less than 0.05. Genotyping errors typically have a larger influence on SNPs with low MAF. Studies with large sample sizes could apply a lower MAF threshold</td>
 </tr>
 <tr>
@@ -301,10 +301,10 @@ individuals with low genotyping rate
 </tbody>
 </table>
 <details class="note"><summary>How many SNPs and samples were filtered?</summary><ul>
-<li><code>5</code> samples were removed due to a high rate of genotype missingness</li>
-<li><code>1</code> SNP were removed due to missing genotype data</li>
-<li><code>872</code> SNPs were removed due to being out of Hardy-Weinberg Equilibrium</li>
-<li><code>242,459</code> SNPs were removed due to low minor allele frequency</li>
+<li><code>14</code> samples were removed due to a high rate of genotype missingness</li>
+<li><code>5,353</code> SNP were removed due to missing genotype data</li>
+<li><code>944</code> SNPs were removed due to being out of Hardy-Weinberg Equilibrium</li>
+<li><code>5,061</code> SNPs were removed due to low minor allele frequency</li>
 </ul>
 </details>
 <div class="admonition note">
@@ -395,7 +395,7 @@ fwrite<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</
 </pre></div></div>
 </div>
 <details class="note"><summary>How many samples were excluded due to high heterozygosity rate?</summary><ul>
-<li><code>7</code> samples were excluded</li>
+<li><code>2</code> samples were excluded</li>
 </ul>
 </details>
 <h1 id="35-ambiguous-snps"># Ambiguous SNPs<a class="headerlink" href="#35-ambiguous-snps" title="Permanent link">&para;</a></h1>
@@ -633,7 +633,7 @@ fwrite<span class="p">(</span>dat<span class="p">[</span>STATUS<span class="o">=
 </pre></div></div>
 </div>
 <details class="note"><summary>How many samples were excluded due mismatched Sex information?</summary><ul>
-<li><code>2</code> samples were excluded</li>
+<li><code>4</code> samples were excluded</li>
 </ul>
 </details>
 <h1 id="35-sample-overlap"># Sample overlap<a class="headerlink" href="#35-sample-overlap" title="Permanent link">&para;</a></h1>
@@ -651,16 +651,16 @@ Individuals that have a first or second degree relative in the sample (<span cla
 </pre></div>
 
 <details class="note"><summary>How many related samples were excluded?</summary><ul>
-<li><code>2</code> samples were excluded</li>
+<li><code>0</code> samples were excluded</li>
 </ul>
 </details>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>A greedy algorithm is used to remove closely related individuals in a way that optimises the size of the sample retained.                However, the algorithm is dependent on the random seed used, which can generate different results. Therefore, to reproduce
+<p>A greedy algorithm is used to remove closely related individuals in a way that optimizes the size of the sample retained.                However, the algorithm is dependent on the random seed used, which can generate different results. Therefore, to reproduce
 the same result, you will need to specify the same random seed. </p>
 <p>PLINK's algorithm for removing related individuals does not account for the phenotype under study. 
 To minimize the removal of cases of a disease, the following algorithm can be used instead: 
-<a href="https://github.com/choishingwan/GreedyRelated">GreedyRelated</a>.</p>
+<a href="https://gitlab.com/choishingwan/GreedyRelated">GreedyRelated</a>.</p>
 </div>
 <h1 id="generate-final-qced-target-data-file">Generate final QC'ed target data file<a class="headerlink" href="#generate-final-qced-target-data-file" title="Permanent link">&para;</a></h1>
 <p>After performing the full analysis, you can generate a QC'ed data set with the following command:

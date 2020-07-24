@@ -274,9 +274,9 @@ ggsave<span class="p">(</span><span class="s">&quot;EUR.height.bar.png&quot;</sp
 <input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
 <label for="__tab_2_0">Without ggplot2</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># Read in the files</span>
-prs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.0.2.profile&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+prs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.0.3.profile&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 height <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
-sex <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+sex <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 <span class="c1"># Rename the sex</span>
 sex<span class="o">$</span>Sex <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span>sex<span class="o">$</span>Sex<span class="p">)</span>
 <span class="kp">levels</span><span class="p">(</span>sex<span class="o">$</span>Sex<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;Male&quot;</span><span class="p">,</span> <span class="s">&quot;Female&quot;</span><span class="p">)</span>
@@ -293,9 +293,9 @@ plot<span class="p">(</span>x<span class="o">=</span>dat<span class="o">$</span>
 <label for="__tab_2_1">ggplot2</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
 <span class="c1"># Read in the files</span>
-prs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.0.2.profile&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+prs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.0.3.profile&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 height <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
-sex <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+sex <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 <span class="c1"># Rename the sex</span>
 sex<span class="o">$</span>Sex <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span>sex<span class="o">$</span>Sex<span class="p">)</span>
 <span class="kp">levels</span><span class="p">(</span>sex<span class="o">$</span>Sex<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;Male&quot;</span><span class="p">,</span> <span class="s">&quot;Female&quot;</span><span class="p">)</span>

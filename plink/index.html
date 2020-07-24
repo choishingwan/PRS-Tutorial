@@ -220,7 +220,7 @@ write.table<span class="p">(</span>dat<span class="p">,</span> <span class="s">&
 <label for="__tab_1_1">With data.table</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
 dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">)</span>
-fwrite<span class="p">(</span>dat<span class="p">[,</span>OR<span class="o">:=</span><span class="kp">log</span><span class="p">(</span>OR<span class="p">)],</span> <span class="s">&quot;Height.QC.Transformed&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
+fwrite<span class="p">(</span>dat<span class="p">[,</span>BETA<span class="o">:=</span><span class="kp">log</span><span class="p">(</span>OR<span class="p">)],</span> <span class="s">&quot;Height.QC.Transformed&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
 <span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 </div>
@@ -308,8 +308,8 @@ Make sure to use the population that most closely reflects represents the base s
 <p>We will need three files:</p>
 <ol>
 <li>The base data file: <strong>Height.QC.Transformed</strong></li>
-<li>A file containing SNP IDs and their corresponding P-values (<code>$1</code> because SNP ID is located in the first column; <code>$8</code> because the P-value is located in the eighth column)
-<div class="codehilite"><pre><span></span>awk <span class="s1">&#39;{print $1,$8}&#39;</span> Height.QC.Transformed &gt; SNP.pvalue
+<li>A file containing SNP IDs and their corresponding P-values (<code>$3</code> because SNP ID is located in the third column; <code>$8</code> because the P-value is located in the eighth column)
+<div class="codehilite"><pre><span></span>awk <span class="s1">&#39;{print $3,$8}&#39;</span> Height.QC.Transformed &gt; SNP.pvalue
 </pre></div></li>
 <li>A file containing the different P-value thresholds for inclusion of SNPs in the PRS. Here calculate PRS corresponding to a few thresholds for illustration purposes:
 <div class="codehilite"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;0.001 0 0.001&quot;</span> &gt; range_list
@@ -346,7 +346,7 @@ The format of the <strong>range_list</strong> file should be as follows:</li>
 <p>We can then calculate the PRS with the following <code>plink</code> command:</p>
 <p><div class="codehilite"><pre><span></span>plink <span class="se">\</span>
     --bfile EUR.QC <span class="se">\</span>
-    --score Height.QC.Transformed <span class="m">1</span> <span class="m">4</span> <span class="m">11</span> header <span class="se">\</span>
+    --score Height.QC.Transformed <span class="m">3</span> <span class="m">4</span> <span class="m">12</span> header <span class="se">\</span>
     --q-score-range range_list SNP.pvalue <span class="se">\</span>
     --extract EUR.valid.snp <span class="se">\</span>
     --out EUR
@@ -363,8 +363,8 @@ The meaning of the new parameters are as follows:</p>
 <tbody>
 <tr>
 <td align="center">score</td>
-<td align="center">Height.QC.Transformed 1 4 11 header</td>
-<td align="left">We read from the <strong>Height.QC.Transformed</strong> file, assuming that the <code>1</code>st column is the SNP ID; <code>4</code>th column is the effective allele information; the <code>11</code>th column is the effect size estimate; and that the file contains a <code>header</code></td>
+<td align="center">Height.QC.Transformed 3 4 11 header</td>
+<td align="left">We read from the <strong>Height.QC.Transformed</strong> file, assuming that the <code>3</code>st column is the SNP ID; <code>4</code>th column is the effective allele information; the <code>12</code>th column is the effect size estimate; and that the file contains a <code>header</code></td>
 </tr>
 <tr>
 <td align="center">q-score-range</td>
@@ -433,7 +433,7 @@ pcs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="
 <span class="c1"># (1:6 because there are 6 PCs)</span>
 <span class="kp">colnames</span><span class="p">(</span>pcs<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span> 
 <span class="c1"># Read in the covariates (here, it is sex)</span>
-covariate <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+covariate <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 <span class="c1"># Now merge the files</span>
 pheno <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span><span class="kp">merge</span><span class="p">(</span>phenotype<span class="p">,</span> covariate<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)),</span> pcs<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">))</span>
 <span class="c1"># We can then calculate the null model (model with PRS) using a linear regression </span>
@@ -474,7 +474,7 @@ prs.result<span class="p">[</span><span class="kp">which.max</span><span class="
 phenotype <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 pcs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
 <span class="kp">colnames</span><span class="p">(</span>pcs<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span> 
-covariate <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+covariate <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 pheno <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span><span class="kp">merge</span><span class="p">(</span>phenotype<span class="p">,</span> covariate<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)),</span> pcs<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">))</span>
 null.r2 <span class="o">&lt;-</span> <span class="kp">summary</span><span class="p">(</span>lm<span class="p">(</span>Height<span class="o">~</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>pheno<span class="p">[,</span><span class="o">!</span><span class="kp">colnames</span><span class="p">(</span>pheno<span class="p">)</span><span class="o">%in%</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">)]))</span><span class="o">$</span>r.squared
 prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
@@ -503,7 +503,7 @@ p.threshold <span class="o">&lt;-</span> <span class="kt">c</span><span class="p
 phenotype <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">)</span>
 pcs <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span> <span class="o">%&gt;%</span>
     setnames<span class="p">(</span><span class="m">.</span><span class="p">,</span> <span class="kp">colnames</span><span class="p">(</span><span class="m">.</span><span class="p">),</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span> <span class="p">)</span>
-covariate <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">)</span>
+covariate <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">)</span>
 pheno <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>phenotype<span class="p">,</span> covariate<span class="p">)</span> <span class="o">%&gt;%</span>
         <span class="kp">merge</span><span class="p">(</span><span class="m">.</span><span class="p">,</span> pcs<span class="p">)</span>
 null.r2 <span class="o">&lt;-</span> <span class="kp">summary</span><span class="p">(</span>lm<span class="p">(</span>Height<span class="o">~</span><span class="m">.</span><span class="p">,</span> data<span class="o">=</span>pheno<span class="p">[,</span><span class="o">-</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">)]))</span><span class="o">$</span>r.squared
@@ -529,9 +529,9 @@ prs.result <span class="o">&lt;-</span> <span class="kc">NULL</span>
 <span class="kp">q</span><span class="p">()</span> <span class="c1"># exit R</span>
 </pre></div></div>
 </div>
-<details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.1</p>
+<details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.3</p>
 </details>
-<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.04776492</p>
+<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.1638468</p>
 </details>
               
             </div>

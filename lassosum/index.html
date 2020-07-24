@@ -192,7 +192,7 @@ install_github<span class="p">(</span><span class="s">&quot;tshmak/lassosum&quot
 <td align="center">This file contains the phenotype of the samples</td>
 </tr>
 <tr>
-<td align="center"><strong>EUR.covariate</strong></td>
+<td align="center"><strong>EUR.cov</strong></td>
 <td align="center">This file contains the covariates of the samples</td>
 </tr>
 <tr>
@@ -211,7 +211,7 @@ install_github<span class="p">(</span><span class="s">&quot;tshmak/lassosum&quot
 sum.stat <span class="o">&lt;-</span> <span class="s">&quot;Height.QC.gz&quot;</span>
 bfile <span class="o">&lt;-</span> <span class="s">&quot;EUR.QC&quot;</span>
 <span class="c1"># Read in and process the covariates</span>
-covariate <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">)</span>
+covariate <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">)</span>
 pcs <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
     setnames<span class="p">(</span><span class="m">.</span><span class="p">,</span> <span class="kp">colnames</span><span class="p">(</span><span class="m">.</span><span class="p">),</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">)))</span>
 <span class="c1"># Need as.data.frame here as lassosum doesn&#39;t handle data.table </span>
@@ -227,15 +227,13 @@ prefix <span class="o">&lt;-</span> <span class="s">&quot;EUR&quot;</span>
 target.pheno <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">)[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="s">&quot;Height&quot;</span><span class="p">)]</span>
 <span class="c1"># Read in the summary statistics</span>
 ss <span class="o">&lt;-</span> fread<span class="p">(</span>sum.stat<span class="p">)</span>
-<span class="c1"># Number of sample in base</span>
-size <span class="o">&lt;-</span> <span class="m">253288</span>
 <span class="c1"># Remove P-value = 0, which causes problem in the transformation</span>
 ss <span class="o">&lt;-</span> ss<span class="p">[</span><span class="o">!</span>P <span class="o">==</span> <span class="m">0</span><span class="p">]</span>
 <span class="c1"># Read in the LD blocks</span>
 ld <span class="o">&lt;-</span> fread<span class="p">(</span>ld.file<span class="p">)</span>
 <span class="c1"># Transform the P-values into correlation</span>
 cor <span class="o">&lt;-</span> p2cor<span class="p">(</span>p <span class="o">=</span> ss<span class="o">$</span>P<span class="p">,</span>
-        n <span class="o">=</span> size<span class="p">,</span>
+        n <span class="o">=</span> ss<span class="o">$</span>N<span class="p">,</span>
         sign <span class="o">=</span> <span class="kp">log</span><span class="p">(</span>ss<span class="o">$</span>OR<span class="p">)</span>
         <span class="p">)</span>
 fam <span class="o">&lt;-</span> fread<span class="p">(</span><span class="kp">paste0</span><span class="p">(</span>bfile<span class="p">,</span> <span class="s">&quot;.fam&quot;</span><span class="p">))</span>
@@ -258,7 +256,7 @@ target.res <span class="o">&lt;-</span> validate<span class="p">(</span>out<span
 r2 <span class="o">&lt;-</span> <span class="kp">max</span><span class="p">(</span>target.res<span class="o">$</span>validation.table<span class="o">$</span>value<span class="p">)</span><span class="o">^</span><span class="m">2</span>
 </pre></div>
 
-<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.03818004</p>
+<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.2395471</p>
 </details>
               
             </div>

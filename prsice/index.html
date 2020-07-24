@@ -213,20 +213,22 @@ On this page you will run a PRS analysis using PRSice-2, which implements the st
 <div class="superfences-tabs">
 <input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
 <label for="__tab_1_0">without data.table</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>covariate <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>covariate <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">T</span><span class="p">)</span>
 pcs <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
 <span class="kp">colnames</span><span class="p">(</span>pcs<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span>
 cov <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>covariate<span class="p">,</span> pcs<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">))</span>
-write.table<span class="p">(</span>cov<span class="p">,</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+write.table<span class="p">(</span>cov<span class="p">,</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> quote<span class="o">=</span><span class="bp">F</span><span class="p">,</span> row.names<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
+<span class="kp">q</span><span class="p">()</span>
 </pre></div></div>
 <input name="__tabs_1" type="radio" id="__tab_1_1" />
 <label for="__tab_1_1">with data.table</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
-covariate <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">)</span>
+covariate <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">)</span>
 pcs <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">,</span> header<span class="o">=</span><span class="bp">F</span><span class="p">)</span>
 <span class="kp">colnames</span><span class="p">(</span>pcs<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">))</span>
 cov <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>covariate<span class="p">,</span> pcs<span class="p">)</span>
-fwrite<span class="p">(</span>cov<span class="p">,</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
+fwrite<span class="p">(</span>cov<span class="p">,</span><span class="s">&quot;EUR.covariate&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
+<span class="kp">q</span><span class="p">()</span>
 </pre></div></div>
 </div>
 <p>which generates <strong>EUR.cov</strong>.</p>
@@ -280,9 +282,9 @@ fwrite<span class="p">(</span>cov<span class="p">,</span><span class="s">&quot;E
 </div>
 <p>This will automatically perform "high-resolution scoring" and generate the "best-fit" PRS (in <strong>EUR.best</strong>), with associated plots of the results. 
 Users should read Section 4.6 of our paper to learn more about issues relating to overfitting in PRS analyses.  </p>
-<details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.15</p>
+<details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.1388</p>
 </details>
-<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.0495036</p>
+<details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.174227</p>
 </details>
               
             </div>
