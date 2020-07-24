@@ -14,7 +14,7 @@ library(devtools)
 install_github("tshmak/lassosum")
 ```
 
-Again, we assume that we have the following files (or you can download it from [here](https://drive.google.com/file/d/1_ujJhCFAAHp_fA2U291pBUPTeF_FQLyu/view?usp=sharing)): 
+Again, we assume that we have the following files (or you can download it from [here](https://drive.google.com/file/d/1x_G0Gxk9jFMY-PMqwtg6-vdEyUPp5p5u/view?usp=sharing)): 
 
 |File Name | Description|
 |:-:|:-:|
