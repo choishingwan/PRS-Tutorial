@@ -26,11 +26,11 @@ Usually we do not need to download and transfer the target data file because it 
 
     |File|md5sum|
     |:-:|:-:|
-    |**EUR.bed**           |940f5a760b41270662eba6264b262a2d|
-    |**EUR.bim**           |a528020cc2448aa04a7499f13bf9f16a|
-    |**EUR.covariate**     |afff13f8f9e15815f2237a62b8bec00b|
-    |**EUR.fam**           |17e8184fb03c690db6980bb7499d4982|
-    |**EUR.height**        |de68203f7f35744e987981ec5ffad35e|
+    |**EUR.bed**           |98bcef133f683b1272d3ea5f97742e0e|
+    |**EUR.bim**           |6b286002904880055a9c94e01522f059|
+    |**EUR.cov**           |85ed18288c708e095385418517e9c3bd|
+    |**EUR.fam**           |e7b856f0c7bcaffc8405926d08386e97|
+    |**EUR.height**        |dd445ce969a81cded20da5c88b82d4df|
 
 # \# Genome build
 As stated in the base data section, the genome build for our base and target data is the same, as it should be.
@@ -47,7 +47,7 @@ The following `plink` command applies some of these QC metrics to the target dat
 ```bash
 plink \
     --bfile EUR \
-    --maf 0.05 \
+    --maf 0.01 \
     --hwe 1e-6 \
     --geno 0.01 \
     --mind 0.01 \
@@ -61,7 +61,7 @@ Each of the parameters corresponds to the following
 | Paramter | Value | Description|
 |:-:|:-:|:-|
 | bfile | EUR | Informs `plink` that the input genotype files should have a prefix of `EUR` |
-| maf | 0.05 | Removes all SNPs with minor allele frequency less than 0.05. Genotyping errors typically have a larger influence on SNPs with low MAF. Studies with large sample sizes could apply a lower MAF threshold|
+| maf | 0.01 | Removes all SNPs with minor allele frequency less than 0.05. Genotyping errors typically have a larger influence on SNPs with low MAF. Studies with large sample sizes could apply a lower MAF threshold|
 | hwe | 1e-6 | Removes SNPs with low P-value from the Hardy-Weinberg Equilibrium Fisher's exact or chi-squared test. SNPs with significant P-values from the HWE test are more likely affected by genotyping error or the effects of natural selection. Filtering should be performed on the control samples to avoid filtering SNPs that are causal (under selection in cases)|
 | geno | 0.01 | Excludes SNPs that are missing in a high fraction of subjects. A two-stage filtering process is usually performed (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/)).|
 | mind | 0.01 | Excludes individuals who have a high rate of genotype missingness, since this may indicate problems in the DNA sample or processing. (see [Marees et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/) for more details).|
@@ -70,10 +70,10 @@ Each of the parameters corresponds to the following
 | out | EUR.QC | Informs `plink` that all output should have a prefix of `EUR.QC` |
 
 ??? note "How many SNPs and samples were filtered?"
-    - `5` samples were removed due to a high rate of genotype missingness
-    - `1` SNP were removed due to missing genotype data
-    -  `872` SNPs were removed due to being out of Hardy-Weinberg Equilibrium
-    - `242,459` SNPs were removed due to low minor allele frequency
+    - `14` samples were removed due to a high rate of genotype missingness
+    - `5,353` SNP were removed due to missing genotype data
+    -  `944` SNPs were removed due to being out of Hardy-Weinberg Equilibrium
+    - `5,061` SNPs were removed due to low minor allele frequency
 
 !!! note
     Normally, we can generate a new genotype file using the new sample list.
@@ -142,7 +142,7 @@ q() # exit R
 ```
 
 ??? note "How many samples were excluded due to high heterozygosity rate?"
-    - `7` samples were excluded
+    - `2` samples were excluded
 
 # \# Ambiguous SNPs
 These were removed during the base data QC.
@@ -385,7 +385,7 @@ q() # exit R
 ```
 
 ??? note "How many samples were excluded due mismatched Sex information?"
-    - `2` samples were excluded
+    - `4` samples were excluded
 
 # \# Sample overlap
 Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper](https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). 
@@ -406,15 +406,15 @@ plink \
 ```
 
 ??? note "How many related samples were excluded?"
-    - `2` samples were excluded
+    - `0` samples were excluded
 
 !!! note
-    A greedy algorithm is used to remove closely related individuals in a way that optimises the size of the sample retained.                However, the algorithm is dependent on the random seed used, which can generate different results. Therefore, to reproduce
+    A greedy algorithm is used to remove closely related individuals in a way that optimizes the size of the sample retained.                However, the algorithm is dependent on the random seed used, which can generate different results. Therefore, to reproduce
     the same result, you will need to specify the same random seed. 
     
     PLINK's algorithm for removing related individuals does not account for the phenotype under study. 
     To minimize the removal of cases of a disease, the following algorithm can be used instead: 
-    [GreedyRelated](https://github.com/choishingwan/GreedyRelated).
+    [GreedyRelated](https://gitlab.com/choishingwan/GreedyRelated).
 
 # Generate final QC'ed target data file
 After performing the full analysis, you can generate a QC'ed data set with the following command:
