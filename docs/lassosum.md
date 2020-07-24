@@ -23,7 +23,7 @@ Again, we assume that we have the following files (or you can download it from [
 |**EUR.QC.bim**| This file contains the SNPs that passed the basic filtering |
 |**EUR.QC.fam**| This file contains the samples that passed the basic filtering |
 |**EUR.height**| This file contains the phenotype of the samples |
-|**EUR.covariate**| This file contains the covariates of the samples |
+|**EUR.cov**| This file contains the covariates of the samples |
 |**EUR.eigenvec**| This file contains the PCs of the samples |
 
 # Running PRS analysis
@@ -39,7 +39,7 @@ library(magrittr)
 sum.stat <- "Height.QC.gz"
 bfile <- "EUR.QC"
 # Read in and process the covariates
-covariate <- fread("EUR.covariate")
+covariate <- fread("EUR.cov")
 pcs <- fread("EUR.eigenvec") %>%
     setnames(., colnames(.), c("FID","IID", paste0("PC",1:6)))
 # Need as.data.frame here as lassosum doesn't handle data.table 
@@ -55,15 +55,13 @@ prefix <- "EUR"
 target.pheno <- fread("EUR.height")[,c("FID", "IID", "Height")]
 # Read in the summary statistics
 ss <- fread(sum.stat)
-# Number of sample in base
-size <- 253288
 # Remove P-value = 0, which causes problem in the transformation
 ss <- ss[!P == 0]
 # Read in the LD blocks
 ld <- fread(ld.file)
 # Transform the P-values into correlation
 cor <- p2cor(p = ss$P,
-        n = size,
+        n = ss$N,
         sign = log(ss$OR)
         )
 fam <- fread(paste0(bfile, ".fam"))
@@ -88,4 +86,4 @@ r2 <- max(target.res$validation.table$value)^2
 
 
 ??? note "How much phenotypic variation does the "best-fit" PRS explain?"
-    0.03818004
+    0.2395471

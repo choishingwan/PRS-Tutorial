@@ -3,7 +3,7 @@ This tutorial provides a step-by-step guide to performing basic polygenic risk s
 The aim of this tutorial is to provide a simple introduction of PRS analyses to those new to PRS, while equipping existing users with a better understanding of the processes and implementation "underneath the hood" of popular PRS software.
 
 The tutorial is separated into four main sections and reflects the structure of our [guide paper](https://doi.org/10.1101/416545): 
-the first two sections on QC correspond to Section 2 of the paper and constitute a 'QC checklist' for PRS analyses, the third section on calculating PRS (here with examples using [PLINK](plink.md), [PRSice-2](prsice.md), [LDpred](ldpred.md) and [lassosum](lassosum.md)) corresponds to Section 3 of the paper, while the fourth section, which provides some examples of visualising PRS results, accompanies Section 4 of the paper.
+the first two sections on QC correspond to Section 2 of the paper and constitute a 'QC checklist' for PRS analyses, the third section on calculating PRS (here with examples using [PLINK](plink.md), [PRSice-2](prsice.md), [LDpred-2](ldpred.md) and [lassosum](lassosum.md)) corresponds to Section 3 of the paper, while the fourth section, which provides some examples of visualising PRS results, accompanies Section 4 of the paper.
 
 1. [Quality Control (QC) of Base Data](base.md)
 2. [Quality Control (QC) of Target Data](target.md)

@@ -27,20 +27,22 @@ To run PRSice-2 we need a single covariate file, and therefore our covariate fil
 
 
 ```R tab="without data.table"    
-covariate <- read.table("EUR.covariate", header=T)
+covariate <- read.table("EUR.cov", header=T)
 pcs <- read.table("EUR.eigenvec", header=F)
 colnames(pcs) <- c("FID","IID", paste0("PC",1:6))
 cov <- merge(covariate, pcs, by=c("FID", "IID"))
-write.table(cov,"EUR.cov", quote=F, row.names=F)
+write.table(cov,"EUR.covariate", quote=F, row.names=F)
+q()
 ```
 
 ```R tab="with data.table"
 library(data.table)
-covariate <- fread("EUR.covariate")
+covariate <- fread("EUR.cov")
 pcs <- fread("EUR.eigenvec", header=F)
 colnames(pcs) <- c("FID","IID", paste0("PC",1:6))
 cov <- merge(covariate, pcs)
-fwrite(cov,"EUR.cov", sep="\t")
+fwrite(cov,"EUR.covariate", sep="\t")
+q()
 ```
 
 which generates **EUR.cov**.
@@ -97,7 +99,7 @@ This will automatically perform "high-resolution scoring" and generate the "best
 Users should read Section 4.6 of our paper to learn more about issues relating to overfitting in PRS analyses.  
 
 ??? note "Which P-value threshold generates the "best-fit" PRS?"
-    0.15
+    0.1388
 
 ??? note "How much phenotypic variation does the "best-fit" PRS explain?"
-    0.0495036
+    0.174227

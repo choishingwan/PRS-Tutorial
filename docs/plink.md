@@ -31,7 +31,7 @@ q() # exit R
 ```R tab="With data.table"
 library(data.table)
 dat <- fread("Height.QC.gz")
-fwrite(dat[,OR:=log(OR)], "Height.QC.Transformed", sep="\t")
+fwrite(dat[,BETA:=log(OR)], "Height.QC.Transformed", sep="\t")
 q() # exit R
 ```
 
@@ -93,9 +93,9 @@ awk 'NR!=1{print $3}' EUR.clumped >  EUR.valid.snp
 We will need three files:
 
 1. The base data file: **Height.QC.Transformed**
-2. A file containing SNP IDs and their corresponding P-values (`$1` because SNP ID is located in the first column; `$8` because the P-value is located in the eighth column)
+2. A file containing SNP IDs and their corresponding P-values (`$3` because SNP ID is located in the third column; `$8` because the P-value is located in the eighth column)
 ```bash
-awk '{print $1,$8}' Height.QC.Transformed > SNP.pvalue
+awk '{print $3,$8}' Height.QC.Transformed > SNP.pvalue
 ```
 3. A file containing the different P-value thresholds for inclusion of SNPs in the PRS. Here calculate PRS corresponding to a few thresholds for illustration purposes:
 ```bash
@@ -121,7 +121,7 @@ We can then calculate the PRS with the following `plink` command:
 ```bash
 plink \
     --bfile EUR.QC \
-    --score Height.QC.Transformed 1 4 11 header \
+    --score Height.QC.Transformed 3 4 12 header \
     --q-score-range range_list SNP.pvalue \
     --extract EUR.valid.snp \
     --out EUR
@@ -130,7 +130,7 @@ The meaning of the new parameters are as follows:
 
 | Paramter | Value | Description|
 |:-:|:-:|:-|
-|score|Height.QC.Transformed 1 4 11 header| We read from the **Height.QC.Transformed** file, assuming that the `1`st column is the SNP ID; `4`th column is the effective allele information; the `11`th column is the effect size estimate; and that the file contains a `header`|
+|score|Height.QC.Transformed 3 4 11 header| We read from the **Height.QC.Transformed** file, assuming that the `3`st column is the SNP ID; `4`th column is the effective allele information; the `12`th column is the effect size estimate; and that the file contains a `header`|
 |q-score-range| range_test SNP.pvalue| We want to calculate PRS based on the thresholds defined in **range_test**, where the threshold values (P-values) were stored in **SNP.pvalue**|
 
 The above command and range_list will generate 7 files:
@@ -197,7 +197,7 @@ pcs <- read.table("EUR.eigenvec", header=F)
 # (1:6 because there are 6 PCs)
 colnames(pcs) <- c("FID", "IID", paste0("PC",1:6)) 
 # Read in the covariates (here, it is sex)
-covariate <- read.table("EUR.covariate", header=T)
+covariate <- read.table("EUR.cov", header=T)
 # Now merge the files
 pheno <- merge(merge(phenotype, covariate, by=c("FID", "IID")), pcs, by=c("FID","IID"))
 # We can then calculate the null model (model with PRS) using a linear regression 
@@ -238,7 +238,7 @@ p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
 phenotype <- read.table("EUR.height", header=T)
 pcs <- read.table("EUR.eigenvec", header=F)
 colnames(pcs) <- c("FID", "IID", paste0("PC",1:6)) 
-covariate <- read.table("EUR.covariate", header=T)
+covariate <- read.table("EUR.cov", header=T)
 pheno <- merge(merge(phenotype, covariate, by=c("FID", "IID")), pcs, by=c("FID","IID"))
 null.r2 <- summary(lm(Height~., data=pheno[,!colnames(pheno)%in%c("FID","IID")]))$r.squared
 prs.result <- NULL
@@ -268,7 +268,7 @@ p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
 phenotype <- fread("EUR.height")
 pcs <- fread("EUR.eigenvec", header=F) %>%
     setnames(., colnames(.), c("FID", "IID", paste0("PC",1:6)) )
-covariate <- fread("EUR.covariate")
+covariate <- fread("EUR.cov")
 pheno <- merge(phenotype, covariate) %>%
         merge(., pcs)
 null.r2 <- summary(lm(Height~., data=pheno[,-c("FID", "IID")]))$r.squared
@@ -295,8 +295,8 @@ q() # exit R
 ```
 
 ??? note "Which P-value threshold generates the "best-fit" PRS?"
-    0.1
+    0.3
 
 ??? note "How much phenotypic variation does the "best-fit" PRS explain?"
-    0.04776492
+    0.1638468
 

@@ -126,9 +126,9 @@ In addition, we can visualise the relationship between the "best-fit" PRS (which
 
 ```R tab="Without ggplot2"
 # Read in the files
-prs <- read.table("EUR.0.2.profile", header=T)
+prs <- read.table("EUR.0.3.profile", header=T)
 height <- read.table("EUR.height", header=T)
-sex <- read.table("EUR.covariate", header=T)
+sex <- read.table("EUR.cov", header=T)
 # Rename the sex
 sex$Sex <- as.factor(sex$Sex)
 levels(sex$Sex) <- c("Male", "Female")
@@ -145,9 +145,9 @@ q() # exit R
 ```R tab="ggplot2"
 library(ggplot2)
 # Read in the files
-prs <- read.table("EUR.0.2.profile", header=T)
+prs <- read.table("EUR.0.3.profile", header=T)
 height <- read.table("EUR.height", header=T)
-sex <- read.table("EUR.covariate", header=T)
+sex <- read.table("EUR.cov", header=T)
 # Rename the sex
 sex$Sex <- as.factor(sex$Sex)
 levels(sex$Sex) <- c("Male", "Female")
