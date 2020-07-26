@@ -336,7 +336,7 @@ gzip  &gt; Height.gz
 <span class="c1"># Read in file</span>
 dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;Height.gwas.txt.gz&quot;</span><span class="p">)</span>
 <span class="c1"># Filter out SNPs</span>
-result <span class="o">&lt;-</span> dat<span class="p">[</span>INFO <span class="o">&gt;</span> <span class="m">0.8</span> <span class="o">&amp;</span> MAF <span class="o">&lt;</span> <span class="m">0.01</span><span class="p">]</span>
+result <span class="o">&lt;-</span> dat<span class="p">[</span>INFO <span class="o">&gt;</span> <span class="m">0.8</span> <span class="o">&amp;</span> MAF <span class="o">&gt;</span> <span class="m">0.01</span><span class="p">]</span>
 <span class="c1"># Output the gz file</span>
 fwrite<span class="p">(</span>result<span class="p">,</span> <span class="s">&quot;Height.gz&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
 </pre></div></div>
