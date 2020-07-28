@@ -402,7 +402,7 @@ fwrite<span class="p">(</span>valid<span class="p">[,</span><span class="kt">c</
 <p>These were removed during the base data QC.</p>
 <h1 id="35-mismatching-snps"># Mismatching SNPs<a class="headerlink" href="#35-mismatching-snps" title="Permanent link">&para;</a></h1>
 <p>SNPs that have mismatching alleles reported in the base and target data may be resolvable by strand-flipping the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target. This can be achieved with the following steps:</p>
-<p>1. Load the bim file, the GIANT summary statistic and the QC SNP list into R</p>
+<p>1. Load the bim file, the summary statistic and the QC SNP list into R</p>
 <div class="superfences-tabs">
 <input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
 <label for="__tab_2_0">Without data.table</label>
@@ -411,7 +411,7 @@ bim <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="
 <span class="kp">colnames</span><span class="p">(</span>bim<span class="p">)</span> <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CM&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">,</span> <span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">)</span>
 <span class="c1"># Read in QCed SNPs</span>
 qc <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="s">&quot;EUR.QC.snplist&quot;</span><span class="p">,</span> header <span class="o">=</span> <span class="bp">F</span><span class="p">,</span> stringsAsFactors <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
-<span class="c1"># Read in GIANT data</span>
+<span class="c1"># Read in the GWAS data</span>
 height <span class="o">&lt;-</span>
     read.table<span class="p">(</span><span class="kp">gzfile</span><span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">),</span>
                header <span class="o">=</span> <span class="bp">T</span><span class="p">,</span>
@@ -438,7 +438,7 @@ bim <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&q
     setnames<span class="p">(</span><span class="m">.</span><span class="p">,</span> <span class="kp">colnames</span><span class="p">(</span><span class="m">.</span><span class="p">),</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CM&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">,</span> <span class="s">&quot;B.A1&quot;</span><span class="p">,</span> <span class="s">&quot;B.A2&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
     <span class="c1"># And immediately change the alleles to upper cases</span>
     <span class="m">.</span><span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;B.A1&quot;</span><span class="p">,</span><span class="s">&quot;B.A2&quot;</span><span class="p">)</span><span class="o">:=</span><span class="kt">list</span><span class="p">(</span><span class="kp">toupper</span><span class="p">(</span>B.A1<span class="p">),</span> <span class="kp">toupper</span><span class="p">(</span>B.A2<span class="p">))]</span>
-<span class="c1"># Read in GIANT data (require data.table v1.12.0+)</span>
+<span class="c1"># Read in summary statistic data (require data.table v1.12.0+)</span>
 height <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;Height.QC.gz&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
     <span class="c1"># And immediately change the alleles to upper cases</span>
     <span class="m">.</span><span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;A1&quot;</span><span class="p">,</span><span class="s">&quot;A2&quot;</span><span class="p">)</span><span class="o">:=</span><span class="kt">list</span><span class="p">(</span><span class="kp">toupper</span><span class="p">(</span>A1<span class="p">),</span> <span class="kp">toupper</span><span class="p">(</span>A2<span class="p">))]</span>
@@ -450,7 +450,7 @@ qc <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&qu
 <div class="superfences-tabs">
 <input name="__tabs_3" type="radio" id="__tab_3_0" checked="checked" />
 <label for="__tab_3_0">Without data.table</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># Merge GIANT with target</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># Merge summary statistic with target</span>
 info <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>bim<span class="p">,</span> height<span class="p">,</span> by <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">))</span>
 <span class="c1"># Filter QCed SNPs</span>
 info <span class="o">&lt;-</span> info<span class="p">[</span>info<span class="o">$</span>SNP <span class="o">%in%</span> qc<span class="o">$</span>V1<span class="p">,]</span>
@@ -481,7 +481,7 @@ bim<span class="p">[</span>complement.snps<span class="p">,]</span><span class="
 </pre></div></div>
 <input name="__tabs_3" type="radio" id="__tab_3_1" />
 <label for="__tab_3_1">With data.table and magrittr</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># Merge GIANT with target</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># Merge summary statistic with target</span>
 info <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>bim<span class="p">,</span> height<span class="p">,</span> by<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;SNP&quot;</span><span class="p">,</span> <span class="s">&quot;CHR&quot;</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
     <span class="c1"># And filter out QCed SNPs</span>
     <span class="m">.</span><span class="p">[</span>SNP <span class="o">%in%</span> qc<span class="p">[,</span>V1<span class="p">]]</span>
