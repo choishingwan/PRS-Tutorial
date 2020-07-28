@@ -150,7 +150,7 @@ These were removed during the base data QC.
 # \# Mismatching SNPs
 SNPs that have mismatching alleles reported in the base and target data may be resolvable by strand-flipping the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target. This can be achieved with the following steps:
 
-1\. Load the bim file, the GIANT summary statistic and the QC SNP list into R
+1\. Load the bim file, the summary statistic and the QC SNP list into R
 
 ```R tab="Without data.table"
 # Read in bim file
@@ -158,7 +158,7 @@ bim <- read.table("EUR.bim")
 colnames(bim) <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
 # Read in QCed SNPs
 qc <- read.table("EUR.QC.snplist", header = F, stringsAsFactors = F)
-# Read in GIANT data
+# Read in the GWAS data
 height <-
     read.table(gzfile("Height.QC.gz"),
                header = T,
@@ -185,7 +185,7 @@ bim <- fread("EUR.bim") %>%
     setnames(., colnames(.), c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")) %>%
     # And immediately change the alleles to upper cases
     .[,c("B.A1","B.A2"):=list(toupper(B.A1), toupper(B.A2))]
-# Read in GIANT data (require data.table v1.12.0+)
+# Read in summary statistic data (require data.table v1.12.0+)
 height <- fread("Height.QC.gz") %>%
     # And immediately change the alleles to upper cases
     .[,c("A1","A2"):=list(toupper(A1), toupper(A2))]
@@ -197,7 +197,7 @@ qc <- fread("EUR.QC.snplist", header=F)
 2\. Identify SNPs that require strand flipping 
 
 ```R tab="Without data.table"
-# Merge GIANT with target
+# Merge summary statistic with target
 info <- merge(bim, height, by = c("SNP", "CHR", "BP"))
 # Filter QCed SNPs
 info <- info[info$SNP %in% qc$V1,]
@@ -228,7 +228,7 @@ bim[complement.snps,]$B.A2 <-
 ```
 
 ```R tab="With data.table and magrittr"
-# Merge GIANT with target
+# Merge summary statistic with target
 info <- merge(bim, height, by=c("SNP", "CHR", "BP")) %>%
     # And filter out QCed SNPs
     .[SNP %in% qc[,V1]]
