@@ -7,14 +7,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Shing Wan CHOI">
+  
   <link rel="shortcut icon" href="../img/favicon.ico">
   <title>1. QC of Base Data - Basic Tutorial for Polygenic Risk Score Analyses</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../css/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  <link href="../css/details.css" rel="stylesheet" />
   
   <script>
     // Current page data
@@ -24,9 +25,7 @@
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
+  <script src="../js/modernizr-2.8.3.min.js" defer></script> 
   
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -46,6 +45,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href=".." class="icon icon-home"> Basic Tutorial for Polygenic Risk Score Analyses</a>
         <div role="search">
@@ -56,100 +56,74 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Overview</a>
-	    </li>
-          
-            <li class="toctree-l1 current">
-		
-    <a class="current" href="./">1. QC of Base Data</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#obtaining-the-base-data-file">Obtaining the base data file</a></li>
-    
-
-    <li class="toctree-l2"><a href="#reading-the-base-data-file">Reading the base data file</a></li>
-    
-
-    <li class="toctree-l2"><a href="#qc-checklist-base-data">QC checklist: Base data</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-heritability-check"># Heritability check</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-effect-allele"># Effect allele</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-file-transfer"># File transfer</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-genome-build"># Genome build</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-standard-gwas-qc"># Standard GWAS QC</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-mismatching-snps"># Mismatching SNPs</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-duplicate-snps"># Duplicate SNPs</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-ambiguous-snps"># Ambiguous SNPs</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-sex-chromosomes"># Sex chromosomes</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-sample-overlap"># Sample overlap</a></li>
-    
-
-    <li class="toctree-l2"><a href="#35-relatedness"># Relatedness</a></li>
-    
-
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">1. QC of Base Data</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#obtaining-the-base-data-file">Obtaining the base data file</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reading-the-base-data-file">Reading the base data file</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qc-checklist-base-data">QC checklist: Base data</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#heritability-check"># Heritability check</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#effect-allele"># Effect allele</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#file-transfer"># File transfer</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#genome-build"># Genome build</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#standard-gwas-qc"># Standard GWAS QC</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mismatching-snps"># Mismatching SNPs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#duplicate-snps"># Duplicate SNPs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ambiguous-snps"># Ambiguous SNPs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sex-chromosomes"># Sex chromosomes</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sample-overlap"># Sample overlap</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#relatedness"># Relatedness</a>
+    </li>
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../target/">2. QC of Target Data</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">3. Calculating and analysing PRS</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../plink/">PLINK</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../prsice/">PRSice-2</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../ldpred/">LDpred</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../lassosum/">lassosum</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../plink_visual/">4. Visualizing PRS Results</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../target/">2. QC of Target Data</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../cal_prs/">3. Calculating and analysing PRS</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../plink/">PLINK</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../prsice/">PRSice-2</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../ldpred/">LDpred-2</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../lassosum/">lassosum</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../plink_visual/">4. Visualizing PRS Results</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -177,12 +151,14 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
             <div class="section">
               
-                <h1 id="obtaining-the-base-data-file">Obtaining the base data file<a class="headerlink" href="#obtaining-the-base-data-file" title="Permanent link">&para;</a></h1>
+                <h1 id="qc-of-base-data">QC of Base Data<a class="headerlink" href="#qc-of-base-data" title="Permanent link">&para;</a></h1>
+<h2 id="obtaining-the-base-data-file">Obtaining the base data file<a class="headerlink" href="#obtaining-the-base-data-file" title="Permanent link">&para;</a></h2>
 <p>The first step in Polygenic Risk Score (PRS) analyses is to generate or obtain the base data (GWAS summary statistics). Ideally these will correspond to the most powerful GWAS results available on the phenotype under study. In this example, we will use GWAS on simulated height. You can download the summary statistic file <a href="https://drive.google.com/file/d/1RWjk49QNZj9zvJHc9X_wyZ51fdy6xQjv/view?usp=sharing">here</a> </p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -192,14 +168,14 @@
 <p class="admonition-title">Warning</p>
 <p>If you download the summary statistics on a MAC machine, the gz file will be decompressed automatically, resulting in a <strong>Height.gwas.txt</strong> file instead. </p>
 <p>To maintain consistency, we suggest compressing the <strong>Height.gwas.txt</strong> file with 
-<div class="codehilite"><pre><span></span>gzip Height.gwas.txt
-</pre></div>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gzip Height.gwas.txt
+</code></pre></div>
 before starting the tutorial</p>
 </div>
-<h1 id="reading-the-base-data-file">Reading the base data file<a class="headerlink" href="#reading-the-base-data-file" title="Permanent link">&para;</a></h1>
+<h2 id="reading-the-base-data-file">Reading the base data file<a class="headerlink" href="#reading-the-base-data-file" title="Permanent link">&para;</a></h2>
 <p><strong>Height.gwas.txt.gz</strong> is compressed. To read its content, you can type:</p>
-<div class="codehilite"><pre><span></span>gunzip -c Height.gwas.txt.gz <span class="p">|</span> head
-</pre></div>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.gwas.txt.gz | head
+</code></pre></div>
 
 <p>which will display the first 10 lines of the file</p>
 <div class="admonition note">
@@ -279,13 +255,13 @@ before starting the tutorial</p>
 <li><strong>INFO</strong>: The imputation information score</li>
 <li><strong>MAF</strong>: The minor allele frequency (MAF) of the SNP</li>
 </ul>
-<h1 id="qc-checklist-base-data">QC checklist: Base data<a class="headerlink" href="#qc-checklist-base-data" title="Permanent link">&para;</a></h1>
+<h2 id="qc-checklist-base-data">QC checklist: Base data<a class="headerlink" href="#qc-checklist-base-data" title="Permanent link">&para;</a></h2>
 <p>Below we perform QC on these base data according to the 'QC checklist' in our <a href="https://doi.org/10.1101/416545">guide paper</a>, which we recommend that users follow while going through this tutorial and when performing PRS analyses:</p>
-<h1 id="35-heritability-check"># Heritability check<a class="headerlink" href="#35-heritability-check" title="Permanent link">&para;</a></h1>
+<h2 id="heritability-check"># Heritability check<a class="headerlink" href="#heritability-check" title="Permanent link">&para;</a></h2>
 <p>We recommend that PRS analyses are performed on base data with a chip-heritability estimate <span class="arithmatex">\(h_{snp}^{2} &gt; 0.05\)</span>. 
 The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). 
 Our height GWAS data are simulated to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. </p>
-<h1 id="35-effect-allele"># Effect allele<a class="headerlink" href="#35-effect-allele" title="Permanent link">&para;</a></h1>
+<h2 id="effect-allele"># Effect allele<a class="headerlink" href="#effect-allele" title="Permanent link">&para;</a></h2>
 <p>It is important to know which allele is the effect allele and which is the non-effect allele for PRS association results to be in the correct direction.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
@@ -293,53 +269,55 @@ Our height GWAS data are simulated to have a chip-heritability much greater than
 If the incorrect assumption is made in computing the PRS, then the effect of the PRS in the target data will be in the wrong direction.</p>
 <p>To avoid misleading conclusions the effect allele from the base (GWAS) data must be known.</p>
 </div>
-<h1 id="35-file-transfer"># File transfer<a class="headerlink" href="#35-file-transfer" title="Permanent link">&para;</a></h1>
+<h2 id="file-transfer"># File transfer<a class="headerlink" href="#file-transfer" title="Permanent link">&para;</a></h2>
 <p>A common problem is that the downloaded base data file can be
 corrupted during download, which can cause PRS software to crash 
 or to produce errors in results. 
 However, a <code>md5sum</code> hash is 
 generally included in files so that file integrity can be checked. 
 The following command performs this <code>md5sum</code> check: </p>
-<div class="superfences-tabs">
-<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
-<label for="__tab_1_0">Linux</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>md5sum Height.gwas.txt.gz
-</pre></div></div>
-<input name="__tabs_1" type="radio" id="__tab_1_1" />
-<label for="__tab_1_1">OS X</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>md5 Height.gwas.txt.gz
-</pre></div></div>
+<div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Linux</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>md5sum Height.gwas.txt.gz
+</code></pre></div>
+
+</div>
+<input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">OS X</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>md5 Height.gwas.txt.gz
+</code></pre></div>
+
+</div>
 </div>
 <p>if the file is intact, then <code>md5sum</code> generates a string of characters, which in this case should be: <code>a2b15fb6a2bbbe7ef49f67959b43b160</code>. 
 If a different string is generated, then the file is corrupted.</p>
-<h1 id="35-genome-build"># Genome build<a class="headerlink" href="#35-genome-build" title="Permanent link">&para;</a></h1>
+<h2 id="genome-build"># Genome build<a class="headerlink" href="#genome-build" title="Permanent link">&para;</a></h2>
 <p>The height summary statistic are on the same genome build as the target data that we will be using. 
 You must check that your base and target data are on the same genome build, and if they are not then use a tool such as <a href="https://genome.ucsc.edu/cgi-bin/hgLiftOver">LiftOver</a> to make the builds consistent across the data sets.</p>
-<h1 id="35-standard-gwas-qc"># Standard GWAS QC<a class="headerlink" href="#35-standard-gwas-qc" title="Permanent link">&para;</a></h1>
+<h2 id="standard-gwas-qc"># Standard GWAS QC<a class="headerlink" href="#standard-gwas-qc" title="Permanent link">&para;</a></h2>
 <p>As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. 
 If the base data have been obtained as summary statistics from a public source, then the typical QC steps that you will be able to perform on them are to filter the SNPs according to INFO score and MAF. 
 SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). 
 Therefore, SNPs with low MAF and INFO are typically removed before performing downstream analyses.
 We recommend removing SNPs with MAF &lt; 1% and INFO &lt; 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results).
 These SNP filters can be achieved using the following code:</p>
-<div class="superfences-tabs">
-<input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
-<label for="__tab_2_0">Using bash</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>gunzip -c Height.gwas.txt.gz <span class="p">|</span><span class="se">\</span>
-awk <span class="s1">&#39;NR==1 || ($11 &gt; 0.01) &amp;&amp; ($10 &gt; 0.8) {print}&#39;</span> <span class="p">|</span><span class="se">\</span>
+<div class="tabbed-set" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Using bash</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.gwas.txt.gz |<span style="color: #BB6622; font-weight: bold">\</span>
+awk <span style="color: #BA2121">&#39;NR==1 || ($11 &gt; 0.01) &amp;&amp; ($10 &gt; 0.8) {print}&#39;</span> |<span style="color: #BB6622; font-weight: bold">\</span>
 gzip  &gt; Height.gz
-</pre></div></div>
-<input name="__tabs_2" type="radio" id="__tab_2_1" />
-<label for="__tab_2_1">Using R with data.table</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="c1"># Alternatively, you can use R, with data.table v1.11.8+</span>
-<span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
-<span class="c1"># Read in file</span>
-dat <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;Height.gwas.txt.gz&quot;</span><span class="p">)</span>
-<span class="c1"># Filter out SNPs</span>
-result <span class="o">&lt;-</span> dat<span class="p">[</span>INFO <span class="o">&gt;</span> <span class="m">0.8</span> <span class="o">&amp;</span> MAF <span class="o">&gt;</span> <span class="m">0.01</span><span class="p">]</span>
-<span class="c1"># Output the gz file</span>
-fwrite<span class="p">(</span>result<span class="p">,</span> <span class="s">&quot;Height.gz&quot;</span><span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
-</pre></div></div>
+</code></pre></div>
+
+</div>
+<input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">Using R with data.table</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># Alternatively, you can use R, with data.table v1.11.8+</span>
+<span style="color: #0000FF">library</span>(data.table)
+<span style="color: #408080; font-style: italic"># Read in file</span>
+dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;Height.gwas.txt.gz&quot;</span>)
+<span style="color: #408080; font-style: italic"># Filter out SNPs</span>
+result <span style="color: #666666">&lt;-</span> dat[INFO <span style="color: #666666">&gt;</span> <span style="color: #666666">0.8</span> <span style="color: #666666">&amp;</span> MAF <span style="color: #666666">&gt;</span> <span style="color: #666666">0.01</span>]
+<span style="color: #408080; font-style: italic"># Output the gz file</span>
+<span style="color: #0000FF">fwrite</span>(result, <span style="color: #BA2121">&quot;Height.gz&quot;</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>)
+</code></pre></div>
+
+</div>
 </div>
 <p>The bash code above does the following:</p>
 <ol>
@@ -349,18 +327,18 @@ fwrite<span class="p">(</span>result<span class="p">,</span> <span class="s">&qu
 <li>Prints any line with INFO above 0.8 (<code>$10</code> because the tenth column of the file contains the INFO information)</li>
 <li>Compresses and writes the results to <strong>Height.gz</strong></li>
 </ol>
-<h1 id="35-mismatching-snps"># Mismatching SNPs<a class="headerlink" href="#35-mismatching-snps" title="Permanent link">&para;</a></h1>
+<h2 id="mismatching-snps"># Mismatching SNPs<a class="headerlink" href="#mismatching-snps" title="Permanent link">&para;</a></h2>
 <p>SNPs that have mismatching alleles reported in the base and target data are either resolvable by "strand-flipping" the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target, or non-resolvable, such as for a SNP with C/G in the base and C/T in the target. 
 Most polygenic score software perform strand-flipping automatically for SNPs that are resolvable, and remove non-resolvable mismatching SNPs.</p>
 <p>Since we need the target data to know which SNPs have mismatching alleles, we will perform this strand-flipping in the target data.</p>
-<h1 id="35-duplicate-snps"># Duplicate SNPs<a class="headerlink" href="#35-duplicate-snps" title="Permanent link">&para;</a></h1>
+<h2 id="duplicate-snps"># Duplicate SNPs<a class="headerlink" href="#duplicate-snps" title="Permanent link">&para;</a></h2>
 <p>If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
 Most PRS software do not allow duplicated SNPs in the base data input and thus they should be removed, using a command such as the one below: </p>
-<div class="codehilite"><pre><span></span>gunzip -c Height.gz <span class="p">|</span><span class="se">\</span>
-awk <span class="s1">&#39;{ print $3}&#39;</span> <span class="p">|</span><span class="se">\</span>
-sort <span class="p">|</span><span class="se">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.gz |<span style="color: #BB6622; font-weight: bold">\</span>
+awk <span style="color: #BA2121">&#39;{ print $3}&#39;</span> |<span style="color: #BB6622; font-weight: bold">\</span>
+sort |<span style="color: #BB6622; font-weight: bold">\</span>
 uniq -d &gt; duplicated.snp
-</pre></div>
+</code></pre></div>
 
 <p>The above command does the following:</p>
 <ol>
@@ -372,34 +350,34 @@ uniq -d &gt; duplicated.snp
 <details class="note"><summary>How many duplicated SNPs are there?</summary><p>There are a total of <code>2</code> duplicated SNPs</p>
 </details>
 <p>Duplicated SNPs can then be removed using the <code>grep</code> command:
-<div class="codehilite"><pre><span></span>gunzip -c Height.gz  <span class="p">|</span><span class="se">\</span>
-grep -vf duplicated.snp <span class="p">|</span><span class="se">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.gz  |<span style="color: #BB6622; font-weight: bold">\</span>
+grep -vf duplicated.snp |<span style="color: #BB6622; font-weight: bold">\</span>
 gzip - &gt; Height.nodup.gz
-</pre></div></p>
+</code></pre></div></p>
 <p>The above command does the following:</p>
 <ol>
 <li>Decompresses and reads the <strong>Height.gz</strong> file</li>
 <li>From the file, remove (<code>-v</code>) any lines contains string within the <strong>duplicated.snp</strong> file (<code>-f</code>)</li>
 <li>Compresses and writes the results to <strong>Height.nodup.gz</strong></li>
 </ol>
-<h1 id="35-ambiguous-snps"># Ambiguous SNPs<a class="headerlink" href="#35-ambiguous-snps" title="Permanent link">&para;</a></h1>
+<h2 id="ambiguous-snps"># Ambiguous SNPs<a class="headerlink" href="#ambiguous-snps" title="Permanent link">&para;</a></h2>
 <p>If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) that was used for either is unknown, then it is not possible to pair-up the alleles of ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T SNPs) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. While allele frequencies could be used to infer which alleles are on the same strand, the accuracy of this could be low for SNPs with MAF close to 50% or when the base and target data are from different populations. Therefore, we recommend removing all ambiguous SNPs to avoid introducing this potential source of systematic error.</p>
 <p>Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.</p>
 <p>Nonambiguous SNPs can be retained using the following:
-<div class="codehilite"><pre><span></span>gunzip -c Height.nodup.gz <span class="p">|</span><span class="se">\</span>
-awk <span class="s1">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) || \</span>
-<span class="s1">        ($4==&quot;T&quot; &amp;&amp; $5==&quot;A&quot;) || \</span>
-<span class="s1">        ($4==&quot;G&quot; &amp;&amp; $5==&quot;C&quot;) || \</span>
-<span class="s1">        ($4==&quot;C&quot; &amp;&amp; $5==&quot;G&quot;)) {print}&#39;</span> <span class="p">|</span><span class="se">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.nodup.gz |<span style="color: #BB6622; font-weight: bold">\</span>
+awk <span style="color: #BA2121">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) || \</span>
+<span style="color: #BA2121">        ($4==&quot;T&quot; &amp;&amp; $5==&quot;A&quot;) || \</span>
+<span style="color: #BA2121">        ($4==&quot;G&quot; &amp;&amp; $5==&quot;C&quot;) || \</span>
+<span style="color: #BA2121">        ($4==&quot;C&quot; &amp;&amp; $5==&quot;G&quot;)) {print}&#39;</span> |<span style="color: #BB6622; font-weight: bold">\</span>
     gzip &gt; Height.QC.gz
-</pre></div></p>
+</code></pre></div></p>
 <details class="note"><summary>How many non-ambiguous SNPs were there?</summary><p>There are <code>499,617</code> non-ambiguous SNPs</p>
 </details>
-<h1 id="35-sex-chromosomes"># Sex chromosomes<a class="headerlink" href="#35-sex-chromosomes" title="Permanent link">&para;</a></h1>
+<h2 id="sex-chromosomes"># Sex chromosomes<a class="headerlink" href="#sex-chromosomes" title="Permanent link">&para;</a></h2>
 <p>Sometimes sample mislabelling can occur, which may lead to invalid results. One indication of a mislabelled sample is a difference between reported sex and that indicated by the sex chromosomes. While this may be due to a difference in sex and gender identity, it could also reflect mislabeling of samples or misreporting and, thus, individuals in which there is a mismatch between biological and reported sex are typically removed. See the Target Data section in which a sex-check is performed.</p>
-<h1 id="35-sample-overlap"># Sample overlap<a class="headerlink" href="#35-sample-overlap" title="Permanent link">&para;</a></h1>
+<h2 id="sample-overlap"># Sample overlap<a class="headerlink" href="#sample-overlap" title="Permanent link">&para;</a></h2>
 <p>Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of <a href="https://doi.org/10.1101/416545">the paper</a> for discussion of the importance of avoiding sample overlap). </p>
-<h1 id="35-relatedness"># Relatedness<a class="headerlink" href="#35-relatedness" title="Permanent link">&para;</a></h1>
+<h2 id="relatedness"># Relatedness<a class="headerlink" href="#relatedness" title="Permanent link">&para;</a></h2>
 <p>Closely related individuals within and between the base and the target data may lead to overfitted results, limiting the generalizability of the results (see the relevant sections of <a href="https://doi.org/10.1101/416545">the paper</a>). Relatedness within the target data is tested in the Target Data section.</p>
 <p>The <strong>Height.QC.gz</strong> base data are now ready for using in downstream analyses.</p>
               
@@ -412,7 +390,7 @@ awk <span class="s1">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) ||
         <a href="../target/" class="btn btn-neutral float-right" title="2. QC of Target Data">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href=".." class="btn btn-neutral" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -424,7 +402,7 @@ awk <span class="s1">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) ||
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -434,7 +412,7 @@ awk <span class="s1">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) ||
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/choishingwan/PRS-Tutorial/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
@@ -450,7 +428,13 @@ awk <span class="s1">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) ||
     <script>var base_url = '..';</script>
     <script src="../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+      <script src="../javascripts/details.js" defer></script>
       <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>

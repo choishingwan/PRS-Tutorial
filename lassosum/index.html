@@ -7,14 +7,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Shing Wan CHOI">
+  
   <link rel="shortcut icon" href="../img/favicon.ico">
   <title>lassosum - Basic Tutorial for Polygenic Risk Score Analyses</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../css/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  <link href="../css/details.css" rel="stylesheet" />
   
   <script>
     // Current page data
@@ -24,9 +25,7 @@
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
+  <script src="../js/modernizr-2.8.3.min.js" defer></script> 
   
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -46,6 +45,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href=".." class="icon icon-home"> Basic Tutorial for Polygenic Risk Score Analyses</a>
         <div role="search">
@@ -56,61 +56,52 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Overview</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../base/">1. QC of Base Data</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../target/">2. QC of Target Data</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">3. Calculating and analysing PRS</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../plink/">PLINK</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../prsice/">PRSice-2</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../ldpred/">LDpred</a>
-                </li>
-                <li class=" current">
-                    
-    <a class="current" href="./">lassosum</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#running-prs-analysis">Running PRS analysis</a></li>
-    
-
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../base/">1. QC of Base Data</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../target/">2. QC of Target Data</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../cal_prs/">3. Calculating and analysing PRS</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../plink/">PLINK</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../prsice/">PRSice-2</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../ldpred/">LDpred-2</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">lassosum</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#installing-lassosum">Installing lassosum</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#required-data">Required Data</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#running-prs-analysis">Running PRS analysis</a>
+    </li>
     </ul>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../plink_visual/">4. Visualizing PRS Results</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../plink_visual/">4. Visualizing PRS Results</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -129,10 +120,6 @@
     <li><a href="..">Docs</a> &raquo;</li>
     
       
-        
-          <li>3. Calculating and analysing PRS &raquo;</li>
-        
-      
     
     <li>lassosum</li>
     <li class="wy-breadcrumbs-aside">
@@ -142,12 +129,15 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
             <div class="section">
               
-                <p>Here we use another PRS program, <code>lassosum</code>, which is an <code>R</code> package that uses penalised regression (LASSO) in its approach to PRS calculation.</p>
+                <h1 id="background">Background<a class="headerlink" href="#background" title="Permanent link">&para;</a></h1>
+<p><code>lassosum</code> is one of the dedicated PRS programs which is an <code>R</code> package that uses penalised regression (LASSO) in its approach to PRS calculation.</p>
+<h2 id="installing-lassosum">Installing lassosum<a class="headerlink" href="#installing-lassosum" title="Permanent link">&para;</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The script used here is based on lassosum version 0.4.4</p>
@@ -157,11 +147,12 @@
 <p>For more details, please refer to <a href="https://github.com/tshmak/lassosum/">lassosum's homepage</a></p>
 </div>
 <p>You can install <code>lassosum</code> and its dependencies in <code>R</code> with the following command:</p>
-<div class="codehilite"><pre><span></span>install.packages<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;devtools&quot;</span><span class="p">,</span><span class="s">&quot;RcppArmadillo&quot;</span><span class="p">,</span> <span class="s">&quot;data.table&quot;</span><span class="p">,</span> <span class="s">&quot;Matrix&quot;</span><span class="p">),</span> dependencies<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>devtools<span class="p">)</span>
-install_github<span class="p">(</span><span class="s">&quot;tshmak/lassosum&quot;</span><span class="p">)</span>
-</pre></div>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #0000FF">install.packages</span>(<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;devtools&quot;</span>,<span style="color: #BA2121">&quot;RcppArmadillo&quot;</span>, <span style="color: #BA2121">&quot;data.table&quot;</span>, <span style="color: #BA2121">&quot;Matrix&quot;</span>), dependencies<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">TRUE</span>)
+<span style="color: #0000FF">library</span>(devtools)
+<span style="color: #0000FF">install_github</span>(<span style="color: #BA2121">&quot;tshmak/lassosum&quot;</span>)
+</code></pre></div>
 
+<h2 id="required-data">Required Data<a class="headerlink" href="#required-data" title="Permanent link">&para;</a></h2>
 <p>Again, we assume that we have the following files (or you can download it from <a href="https://drive.google.com/file/d/1x_G0Gxk9jFMY-PMqwtg6-vdEyUPp5p5u/view?usp=sharing">here</a>): </p>
 <table>
 <thead>
@@ -201,60 +192,60 @@ install_github<span class="p">(</span><span class="s">&quot;tshmak/lassosum&quot
 </tr>
 </tbody>
 </table>
-<h1 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h1>
+<h2 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h2>
 <p>We can run lassosum as follows: </p>
-<div class="codehilite"><pre><span></span><span class="kn">library</span><span class="p">(</span>lassosum<span class="p">)</span>
-<span class="c1"># Prefer to work with data.table as it speeds up file reading</span>
-<span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>methods<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>magrittr<span class="p">)</span>
-sum.stat <span class="o">&lt;-</span> <span class="s">&quot;Height.QC.gz&quot;</span>
-bfile <span class="o">&lt;-</span> <span class="s">&quot;EUR.QC&quot;</span>
-<span class="c1"># Read in and process the covariates</span>
-covariate <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.cov&quot;</span><span class="p">)</span>
-pcs <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.eigenvec&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    setnames<span class="p">(</span><span class="m">.</span><span class="p">,</span> <span class="kp">colnames</span><span class="p">(</span><span class="m">.</span><span class="p">),</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span><span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;PC&quot;</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">)))</span>
-<span class="c1"># Need as.data.frame here as lassosum doesn&#39;t handle data.table </span>
-<span class="c1"># covariates very well</span>
-cov <span class="o">&lt;-</span> <span class="kp">merge</span><span class="p">(</span>covariate<span class="p">,</span> pcs<span class="p">)</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #0000FF">library</span>(lassosum)
+<span style="color: #408080; font-style: italic"># Prefer to work with data.table as it speeds up file reading</span>
+<span style="color: #0000FF">library</span>(data.table)
+<span style="color: #0000FF">library</span>(methods)
+<span style="color: #0000FF">library</span>(magrittr)
+sum.stat <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;Height.QC.gz&quot;</span>
+bfile <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;EUR.QC&quot;</span>
+<span style="color: #408080; font-style: italic"># Read in and process the covariates</span>
+covariate <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>)
+pcs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.eigenvec&quot;</span>) <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">setnames</span>(., <span style="color: #0000FF">colnames</span>(.), <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;PC&quot;</span>,<span style="color: #666666">1:6</span>)))
+<span style="color: #408080; font-style: italic"># Need as.data.frame here as lassosum doesn&#39;t handle data.table </span>
+<span style="color: #408080; font-style: italic"># covariates very well</span>
+cov <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(covariate, pcs)
 
-<span class="c1"># We will need the EUR.hg19 file provided by lassosum </span>
-<span class="c1"># which are LD regions defined in Berisa and Pickrell (2015) for the European population and the hg19 genome.</span>
-ld.file <span class="o">&lt;-</span> <span class="kp">system.file</span><span class="p">(</span><span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="s">&quot;Berisa.EUR.hg19.bed&quot;</span><span class="p">,</span>package<span class="o">=</span><span class="s">&quot;lassosum&quot;</span><span class="p">)</span>
-<span class="c1"># output prefix</span>
-prefix <span class="o">&lt;-</span> <span class="s">&quot;EUR&quot;</span>
-<span class="c1"># Read in the target phenotype file</span>
-target.pheno <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;EUR.height&quot;</span><span class="p">)[,</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;FID&quot;</span><span class="p">,</span> <span class="s">&quot;IID&quot;</span><span class="p">,</span> <span class="s">&quot;Height&quot;</span><span class="p">)]</span>
-<span class="c1"># Read in the summary statistics</span>
-ss <span class="o">&lt;-</span> fread<span class="p">(</span>sum.stat<span class="p">)</span>
-<span class="c1"># Remove P-value = 0, which causes problem in the transformation</span>
-ss <span class="o">&lt;-</span> ss<span class="p">[</span><span class="o">!</span>P <span class="o">==</span> <span class="m">0</span><span class="p">]</span>
-<span class="c1"># Read in the LD blocks</span>
-ld <span class="o">&lt;-</span> fread<span class="p">(</span>ld.file<span class="p">)</span>
-<span class="c1"># Transform the P-values into correlation</span>
-cor <span class="o">&lt;-</span> p2cor<span class="p">(</span>p <span class="o">=</span> ss<span class="o">$</span>P<span class="p">,</span>
-        n <span class="o">=</span> ss<span class="o">$</span>N<span class="p">,</span>
-        sign <span class="o">=</span> <span class="kp">log</span><span class="p">(</span>ss<span class="o">$</span>OR<span class="p">)</span>
-        <span class="p">)</span>
-fam <span class="o">&lt;-</span> fread<span class="p">(</span><span class="kp">paste0</span><span class="p">(</span>bfile<span class="p">,</span> <span class="s">&quot;.fam&quot;</span><span class="p">))</span>
-fam<span class="p">[,</span>ID<span class="o">:=</span><span class="kp">do.call</span><span class="p">(</span><span class="kp">paste</span><span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="m">.</span>SD<span class="p">,</span> sep<span class="o">=</span><span class="s">&quot;:&quot;</span><span class="p">)),</span><span class="m">.</span>SDcols<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">)]</span>
+<span style="color: #408080; font-style: italic"># We will need the EUR.hg19 file provided by lassosum </span>
+<span style="color: #408080; font-style: italic"># which are LD regions defined in Berisa and Pickrell (2015) for the European population and the hg19 genome.</span>
+ld.file <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">system.file</span>(<span style="color: #BA2121">&quot;data&quot;</span>, <span style="color: #BA2121">&quot;Berisa.EUR.hg19.bed&quot;</span>,package<span style="color: #666666">=</span><span style="color: #BA2121">&quot;lassosum&quot;</span>)
+<span style="color: #408080; font-style: italic"># output prefix</span>
+prefix <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;EUR&quot;</span>
+<span style="color: #408080; font-style: italic"># Read in the target phenotype file</span>
+target.pheno <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>)[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #BA2121">&quot;Height&quot;</span>)]
+<span style="color: #408080; font-style: italic"># Read in the summary statistics</span>
+ss <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(sum.stat)
+<span style="color: #408080; font-style: italic"># Remove P-value = 0, which causes problem in the transformation</span>
+ss <span style="color: #666666">&lt;-</span> ss[<span style="color: #666666">!</span>P <span style="color: #666666">==</span> <span style="color: #666666">0</span>]
+<span style="color: #408080; font-style: italic"># Read in the LD blocks</span>
+ld <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(ld.file)
+<span style="color: #408080; font-style: italic"># Transform the P-values into correlation</span>
+cor <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">p2cor</span>(p <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>P,
+        n <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>N,
+        sign <span style="color: #666666">=</span> <span style="color: #0000FF">log</span>(ss<span style="color: #666666">$</span>OR)
+        )
+fam <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #0000FF">paste0</span>(bfile, <span style="color: #BA2121">&quot;.fam&quot;</span>))
+fam[,ID<span style="color: #666666">:=</span><span style="color: #0000FF">do.call</span>(paste, <span style="color: #0000FF">c</span>(.SD, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;:&quot;</span>)),.SDcols<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #666666">1:2</span>)]
 
-<span class="c1"># Run the lassosum pipeline</span>
-out <span class="o">&lt;-</span> lassosum.pipeline<span class="p">(</span>
-    cor <span class="o">=</span> cor<span class="p">,</span>
-    chr <span class="o">=</span> ss<span class="o">$</span>CHR<span class="p">,</span>
-    pos <span class="o">=</span> ss<span class="o">$</span>BP<span class="p">,</span>
-    A1 <span class="o">=</span> ss<span class="o">$</span>A1<span class="p">,</span>
-    A2 <span class="o">=</span> ss<span class="o">$</span>A2<span class="p">,</span>
-    ref.bfile <span class="o">=</span> bfile<span class="p">,</span>
-    test.bfile <span class="o">=</span> bfile<span class="p">,</span>
-    LDblocks <span class="o">=</span> ld
-<span class="p">)</span>
-<span class="c1"># Store the R2 results</span>
-target.res <span class="o">&lt;-</span> validate<span class="p">(</span>out<span class="p">,</span> pheno <span class="o">=</span> target.pheno<span class="p">,</span> covar<span class="o">=</span>cov<span class="p">)</span>
-<span class="c1"># Get the maximum R2</span>
-r2 <span class="o">&lt;-</span> <span class="kp">max</span><span class="p">(</span>target.res<span class="o">$</span>validation.table<span class="o">$</span>value<span class="p">)</span><span class="o">^</span><span class="m">2</span>
-</pre></div>
+<span style="color: #408080; font-style: italic"># Run the lassosum pipeline</span>
+out <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lassosum.pipeline</span>(
+    cor <span style="color: #666666">=</span> cor,
+    chr <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>CHR,
+    pos <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>BP,
+    A1 <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>A1,
+    A2 <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>A2,
+    ref.bfile <span style="color: #666666">=</span> bfile,
+    test.bfile <span style="color: #666666">=</span> bfile,
+    LDblocks <span style="color: #666666">=</span> ld
+)
+<span style="color: #408080; font-style: italic"># Store the R2 results</span>
+target.res <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">validate</span>(out, pheno <span style="color: #666666">=</span> target.pheno, covar<span style="color: #666666">=</span>cov)
+<span style="color: #408080; font-style: italic"># Get the maximum R2</span>
+r2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">max</span>(target.res<span style="color: #666666">$</span>validation.table<span style="color: #666666">$</span>value)<span style="color: #666666">^2</span>
+</code></pre></div>
 
 <details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.2395471</p>
 </details>
@@ -268,7 +259,7 @@ r2 <span class="o">&lt;-</span> <span class="kp">max</span><span class="p">(</sp
         <a href="../plink_visual/" class="btn btn-neutral float-right" title="4. Visualizing PRS Results">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../ldpred/" class="btn btn-neutral" title="LDpred"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ldpred/" class="btn btn-neutral" title="LDpred-2"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -280,7 +271,7 @@ r2 <span class="o">&lt;-</span> <span class="kp">max</span><span class="p">(</sp
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -290,7 +281,7 @@ r2 <span class="o">&lt;-</span> <span class="kp">max</span><span class="p">(</sp
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/choishingwan/PRS-Tutorial/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
@@ -306,7 +297,13 @@ r2 <span class="o">&lt;-</span> <span class="kp">max</span><span class="p">(</sp
     <script>var base_url = '..';</script>
     <script src="../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+      <script src="../javascripts/details.js" defer></script>
       <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>
