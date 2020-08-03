@@ -56,9 +56,7 @@ table tbody {
 table th {
     font-size: 100%;
 }
-table tr:hover {
-    background-color: #ffff99;
-}
+
 
 table td {
     font-family: sans-serif;
