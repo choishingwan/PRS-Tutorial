@@ -25,13 +25,17 @@ If you are only interested in how to perform PRS on previously QC'ed data then y
 !!! note
     Throughout the tutorial you will see tabs above some of the code:
 
-    ```bash tab="A"
-    echo "Tab A"
-    ```
+    === "A"
 
-    ```bash tab="B"
-    echo "Tab B"
-    ```
+        ```bash
+        echo "Tab A"
+        ```
+
+    === "B"
+
+        ```bash
+        echo "Tab B"
+        ```
 
     You can click on the tab to change to an alternative code (eg. to a different operation system)
 # Datasets
@@ -49,5 +53,4 @@ If you find this tutorial helpful for a publication, then please consider citing
 
 !!! important "Citation"
 
-    Choi SW, Mak TSH, O'Reilly PF.  A guide to performing Polygenic Risk Score analyses. 
-    bioRxiv 416545 (2018). https://doi.org/10.1101/416545
+    Choi, S.W., Mak, T.S. & O’Reilly, P.F. Tutorial: a guide to performing polygenic risk score analyses. Nat Protoc (2020). [https://doi.org/10.1038/s41596-020-0353-1](https://doi.org/10.1038/s41596-020-0353-1)

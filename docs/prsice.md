@@ -25,75 +25,83 @@ In this tutorial, you will only need `PRSice.R` and `PRSice_XXX` where XXX is th
 # Running PRS analysis
 To run PRSice-2 we need a single covariate file, and therefore our covariate file and PCs file should be combined. This can be done with `R` as follows:
 
+=== "without data.table"    
 
-```R tab="without data.table"    
-covariate <- read.table("EUR.cov", header=T)
-pcs <- read.table("EUR.eigenvec", header=F)
-colnames(pcs) <- c("FID","IID", paste0("PC",1:6))
-cov <- merge(covariate, pcs, by=c("FID", "IID"))
-write.table(cov,"EUR.covariate", quote=F, row.names=F)
-q()
-```
+    ```R
+    covariate <- read.table("EUR.cov", header=T)
+    pcs <- read.table("EUR.eigenvec", header=F)
+    colnames(pcs) <- c("FID","IID", paste0("PC",1:6))
+    cov <- merge(covariate, pcs, by=c("FID", "IID"))
+    write.table(cov,"EUR.covariate", quote=F, row.names=F)
+    q()
+    ```
 
-```R tab="with data.table"
-library(data.table)
-covariate <- fread("EUR.cov")
-pcs <- fread("EUR.eigenvec", header=F)
-colnames(pcs) <- c("FID","IID", paste0("PC",1:6))
-cov <- merge(covariate, pcs)
-fwrite(cov,"EUR.covariate", sep="\t")
-q()
-```
+=== "with data.table"
+
+    ```R
+    library(data.table)
+    covariate <- fread("EUR.cov")
+    pcs <- fread("EUR.eigenvec", header=F)
+    colnames(pcs) <- c("FID","IID", paste0("PC",1:6))
+    cov <- merge(covariate, pcs)
+    fwrite(cov,"EUR.covariate", sep="\t")
+    q()
+    ```
 
 which generates **EUR.cov**.
 
 PRSice-2 can then be run to obtain the PRS results as follows:
 
-```bash tab="Linux"
-Rscript PRSice.R \
-    --prsice PRSice_linux \
-    --base Height.QC.gz \
-    --target EUR.QC \
-    --binary-target F \
-    --pheno EUR.height \
-    --cov EUR.cov \
-    --base-maf MAF:0.01 \
-    --base-info INFO:0.8 \
-    --stat OR \
-    --or \
-    --out EUR
-```
+=== "Linux"
 
+    ```bash
+    Rscript PRSice.R \
+        --prsice PRSice_linux \
+        --base Height.QC.gz \
+        --target EUR.QC \
+        --binary-target F \
+        --pheno EUR.height \
+        --cov EUR.cov \
+        --base-maf MAF:0.01 \
+        --base-info INFO:0.8 \
+        --stat OR \
+        --or \
+        --out EUR
+    ```
 
-```bash tab="OS X"
-Rscript PRSice.R \
-    --prsice PRSice_mac \
-    --base Height.QC.gz \
-    --target EUR.QC \
-    --binary-target F \
-    --pheno EUR.height \
-    --cov EUR.cov \
-    --base-maf MAF:0.01 \
-    --base-info INFO:0.8 \
-    --stat OR \
-    --or \
-    --out EUR
-```
+==="OS X"
 
-```bash tab="Windows"
-Rscript PRSice.R ^
-    --prsice PRSice_win64.exe ^
-    --base Height.QC.gz ^
-    --target EUR.QC ^
-    --binary-target F ^
-    --pheno EUR.height ^
-    --cov EUR.cov ^
-    --base-maf MAF:0.05 ^
-    --base-info INFO:0.8 ^
-    --stat OR ^
-    --or ^
-    --out EUR
-```
+    ```bash
+    Rscript PRSice.R \
+        --prsice PRSice_mac \
+        --base Height.QC.gz \
+        --target EUR.QC \
+        --binary-target F \
+        --pheno EUR.height \
+        --cov EUR.cov \
+        --base-maf MAF:0.01 \
+        --base-info INFO:0.8 \
+        --stat OR \
+        --or \
+        --out EUR
+    ```
+
+=== "Windows"
+
+    ```bash
+    Rscript PRSice.R ^
+        --prsice PRSice_win64.exe ^
+        --base Height.QC.gz ^
+        --target EUR.QC ^
+        --binary-target F ^
+        --pheno EUR.height ^
+        --cov EUR.cov ^
+        --base-maf MAF:0.05 ^
+        --base-info INFO:0.8 ^
+        --stat OR ^
+        --or ^
+        --out EUR
+    ```
 
 This will automatically perform "high-resolution scoring" and generate the "best-fit" PRS (in **EUR.best**), with associated plots of the results. 
 Users should read Section 4.6 of our paper to learn more about issues relating to overfitting in PRS analyses.  

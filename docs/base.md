@@ -78,13 +78,17 @@ However, a `md5sum` hash is
 generally included in files so that file integrity can be checked. 
 The following command performs this `md5sum` check: 
 
-```bash tab="Linux"
-md5sum Height.gwas.txt.gz
-```
+=== "Linux"
 
-```bash tab="OS X"
-md5 Height.gwas.txt.gz
-```
+    ```bash
+    md5sum Height.gwas.txt.gz
+    ```
+
+=== "OS X"
+
+    ```bash
+    md5 Height.gwas.txt.gz
+    ```
 
 
 if the file is intact, then `md5sum` generates a string of characters, which in this case should be: `a2b15fb6a2bbbe7ef49f67959b43b160`. 
@@ -102,22 +106,23 @@ Therefore, SNPs with low MAF and INFO are typically removed before performing do
 We recommend removing SNPs with MAF < 1% and INFO < 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results).
 These SNP filters can be achieved using the following code:
 
-```bash tab="Using bash"
-gunzip -c Height.gwas.txt.gz |\
-awk 'NR==1 || ($11 > 0.01) && ($10 > 0.8) {print}' |\
-gzip  > Height.gz
-```
-
-```R tab="Using R with data.table"
-# Alternatively, you can use R, with data.table v1.11.8+
-library(data.table)
-# Read in file
-dat <- fread("Height.gwas.txt.gz")
-# Filter out SNPs
-result <- dat[INFO > 0.8 & MAF > 0.01]
-# Output the gz file
-fwrite(result, "Height.gz", sep="\t")
-```
+=== "Using bash"
+    ```bash 
+    gunzip -c Height.gwas.txt.gz |\
+    awk 'NR==1 || ($11 > 0.01) && ($10 > 0.8) {print}' |\
+    gzip  > Height.gz
+    ```
+=== "Using R with data.table"
+    ```R
+    # Alternatively, you can use R, with data.table v1.11.8+
+    library(data.table)
+    # Read in file
+    dat <- fread("Height.gwas.txt.gz")
+    # Filter out SNPs
+    result <- dat[INFO > 0.8 & MAF > 0.01]
+    # Output the gz file
+    fwrite(result, "Height.gz", sep="\t")
+    ```
 
 The bash code above does the following:
 

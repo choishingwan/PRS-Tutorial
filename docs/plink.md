@@ -21,19 +21,23 @@ In the previous sections, we have generated the following files:
 When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we take the natural logarithm of the OR so that the PRS can be computed using summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with `R`:
 
-```R tab="Without data.table"
-dat <- read.table(gzfile("Height.QC.gz"), header=T)
-dat$OR <- log(dat$OR)
-write.table(dat, "Height.QC.Transformed", quote=F, row.names=F)
-q() # exit R
-```
+=== "Without data.table"
 
-```R tab="With data.table"
-library(data.table)
-dat <- fread("Height.QC.gz")
-fwrite(dat[,BETA:=log(OR)], "Height.QC.Transformed", sep="\t")
-q() # exit R
-```
+    ```R
+    dat <- read.table(gzfile("Height.QC.gz"), header=T)
+    dat$OR <- log(dat$OR)
+    write.table(dat, "Height.QC.Transformed", quote=F, row.names=F)
+    q() # exit R
+    ```
+
+=== "With data.table"
+
+    ```R
+    library(data.table)
+    dat <- fread("Height.QC.gz")
+    fwrite(dat[,BETA:=log(OR)], "Height.QC.Transformed", sep="\t")
+    q() # exit R
+    ```
 
 
 !!! warning
@@ -76,7 +80,7 @@ A more detailed description of the clumping process can be found [here](https://
 This will generate **EUR.clumped**, containing the index SNPs after clumping is performed.
 We can extract the index SNP ID by performing the following command:
 
-```bash
+```awk
 awk 'NR!=1{print $3}' EUR.clumped >  EUR.valid.snp
 ```
 
@@ -94,12 +98,15 @@ We will need three files:
 
 1. The base data file: **Height.QC.Transformed**
 2. A file containing SNP IDs and their corresponding P-values (`$3` because SNP ID is located in the third column; `$8` because the P-value is located in the eighth column)
-```bash
+
+```awk
 awk '{print $3,$8}' Height.QC.Transformed > SNP.pvalue
 ```
+
 3. A file containing the different P-value thresholds for inclusion of SNPs in the PRS. Here calculate PRS corresponding to a few thresholds for illustration purposes:
+
 ```bash
-echo "0.001 0 0.001" > range_list
+echo "0.001 0 0.001" > range_list 
 echo "0.05 0 0.05" >> range_list
 echo "0.1 0 0.1" >> range_list
 echo "0.2 0 0.2" >> range_list
@@ -130,7 +137,7 @@ The meaning of the new parameters are as follows:
 
 | Paramter | Value | Description|
 |:-:|:-:|:-|
-|score|Height.QC.Transformed 3 4 11 header| We read from the **Height.QC.Transformed** file, assuming that the `3`st column is the SNP ID; `4`th column is the effective allele information; the `12`th column is the effect size estimate; and that the file contains a `header`|
+|score|Height.QC.Transformed 3 4 12 header| We read from the **Height.QC.Transformed** file, assuming that the `3`st column is the SNP ID; `4`th column is the effective allele information; the `12`th column is the effect size estimate; and that the file contains a `header`|
 |q-score-range| range_test SNP.pvalue| We want to calculate PRS based on the thresholds defined in **range_test**, where the threshold values (P-values) were stored in **SNP.pvalue**|
 
 The above command and range_list will generate 7 files:
@@ -157,6 +164,7 @@ The above command and range_list will generate 7 files:
 Population structure is the principal source of confounding in GWAS and is usually accounted for by incorporating principal components (PCs) as covariates. We can incorporate PCs into our PRS analysis to account for population stratification.
 
 Again, we can calculate the PCs using `plink`: 
+
 ```bash
 # First, we need to perform prunning
 plink \
@@ -186,113 +194,116 @@ The P-value threshold that provides the "best-fit" PRS under the C+T method is u
 To approximate the "best-fit" PRS, we can perform a regression between PRS calculated at a range of P-value thresholds and then select the PRS that explains the highest phenotypic variance (please see Section 4.6 of our paper on overfitting issues). 
 This can be achieved using `R` as follows:
 
-```R tab="detail"
-p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
-# Read in the phenotype file 
-phenotype <- read.table("EUR.height", header=T)
-# Read in the PCs
-pcs <- read.table("EUR.eigenvec", header=F)
-# The default output from plink does not include a header
-# To make things simple, we will add the appropriate headers
-# (1:6 because there are 6 PCs)
-colnames(pcs) <- c("FID", "IID", paste0("PC",1:6)) 
-# Read in the covariates (here, it is sex)
-covariate <- read.table("EUR.cov", header=T)
-# Now merge the files
-pheno <- merge(merge(phenotype, covariate, by=c("FID", "IID")), pcs, by=c("FID","IID"))
-# We can then calculate the null model (model with PRS) using a linear regression 
-# (as height is quantitative)
-null.model <- lm(Height~., data=pheno[,!colnames(pheno)%in%c("FID","IID")])
-# And the R2 of the null model is 
-null.r2 <- summary(null.model)$r.squared
-prs.result <- NULL
-for(i in p.threshold){
-    # Go through each p-value threshold
-    prs <- read.table(paste0("EUR.",i,".profile"), header=T)
-    # Merge the prs with the phenotype matrix
-    # We only want the FID, IID and PRS from the PRS file, therefore we only select the 
-    # relevant columns
-    pheno.prs <- merge(pheno, prs[,c("FID","IID", "SCORE")], by=c("FID", "IID"))
-    # Now perform a linear regression on Height with PRS and the covariates
-    # ignoring the FID and IID from our model
-    model <- lm(Height~., data=pheno.prs[,!colnames(pheno.prs)%in%c("FID","IID")])
-    # model R2 is obtained as 
-    model.r2 <- summary(model)$r.squared
-    # R2 of PRS is simply calculated as the model R2 minus the null R2
-    prs.r2 <- model.r2-null.r2
-    # We can also obtain the coeffcient and p-value of association of PRS as follow
-    prs.coef <- summary(model)$coeff["SCORE",]
-    prs.beta <- as.numeric(prs.coef[1])
-    prs.se <- as.numeric(prs.coef[2])
-    prs.p <- as.numeric(prs.coef[4])
-    # We can then store the results
-    prs.result <- rbind(prs.result, data.frame(Threshold=i, R2=prs.r2, P=prs.p, BETA=prs.beta,SE=prs.se))
-}
-# Best result is:
-prs.result[which.max(prs.result$R2),]
-q() # exit R
-```
+=== "detail"
+    ```R 
+    p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
+    # Read in the phenotype file 
+    phenotype <- read.table("EUR.height", header=T)
+    # Read in the PCs
+    pcs <- read.table("EUR.eigenvec", header=F)
+    # The default output from plink does not include a header
+    # To make things simple, we will add the appropriate headers
+    # (1:6 because there are 6 PCs)
+    colnames(pcs) <- c("FID", "IID", paste0("PC",1:6)) 
+    # Read in the covariates (here, it is sex)
+    covariate <- read.table("EUR.cov", header=T)
+    # Now merge the files
+    pheno <- merge(merge(phenotype, covariate, by=c("FID", "IID")), pcs, by=c("FID","IID"))
+    # We can then calculate the null model (model with PRS) using a linear regression 
+    # (as height is quantitative)
+    null.model <- lm(Height~., data=pheno[,!colnames(pheno)%in%c("FID","IID")])
+    # And the R2 of the null model is 
+    null.r2 <- summary(null.model)$r.squared
+    prs.result <- NULL
+    for(i in p.threshold){
+        # Go through each p-value threshold
+        prs <- read.table(paste0("EUR.",i,".profile"), header=T)
+        # Merge the prs with the phenotype matrix
+        # We only want the FID, IID and PRS from the PRS file, therefore we only select the 
+        # relevant columns
+        pheno.prs <- merge(pheno, prs[,c("FID","IID", "SCORE")], by=c("FID", "IID"))
+        # Now perform a linear regression on Height with PRS and the covariates
+        # ignoring the FID and IID from our model
+        model <- lm(Height~., data=pheno.prs[,!colnames(pheno.prs)%in%c("FID","IID")])
+        # model R2 is obtained as 
+        model.r2 <- summary(model)$r.squared
+        # R2 of PRS is simply calculated as the model R2 minus the null R2
+        prs.r2 <- model.r2-null.r2
+        # We can also obtain the coeffcient and p-value of association of PRS as follow
+        prs.coef <- summary(model)$coeff["SCORE",]
+        prs.beta <- as.numeric(prs.coef[1])
+        prs.se <- as.numeric(prs.coef[2])
+        prs.p <- as.numeric(prs.coef[4])
+        # We can then store the results
+        prs.result <- rbind(prs.result, data.frame(Threshold=i, R2=prs.r2, P=prs.p, BETA=prs.beta,SE=prs.se))
+    }
+    # Best result is:
+    prs.result[which.max(prs.result$R2),]
+    q() # exit R
+    ```
 
-```R tab="quick"
-p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
-phenotype <- read.table("EUR.height", header=T)
-pcs <- read.table("EUR.eigenvec", header=F)
-colnames(pcs) <- c("FID", "IID", paste0("PC",1:6)) 
-covariate <- read.table("EUR.cov", header=T)
-pheno <- merge(merge(phenotype, covariate, by=c("FID", "IID")), pcs, by=c("FID","IID"))
-null.r2 <- summary(lm(Height~., data=pheno[,!colnames(pheno)%in%c("FID","IID")]))$r.squared
-prs.result <- NULL
-for(i in p.threshold){
-    pheno.prs <- merge(pheno, 
-                        read.table(paste0("EUR.",i,".profile"), header=T)[,c("FID","IID", "SCORE")],
-                        by=c("FID", "IID"))
-    model <- summary(lm(Height~., data=pheno.prs[,!colnames(pheno.prs)%in%c("FID","IID")]))
-    model.r2 <- model$r.squared
-    prs.r2 <- model.r2-null.r2
-    prs.coef <- model$coeff["SCORE",]
-    prs.result <- rbind(prs.result, 
-        data.frame(Threshold=i, R2=prs.r2, 
-                    P=as.numeric(prs.coef[4]), 
-                    BETA=as.numeric(prs.coef[1]),
-                    SE=as.numeric(prs.coef[2])))
-}
-print(prs.result[which.max(prs.result$R2),])
-q() # exit R
-```
+=== "quick"
+    ```R
+    p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
+    phenotype <- read.table("EUR.height", header=T)
+    pcs <- read.table("EUR.eigenvec", header=F)
+    colnames(pcs) <- c("FID", "IID", paste0("PC",1:6)) 
+    covariate <- read.table("EUR.cov", header=T)
+    pheno <- merge(merge(phenotype, covariate, by=c("FID", "IID")), pcs, by=c("FID","IID"))
+    null.r2 <- summary(lm(Height~., data=pheno[,!colnames(pheno)%in%c("FID","IID")]))$r.squared
+    prs.result <- NULL
+    for(i in p.threshold){
+        pheno.prs <- merge(pheno, 
+                            read.table(paste0("EUR.",i,".profile"), header=T)[,c("FID","IID", "SCORE")],
+                            by=c("FID", "IID"))
+        model <- summary(lm(Height~., data=pheno.prs[,!colnames(pheno.prs)%in%c("FID","IID")]))
+        model.r2 <- model$r.squared
+        prs.r2 <- model.r2-null.r2
+        prs.coef <- model$coeff["SCORE",]
+        prs.result <- rbind(prs.result, 
+            data.frame(Threshold=i, R2=prs.r2, 
+                        P=as.numeric(prs.coef[4]), 
+                        BETA=as.numeric(prs.coef[1]),
+                        SE=as.numeric(prs.coef[2])))
+    }
+    print(prs.result[which.max(prs.result$R2),])
+    q() # exit R
+    ```
 
+=== "with data.table and magrittr"
 
-```R tab="with data.table and  magrittr"
-library(data.table)
-library(magrittr)
-p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
-phenotype <- fread("EUR.height")
-pcs <- fread("EUR.eigenvec", header=F) %>%
-    setnames(., colnames(.), c("FID", "IID", paste0("PC",1:6)) )
-covariate <- fread("EUR.cov")
-pheno <- merge(phenotype, covariate) %>%
-        merge(., pcs)
-null.r2 <- summary(lm(Height~., data=pheno[,-c("FID", "IID")]))$r.squared
-prs.result <- NULL
-for(i in p.threshold){
-    pheno.prs <- paste0("EUR.", i, ".profile") %>%
-        fread(.) %>%
-        .[,c("FID", "IID", "SCORE")] %>%
-        merge(., pheno, by=c("FID", "IID"))
+    ```R
+    library(data.table)
+    library(magrittr)
+    p.threshold <- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
+    phenotype <- fread("EUR.height")
+    pcs <- fread("EUR.eigenvec", header=F) %>%
+        setnames(., colnames(.), c("FID", "IID", paste0("PC",1:6)) )
+    covariate <- fread("EUR.cov")
+    pheno <- merge(phenotype, covariate) %>%
+            merge(., pcs)
+    null.r2 <- summary(lm(Height~., data=pheno[,-c("FID", "IID")]))$r.squared
+    prs.result <- NULL
+    for(i in p.threshold){
+        pheno.prs <- paste0("EUR.", i, ".profile") %>%
+            fread(.) %>%
+            .[,c("FID", "IID", "SCORE")] %>%
+            merge(., pheno, by=c("FID", "IID"))
 
-    model <- lm(Height~., data=pheno.prs[,-c("FID","IID")]) %>%
-            summary
-    model.r2 <- model$r.squared
-    prs.r2 <- model.r2-null.r2
-    prs.coef <- model$coeff["SCORE",]
-    prs.result %<>% rbind(.,
-        data.frame(Threshold=i, R2=prs.r2, 
-                    P=as.numeric(prs.coef[4]), 
-                    BETA=as.numeric(prs.coef[1]),
-                    SE=as.numeric(prs.coef[2])))
-}
-print(prs.result[which.max(prs.result$R2),])
-q() # exit R
-```
+        model <- lm(Height~., data=pheno.prs[,-c("FID","IID")]) %>%
+                summary
+        model.r2 <- model$r.squared
+        prs.r2 <- model.r2-null.r2
+        prs.coef <- model$coeff["SCORE",]
+        prs.result %<>% rbind(.,
+            data.frame(Threshold=i, R2=prs.r2, 
+                        P=as.numeric(prs.coef[4]), 
+                        BETA=as.numeric(prs.coef[1]),
+                        SE=as.numeric(prs.coef[2])))
+    }
+    print(prs.result[which.max(prs.result$R2),])
+    q() # exit R
+    ```
 
 ??? note "Which P-value threshold generates the "best-fit" PRS?"
     0.3

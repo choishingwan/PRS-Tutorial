@@ -8,15 +8,25 @@ nav:
     - 3. Calculating and analysing PRS:
         - PLINK: plink.md
         - PRSice-2: prsice.md
-        - LDpred: ldpred.md
+        - LDpred-2: ldpred.md
         - lassosum: lassosum.md
     - 4. Visualizing PRS Results: plink_visual.md
 
-theme: readthedocs
+theme: 
+    name: readthedocs
+    highlightjs: True
+    hljs_languages:
+        - R
+        - bash
+        - awk
+
 markdown_extensions:
     - admonition
     - pymdownx.details
+    - pymdownx.tabbed
     - pymdownx.superfences
+    - pymdownx.highlight:
+        use_pygments: True
     - toc:
         permalink: True
     - codehilite
@@ -29,6 +39,7 @@ markdown_extensions:
 
 extra_css:
   - css/extra.css
+  - css/details.css
 
 google_analytics:
     - 'UA-145068952-1'
@@ -36,3 +47,4 @@ google_analytics:
 
 extra_javascript:
   - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'
+  - javascripts/details.js

@@ -44,6 +44,7 @@ individuals with low genotyping rate
 
 The following `plink` command applies some of these QC metrics to the target data:
 
+
 ```bash
 plink \
     --bfile EUR \
@@ -85,6 +86,7 @@ Each of the parameters corresponds to the following
 Very high or low heterozygosity rates in individuals could be due to DNA contamination or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. 
 
 First, we perform prunning to remove highly correlated SNPs:
+
 ```bash
 plink \
     --bfile EUR \
@@ -109,6 +111,7 @@ This will generate two files 1) **EUR.QC.prune.in** and 2) **EUR.QC.prune.out**.
 
 
 Heterozygosity rates can then be computed using `plink`:
+
 ```bash
 plink \
     --bfile EUR \
@@ -121,25 +124,27 @@ plink \
 This will generate the **EUR.QC.het** file, which contains F coefficient estimates for assessing heterozygosity.
 We will remove individuals with F coefficients that are more than 3 standard deviation (SD) units from the mean, which can be performed using the following `R` command (assuming that you have R downloaded, then you can open an `R` session by typing `R` in your terminal):
 
-```R tab="Without library"
-dat <- read.table("EUR.QC.het", header=T) # Read in the EUR.het file, specify it has header
-m <- mean(dat$F) # Calculate the mean  
-s <- sd(dat$F) # Calculate the SD
-valid <- subset(dat, F <= m+3*s & F >= m-3*s) # Get any samples with F coefficient within 3 SD of the population mean
-write.table(valid[,c(1,2)], "EUR.valid.sample", quote=F, row.names=F) # print FID and IID for valid samples
-q() # exit R
-```
+=== "Without library"
+    ```R
+    dat <- read.table("EUR.QC.het", header=T) # Read in the EUR.het file, specify it has header
+    m <- mean(dat$F) # Calculate the mean  
+    s <- sd(dat$F) # Calculate the SD
+    valid <- subset(dat, F <= m+3*s & F >= m-3*s) # Get any samples with F coefficient within 3 SD of the population mean
+    write.table(valid[,c(1,2)], "EUR.valid.sample", quote=F, row.names=F) # print FID and IID for valid samples
+    q() # exit R
+    ```
 
-```R tab="With data.table"
-library(data.table)
-# Read in file
-dat <- fread("EUR.QC.het")
-# Get samples with F coefficient within 3 SD of the population mean
-valid <- dat[F<=mean(F)+3*sd(F) & F>=mean(F)-3*sd(F)] 
-# print FID and IID for valid samples
-fwrite(valid[,c("FID","IID")], "EUR.valid.sample", sep="\t") 
-q() # exit R
-```
+=== "With data.table"
+    ```R
+    library(data.table)
+    # Read in file
+    dat <- fread("EUR.QC.het")
+    # Get samples with F coefficient within 3 SD of the population mean
+    valid <- dat[F<=mean(F)+3*sd(F) & F>=mean(F)-3*sd(F)] 
+    # print FID and IID for valid samples
+    fwrite(valid[,c("FID","IID")], "EUR.valid.sample", sep="\t") 
+    q() # exit R
+    ```
 
 ??? note "How many samples were excluded due to high heterozygosity rate?"
     - `2` samples were excluded
@@ -152,185 +157,198 @@ SNPs that have mismatching alleles reported in the base and target data may be r
 
 1\. Load the bim file, the summary statistic and the QC SNP list into R
 
-```R tab="Without data.table"
-# Read in bim file
-bim <- read.table("EUR.bim")
-colnames(bim) <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
-# Read in QCed SNPs
-qc <- read.table("EUR.QC.snplist", header = F, stringsAsFactors = F)
-# Read in the GWAS data
-height <-
-    read.table(gzfile("Height.QC.gz"),
-               header = T,
-               stringsAsFactors = F, 
-               sep="\t")
-# Change all alleles to upper case for easy comparison
-height$A1 <- toupper(height$A1)
-height$A2 <- toupper(height$A2)
-bim$B.A1 <- toupper(bim$B.A1)
-bim$B.A2 <- toupper(bim$B.A2)
-```
+=== "Without data.table"
+    ```R
+    # Read in bim file
+    bim <- read.table("EUR.bim")
+    colnames(bim) <- c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")
+    # Read in QCed SNPs
+    qc <- read.table("EUR.QC.snplist", header = F, stringsAsFactors = F)
+    # Read in the GWAS data
+    height <-
+        read.table(gzfile("Height.QC.gz"),
+                header = T,
+                stringsAsFactors = F, 
+                sep="\t")
+    # Change all alleles to upper case for easy comparison
+    height$A1 <- toupper(height$A1)
+    height$A2 <- toupper(height$A2)
+    bim$B.A1 <- toupper(bim$B.A1)
+    bim$B.A2 <- toupper(bim$B.A2)
+    ```
 
-```R tab="With data.table and magrittr"
-# magrittr allow us to do piping, which help to reduce the 
-# amount of intermediate data types
-library(data.table)
-library(magrittr)
-# Read in bim file 
-bim <- fread("EUR.bim") %>%
-    # Note: . represents the output from previous step
-    # The syntax here means, setnames of the data read from
-    # the bim file, and replace the original column names by 
-    # the new names
-    setnames(., colnames(.), c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")) %>%
-    # And immediately change the alleles to upper cases
-    .[,c("B.A1","B.A2"):=list(toupper(B.A1), toupper(B.A2))]
-# Read in summary statistic data (require data.table v1.12.0+)
-height <- fread("Height.QC.gz") %>%
-    # And immediately change the alleles to upper cases
-    .[,c("A1","A2"):=list(toupper(A1), toupper(A2))]
-# Read in QCed SNPs
-qc <- fread("EUR.QC.snplist", header=F)
-```
+=== "With data.table and magrittr"
+
+    ```R
+    # magrittr allow us to do piping, which help to reduce the 
+    # amount of intermediate data types
+    library(data.table)
+    library(magrittr)
+    # Read in bim file 
+    bim <- fread("EUR.bim") %>%
+        # Note: . represents the output from previous step
+        # The syntax here means, setnames of the data read from
+        # the bim file, and replace the original column names by 
+        # the new names
+        setnames(., colnames(.), c("CHR", "SNP", "CM", "BP", "B.A1", "B.A2")) %>%
+        # And immediately change the alleles to upper cases
+        .[,c("B.A1","B.A2"):=list(toupper(B.A1), toupper(B.A2))]
+    # Read in summary statistic data (require data.table v1.12.0+)
+    height <- fread("Height.QC.gz") %>%
+        # And immediately change the alleles to upper cases
+        .[,c("A1","A2"):=list(toupper(A1), toupper(A2))]
+    # Read in QCed SNPs
+    qc <- fread("EUR.QC.snplist", header=F)
+    ```
 
 
 2\. Identify SNPs that require strand flipping 
 
-```R tab="Without data.table"
-# Merge summary statistic with target
-info <- merge(bim, height, by = c("SNP", "CHR", "BP"))
-# Filter QCed SNPs
-info <- info[info$SNP %in% qc$V1,]
-# Function for finding the complementary allele
-complement <- function(x) {
-    switch (
-        x,
-        "A" = "T",
-        "C" = "G",
-        "T" = "A",
-        "G" = "C",
-        return(NA)
-    )
-}
-# Get SNPs that have the same alleles across base and target
-info.match <- subset(info, A1 == B.A1 & A2 == B.A2)
-# Identify SNPs that are complementary between base and target
-info$C.A1 <- sapply(info$B.A1, complement)
-info$C.A2 <- sapply(info$B.A2, complement)
-info.complement <- subset(info, A1 == C.A1 & A2 == C.A2)
-# Update the complementary alleles in the bim file
-# This allow us to match the allele in subsequent analysis
-complement.snps <- bim$SNP %in% info.complement$SNP
-bim[complement.snps,]$B.A1 <-
-    sapply(bim[complement.snps,]$B.A1, complement)
-bim[complement.snps,]$B.A2 <-
-    sapply(bim[complement.snps,]$B.A2, complement)
-```
+=== "Without data.table"
 
-```R tab="With data.table and magrittr"
-# Merge summary statistic with target
-info <- merge(bim, height, by=c("SNP", "CHR", "BP")) %>%
-    # And filter out QCed SNPs
-    .[SNP %in% qc[,V1]]
+    ```R
+    # Merge summary statistic with target
+    info <- merge(bim, height, by = c("SNP", "CHR", "BP"))
+    # Filter QCed SNPs
+    info <- info[info$SNP %in% qc$V1,]
+    # Function for finding the complementary allele
+    complement <- function(x) {
+        switch (
+            x,
+            "A" = "T",
+            "C" = "G",
+            "T" = "A",
+            "G" = "C",
+            return(NA)
+        )
+    }
+    # Get SNPs that have the same alleles across base and target
+    info.match <- subset(info, A1 == B.A1 & A2 == B.A2)
+    # Identify SNPs that are complementary between base and target
+    info$C.A1 <- sapply(info$B.A1, complement)
+    info$C.A2 <- sapply(info$B.A2, complement)
+    info.complement <- subset(info, A1 == C.A1 & A2 == C.A2)
+    # Update the complementary alleles in the bim file
+    # This allow us to match the allele in subsequent analysis
+    complement.snps <- bim$SNP %in% info.complement$SNP
+    bim[complement.snps,]$B.A1 <-
+        sapply(bim[complement.snps,]$B.A1, complement)
+    bim[complement.snps,]$B.A2 <-
+        sapply(bim[complement.snps,]$B.A2, complement)
+    ```
 
-# Function for calculating the complementary allele
-complement <- function(x){
-    switch (x,
-        "A" = "T",
-        "C" = "G",
-        "T" = "A",
-        "G" = "C",
-        return(NA)
-    )
-} 
-# Get SNPs that have the same alleles across base and target
-info.match <- info[A1 == B.A1 & A2 == B.A2, SNP]
-# Identify SNPs that are complementary between base and target
-com.snps <- info[sapply(B.A1, complement) == A1 &
-                     sapply(B.A2, complement) == A2, SNP]
-# Now update the bim file
-bim[SNP %in% com.snps, c("B.A1", "B.A2") :=
-        list(sapply(B.A1, complement),
-             sapply(B.A2, complement))]
-```
+=== "With data.table and magrittr"
+    ```R
+    # Merge summary statistic with target
+    info <- merge(bim, height, by=c("SNP", "CHR", "BP")) %>%
+        # And filter out QCed SNPs
+        .[SNP %in% qc[,V1]]
+
+    # Function for calculating the complementary allele
+    complement <- function(x){
+        switch (x,
+            "A" = "T",
+            "C" = "G",
+            "T" = "A",
+            "G" = "C",
+            return(NA)
+        )
+    } 
+    # Get SNPs that have the same alleles across base and target
+    info.match <- info[A1 == B.A1 & A2 == B.A2, SNP]
+    # Identify SNPs that are complementary between base and target
+    com.snps <- info[sapply(B.A1, complement) == A1 &
+                        sapply(B.A2, complement) == A2, SNP]
+    # Now update the bim file
+    bim[SNP %in% com.snps, c("B.A1", "B.A2") :=
+            list(sapply(B.A1, complement),
+                sapply(B.A2, complement))]
+    ```
 
 
 3\. Identify SNPs that require recoding in the target (to ensure the coding allele in the target data is the effective allele in the base summary statistic)
 
-```R tab="Without data.table"
-# identify SNPs that need recoding
-info.recode <- subset(info, A1 == B.A2 & A2 == B.A1)
-# Update the recode SNPs
-recode.snps <- bim$SNP %in% info.recode$SNP
-tmp <- bim[recode.snps,]$B.A1
-bim[recode.snps,]$B.A1 <- bim[recode.snps,]$B.A2
-bim[recode.snps,]$B.A2 <- tmp
+=== "Without data.table"
 
-# identify SNPs that need recoding & complement
-info.crecode <- subset(info, A1 == C.A2 & A2 == C.A1)
-# Update the recode + strand flip SNPs
-com.snps <- bim$SNP %in% info.crecode$SNP
-tmp <- bim[com.snps,]$B.A1
-bim[com.snps,]$B.A1 <- as.character(sapply(bim[com.snps,]$B.A2, complement))
-bim[com.snps,]$B.A2 <- as.character(sapply(tmp, complement))
+    ```R
+    # identify SNPs that need recoding
+    info.recode <- subset(info, A1 == B.A2 & A2 == B.A1)
+    # Update the recode SNPs
+    recode.snps <- bim$SNP %in% info.recode$SNP
+    tmp <- bim[recode.snps,]$B.A1
+    bim[recode.snps,]$B.A1 <- bim[recode.snps,]$B.A2
+    bim[recode.snps,]$B.A2 <- tmp
 
-# Output updated bim file
-write.table(
-    bim,
-    "EUR.QC.adj.bim",
-    quote = F,
-    row.names = F,
-    col.names = F,
-    sep="\t"
-)
-```
+    # identify SNPs that need recoding & complement
+    info.crecode <- subset(info, A1 == C.A2 & A2 == C.A1)
+    # Update the recode + strand flip SNPs
+    com.snps <- bim$SNP %in% info.crecode$SNP
+    tmp <- bim[com.snps,]$B.A1
+    bim[com.snps,]$B.A1 <- as.character(sapply(bim[com.snps,]$B.A2, complement))
+    bim[com.snps,]$B.A2 <- as.character(sapply(tmp, complement))
 
-```R tab="With data.table  and magrittr"
-# identify SNPs that need recoding
-recode.snps <- info[B.A1==A2 & B.A2==A1, SNP]
-# Update the bim file
-bim[SNP %in% recode.snps, c("B.A1", "B.A2") :=
-        list(B.A2, B.A1)]
+    # Output updated bim file
+    write.table(
+        bim,
+        "EUR.QC.adj.bim",
+        quote = F,
+        row.names = F,
+        col.names = F,
+        sep="\t"
+    )
+    ```
 
-# identify SNPs that need recoding & complement
-com.recode <- info[sapply(B.A1, complement) == A2 &
-                     sapply(B.A2, complement) == A1, SNP]
-# Now update the bim file
-bim[SNP %in% com.recode, c("B.A1", "B.A2") :=
-        list(sapply(B.A2, complement),
-             sapply(B.A1, complement))]
-# Write the updated bim file
-fwrite(bim, "EUR.QC.adj.bim", col.names=F, sep="\t")
-```
+=== "With data.table  and magrittr"
+
+    ```R
+    # identify SNPs that need recoding
+    recode.snps <- info[B.A1==A2 & B.A2==A1, SNP]
+    # Update the bim file
+    bim[SNP %in% recode.snps, c("B.A1", "B.A2") :=
+            list(B.A2, B.A1)]
+
+    # identify SNPs that need recoding & complement
+    com.recode <- info[sapply(B.A1, complement) == A2 &
+                        sapply(B.A2, complement) == A1, SNP]
+    # Now update the bim file
+    bim[SNP %in% com.recode, c("B.A1", "B.A2") :=
+            list(sapply(B.A2, complement),
+                sapply(B.A1, complement))]
+    # Write the updated bim file
+    fwrite(bim, "EUR.QC.adj.bim", col.names=F, sep="\t")
+    ```
 
 
 4\. Identify SNPs that have different allele in base and target (usually due to difference in genome build or Indel)
 
-```R tab="Without data.table"
-mismatch <-
-    bim$SNP[!(bim$SNP %in% info.match$SNP |
-                  bim$SNP %in% info.complement$SNP | 
-                  bim$SNP %in% info.recode$SNP |
-                  bim$SNP %in% info.crecode$SNP)]
-write.table(
-    mismatch,
-    "EUR.mismatch",
-    quote = F,
-    row.names = F,
-    col.names = F
-)
-q() # exit R
-```
+=== "Without data.table"
 
-``` R tab="With data.table"
-mismatch <- bim[!(SNP %in% info.match |
-                    SNP %in% com.snps |
-                    SNP %in% recode.snps |
-                    SNP %in% com.recode), SNP]
-write.table(mismatch, "EUR.mismatch", quote=F, row.names=F, col.names=F)
-q() # exit R
-```
+    ```R
+    mismatch <-
+        bim$SNP[!(bim$SNP %in% info.match$SNP |
+                    bim$SNP %in% info.complement$SNP | 
+                    bim$SNP %in% info.recode$SNP |
+                    bim$SNP %in% info.crecode$SNP)]
+    write.table(
+        mismatch,
+        "EUR.mismatch",
+        quote = F,
+        row.names = F,
+        col.names = F
+    )
+    q() # exit R
+    ```
 
+=== "With data.table"
+
+    ``` R
+    mismatch <- bim[!(SNP %in% info.match |
+                        SNP %in% com.snps |
+                        SNP %in% recode.snps |
+                        SNP %in% com.recode), SNP]
+    write.table(mismatch, "EUR.mismatch", quote=F, row.names=F, col.names=F)
+    q() # exit R
+    ```
 
 5\. Replace **EUR.bim** with **EUR.QC.adj.bim**:
 
@@ -366,23 +384,27 @@ plink \
 
 This will generate a file called **EUR.QC.sexcheck** containing the F-statistics for each individual. Individuals are typically called as being biologically male if the F-statistic is > 0.8 and biologically female if F < 0.2.
 
-```R tab="Without library"
-# Read in file
-valid <- read.table("EUR.valid.sample", header=T)
-dat <- read.table("EUR.QC.sexcheck", header=T)
-valid <- subset(dat, STATUS=="OK" & FID %in% valid$FID)
-write.table(valid[,c("FID", "IID")], "EUR.QC.valid", row.names=F, col.names=F, sep="\t", quote=F) 
-q() # exit R
-```
+=== "Without library"
 
-```R tab="With data.table"
-library(data.table)
-# Read in file
-valid <- fread("EUR.valid.sample")
-dat <- fread("EUR.QC.sexcheck")[FID%in%valid$FID]
-fwrite(dat[STATUS=="OK",c("FID","IID")], "EUR.QC.valid", sep="\t") 
-q() # exit R
-```
+    ```R
+    # Read in file
+    valid <- read.table("EUR.valid.sample", header=T)
+    dat <- read.table("EUR.QC.sexcheck", header=T)
+    valid <- subset(dat, STATUS=="OK" & FID %in% valid$FID)
+    write.table(valid[,c("FID", "IID")], "EUR.QC.valid", row.names=F, col.names=F, sep="\t", quote=F) 
+    q() # exit R
+    ```
+
+=== "With data.table"
+
+    ```R
+    library(data.table)
+    # Read in file
+    valid <- fread("EUR.valid.sample")
+    dat <- fread("EUR.QC.sexcheck")[FID%in%valid$FID]
+    fwrite(dat[STATUS=="OK",c("FID","IID")], "EUR.QC.valid", sep="\t") 
+    q() # exit R
+    ```
 
 ??? note "How many samples were excluded due mismatched Sex information?"
     - `4` samples were excluded
