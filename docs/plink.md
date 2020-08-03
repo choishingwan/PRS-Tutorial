@@ -61,7 +61,7 @@ plink \
 
 Each of the new parameters corresponds to the following
 
-| Paramter | Value | Description|
+| Parameter | Value | Description|
 |:-:|:-:|:-|
 | clump-p1 | 1 | P-value threshold for a SNP to be included as an index SNP. 1 is selected such that all SNPs are include for clumping|
 | clump-r2 | 0.1 | SNPs having $r^2$ higher than 0.1 with the index SNPs will be removed |
