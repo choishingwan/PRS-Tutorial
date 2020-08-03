@@ -14,11 +14,7 @@ nav:
 
 theme: 
     name: readthedocs
-    highlightjs: True
-    hljs_languages:
-        - R
-        - bash
-        - awk
+    highlightjs: false
 
 markdown_extensions:
     - admonition
@@ -26,12 +22,12 @@ markdown_extensions:
     - pymdownx.tabbed
     - pymdownx.superfences
     - pymdownx.highlight:
-        use_pygments: True
+        use_pygments: true
+        noclasses: true
     - toc:
-        permalink: True
-    - codehilite
+        permalink: true
     - pymdownx.arithmatex:
-        generic: True
+        generic: true
     - pymdownx.betterem:
         smart_enable: all
     - pymdownx.caret

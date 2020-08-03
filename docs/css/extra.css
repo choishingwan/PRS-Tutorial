@@ -46,6 +46,7 @@ li {
 
 code {
     font-size: 18px !important;
+    line-height: 100%;
 }
 
 table tbody { 
@@ -130,4 +131,22 @@ table{
 
 details > summary{
     font-size: 100%
+}
+
+.note p.admonition-title{
+    color: white !important;
+    background: #555599 !important;
+}
+
+.admonition.note {
+    background: #F0F0FF !important;
+}
+
+.admonition.warning {
+    background: #FFEEEE !important;
+}
+
+.warning p.admonition-title {
+    color: white !important;
+    background: #FF6666 !important;
 }
