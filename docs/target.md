@@ -1,4 +1,5 @@
-# Obtaining the target data
+# QC of Target Data
+## Obtaining the target data
 Target data consist of individual-level genotype-phenotype data, usually generated within your lab/department/collaboration. For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
 You can download the data [here](https://drive.google.com/file/d/1uhJR_3sn7RA8U5iYQbcmTp6vFdQiF4F2/view?usp=sharing)
 
@@ -13,13 +14,13 @@ unzip EUR.zip
 
     Install the program `plink` and include its location in your PATH directory, which allows us to use `plink` instead of `./plink` in the commands below. If PLINK is not in your PATH directory and is instead in your working directory, replace all instances of `plink` in the tutorial with `./plink`.
 
-# QC checklist: Target data
+## QC checklist: Target data
 Below are the QC steps that comprise the QC checklist for the target data.
 
-# \# Sample size
+## \# Sample size
 We recommend that users only perform PRS analyses on target data of at least 100 individuals. The sample size of our target data here is 503 individuals. 
 
-# \# File transfer
+## \# File transfer
 Usually we do not need to download and transfer the target data file because it is typically generated locally. However, the file should contain an md5sum code in case we send the data file to collaborators who may want to confirm that the file has not changed during the transfer.
 
 ??? note "What is the md5sum code for each of the target files?"
@@ -32,10 +33,10 @@ Usually we do not need to download and transfer the target data file because it 
     |**EUR.fam**           |e7b856f0c7bcaffc8405926d08386e97|
     |**EUR.height**        |dd445ce969a81cded20da5c88b82d4df|
 
-# \# Genome build
+## \# Genome build
 As stated in the base data section, the genome build for our base and target data is the same, as it should be.
 
-# \# Standard GWAS QC
+## \# Standard GWAS QC
 The target data must be quality controlled to at least the standards 
 implemented in GWAS studies, e.g. removing SNPs with low genotyping rate, 
 low minor allele frequency, out of Hardy-Weinberg Equilibrium, removing
@@ -149,10 +150,10 @@ We will remove individuals with F coefficients that are more than 3 standard dev
 ??? note "How many samples were excluded due to high heterozygosity rate?"
     - `2` samples were excluded
 
-# \# Ambiguous SNPs
+## \# Ambiguous SNPs
 These were removed during the base data QC.
 
-# \# Mismatching SNPs
+## \# Mismatching SNPs
 SNPs that have mismatching alleles reported in the base and target data may be resolvable by strand-flipping the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target. This can be achieved with the following steps:
 
 1\. Load the bim file, the summary statistic and the QC SNP list into R
@@ -365,10 +366,10 @@ The above commands do the following:
 !!! note
     Most PRS software will perform strand-flipping automatically, thus this step is usually not required.
 
-# \# Duplicate SNPs
+## \# Duplicate SNPs
 Make sure to remove any duplicate SNPs in your target data (these target data were simulated and so include no duplicated SNPs).
 
-# \# Sex chromosomes 
+## \# Sex chromosomes 
 Sometimes sample mislabelling can occur, which may lead to invalid results. One indication of a mislabelled sample is a difference between reported sex and that indicated by the sex chromosomes. While this may be due to a difference in sex and gender identity, it could also reflect mislabeling of samples or misreporting and, thus, individuals in which there is a mismatch between biological and reported sex are typically removed. A sex check can be performed in PLINK, in which individuals are called as females if their X chromosome homozygosity estimate (F statistic) is < 0.2 and as males if the estimate is > 0.8.
 
 Before performing a sex check, pruning should be performed (see [here](target.md#35-standard-gwas-qc)).
@@ -409,10 +410,10 @@ This will generate a file called **EUR.QC.sexcheck** containing the F-statistics
 ??? note "How many samples were excluded due mismatched Sex information?"
     - `4` samples were excluded
 
-# \# Sample overlap
+## \# Sample overlap
 Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper](https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). 
 
-# \# Relatedness
+## \# Relatedness
 Closely related individuals in the target data may lead to overfitted results, limiting the generalisability of the results. 
 
 Before calculating the relatedness, pruning should be performed (see [here](target.md#35-standard-gwas-qc)).
@@ -438,7 +439,7 @@ plink \
     To minimize the removal of cases of a disease, the following algorithm can be used instead: 
     [GreedyRelated](https://gitlab.com/choishingwan/GreedyRelated).
 
-# Generate final QC'ed target data file
+## Generate final QC'ed target data file
 After performing the full analysis, you can generate a QC'ed data set with the following command:
 ```bash
 plink \

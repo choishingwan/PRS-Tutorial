@@ -1,5 +1,21 @@
-Over the following three pages you can run three dedicated PRS programs, which automate many of the steps from the previous page that used a sequence of PLINK functions (plus some QC steps). 
+# Background
+
+PRSice-2 is one of the dedicated PRS programs which automates many of the steps from the previous page that used a sequence of PLINK functions (plus some QC steps). 
 On this page you will run a PRS analysis using PRSice-2, which implements the standard C+T method.
+
+## Obtaining PRSice-2
+`PRSice-2` can be downloaded from:
+
+| Operating System | Link |
+| -----------------|:----:|
+| Linux 64-bit | [v2.3.2](https://github.com/choishingwan/PRSice/releases/download/2.3.2/PRSice_linux.zip) |
+| OS X 64-bit | [v2.3.2](https://github.com/choishingwan/PRSice/releases/download/2.3.2/PRSice_mac.zip) |
+
+and can be directly used after extracting the file. 
+
+In this tutorial, you will only need `PRSice.R` and `PRSice_XXX` where XXX is the operation system
+
+## Required Data
 
 This analysis assumes that you have the following files (or you can download it from [here](https://drive.google.com/file/d/1x_G0Gxk9jFMY-PMqwtg6-vdEyUPp5p5u/view?usp=sharing)): 
 
@@ -13,16 +29,7 @@ This analysis assumes that you have the following files (or you can download it 
 |**EUR.covariate**| This file contains the covariates of the samples |
 |**EUR.eigenvec**| This file contains the principal components (PCs) of the samples |
 
-And `PRSice-2`, which can be downloaded from:
-
-| Operating System | Link |
-| -----------------|:----:|
-| Linux 64-bit | [v2.3.2](https://github.com/choishingwan/PRSice/releases/download/2.3.2/PRSice_linux.zip) |
-| OS X 64-bit | [v2.3.2](https://github.com/choishingwan/PRSice/releases/download/2.3.2/PRSice_mac.zip) |
-
-In this tutorial, you will only need `PRSice.R` and `PRSice_XXX` where XXX is the operation system
-
-# Running PRS analysis
+## Running PRS analysis
 To run PRSice-2 we need a single covariate file, and therefore our covariate file and PCs file should be combined. This can be done with `R` as follows:
 
 === "without data.table"    

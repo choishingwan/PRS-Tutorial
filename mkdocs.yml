@@ -5,11 +5,11 @@ nav:
     - index.md
     - 1. QC of Base Data: base.md
     - 2. QC of Target Data: target.md
-    - 3. Calculating and analysing PRS:
-        - PLINK: plink.md
-        - PRSice-2: prsice.md
-        - LDpred-2: ldpred.md
-        - lassosum: lassosum.md
+    - 3. Calculating and analysing PRS: cal_prs.md
+    - PLINK: plink.md
+    - PRSice-2: prsice.md
+    - LDpred-2: ldpred.md
+    - lassosum: lassosum.md
     - 4. Visualizing PRS Results: plink_visual.md
 
 theme: 

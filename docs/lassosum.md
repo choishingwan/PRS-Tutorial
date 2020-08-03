@@ -1,4 +1,8 @@
-Here we use another PRS program, `lassosum`, which is an `R` package that uses penalised regression (LASSO) in its approach to PRS calculation.
+# Background
+
+`lassosum` is one of the dedicated PRS programs which is an `R` package that uses penalised regression (LASSO) in its approach to PRS calculation.
+
+## Installing lassosum
 
 !!! note
     The script used here is based on lassosum version 0.4.4
@@ -14,6 +18,8 @@ library(devtools)
 install_github("tshmak/lassosum")
 ```
 
+## Required Data
+
 Again, we assume that we have the following files (or you can download it from [here](https://drive.google.com/file/d/1x_G0Gxk9jFMY-PMqwtg6-vdEyUPp5p5u/view?usp=sharing)): 
 
 |File Name | Description|
@@ -26,7 +32,7 @@ Again, we assume that we have the following files (or you can download it from [
 |**EUR.cov**| This file contains the covariates of the samples |
 |**EUR.eigenvec**| This file contains the PCs of the samples |
 
-# Running PRS analysis
+## Running PRS analysis
 
 We can run lassosum as follows: 
 

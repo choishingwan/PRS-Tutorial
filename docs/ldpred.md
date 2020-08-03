@@ -1,4 +1,8 @@
-Here we use another PRS program, [LDpred-2](https://privefl.github.io/bigsnpr/articles/LDpred2.html), that uses a Bayesian approach to polygenic risk scoring.
+# Background
+
+[LDpred-2](https://privefl.github.io/bigsnpr/articles/LDpred2.html) is one of the dedicated PRS programs which is an `R` package that uses a Bayesian approach to polygenic risk scoring.
+
+## Installing LDpred-2
 
 !!! note
     The script used here is based on LDpred 2 implemented under bigsnpr version 1.4.7
@@ -17,6 +21,7 @@ remotes::install_github("https://github.com/privefl/bigsnpr.git")
 !!! note
     For mac users, you might need to follow the guide [here](https://thecoatlessprofessor.com/programming/cpp/openmp-in-r-on-os-x/) to be able to install LDpred2
 
+## Required Data
 
 We assume that you have the following files (or you can download it from [here](https://drive.google.com/file/d/1x_G0Gxk9jFMY-PMqwtg6-vdEyUPp5p5u/view?usp=sharing)):
 
@@ -31,8 +36,9 @@ We assume that you have the following files (or you can download it from [here](
 |**EUR.eigenvec**| This file contains the PCs of the samples |
 
 
-# Running PRS analysis
-#0. On some server, you might need to first use the following code in order to run LDpred with multi-thread
+## Running PRS analysis
+###0. Prepare workspace
+On some server, you might need to first use the following code in order to run LDpred with multi-thread
 
 === "prepare workspace"
 
@@ -41,7 +47,7 @@ We assume that you have the following files (or you can download it from [here](
     options(default.nproc.blas = NULL)
     ```
 
-#1. Read in the phenotype and covariate files
+###1. Read in the phenotype and covariate files
 
 === "read in phenotype and covariates"
 
@@ -58,7 +64,7 @@ We assume that you have the following files (or you can download it from [here](
         merge(., pcs)
     ``` 
 
-#2. Load in the genotype and summary statistic file using bigsnpr
+###2. Load in the genotype and summary statistic file using bigsnpr
 
 === "Load genotype with bigsnpr"
 
@@ -73,7 +79,7 @@ We assume that you have the following files (or you can download it from [here](
     sumstats <- bigreadr::fread2("Height.QC.gz")
     ```
 
-#3. Reformat data in preparation of LDpred2
+###3. Reformat data in preparation of LDpred2
 
 === "data reformating"
 
@@ -129,7 +135,7 @@ We assume that you have the following files (or you can download it from [here](
         as.formula
     ```
 
-#4. Start running LDpred 2
+###4. Start running LDpred 2
 
 === "infinitesimal model"
 
@@ -396,7 +402,7 @@ We assume that you have the following files (or you can download it from [here](
     print("Completed")
     ```
 
-#5. Get the final performance of the LDpred models
+###5. Get the final performance of the LDpred models
 
 === "infinitesimal model"
 

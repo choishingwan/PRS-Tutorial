@@ -1,4 +1,5 @@
-# Obtaining the base data file
+# QC of Base Data
+## Obtaining the base data file
 The first step in Polygenic Risk Score (PRS) analyses is to generate or obtain the base data (GWAS summary statistics). Ideally these will correspond to the most powerful GWAS results available on the phenotype under study. In this example, we will use GWAS on simulated height. You can download the summary statistic file [here](https://drive.google.com/file/d/1RWjk49QNZj9zvJHc9X_wyZ51fdy6xQjv/view?usp=sharing) 
 
 !!! note
@@ -16,7 +17,7 @@ The first step in Polygenic Risk Score (PRS) analyses is to generate or obtain t
     
 
 
-# Reading the base data file
+## Reading the base data file
 **Height.gwas.txt.gz** is compressed. To read its content, you can type:
 
 ```bash
@@ -50,16 +51,16 @@ The column headers correspond to the following:
 - **INFO**: The imputation information score
 - **MAF**: The minor allele frequency (MAF) of the SNP
 
-# QC checklist: Base data
+## QC checklist: Base data
 
 Below we perform QC on these base data according to the 'QC checklist' in our [guide paper](https://doi.org/10.1101/416545), which we recommend that users follow while going through this tutorial and when performing PRS analyses:
 
-# \# Heritability check
+## \# Heritability check
 We recommend that PRS analyses are performed on base data with a chip-heritability estimate $h_{snp}^{2} > 0.05$. 
 The chip-heritability of a GWAS can be estimated using e.g. LD Score Regression (LDSC). 
 Our height GWAS data are simulated to have a chip-heritability much greater than 0.05 and so we can move on to the next QC step. 
 
-# \# Effect allele
+## \# Effect allele
 It is important to know which allele is the effect allele and which is the non-effect allele for PRS association results to be in the correct direction.
 
 !!! Important
@@ -69,7 +70,7 @@ It is important to know which allele is the effect allele and which is the non-e
     To avoid misleading conclusions the effect allele from the base (GWAS) data must be known.
 
 
-# \# File transfer
+## \# File transfer
 
 A common problem is that the downloaded base data file can be
 corrupted during download, which can cause PRS software to crash 
@@ -94,11 +95,11 @@ The following command performs this `md5sum` check:
 if the file is intact, then `md5sum` generates a string of characters, which in this case should be: `a2b15fb6a2bbbe7ef49f67959b43b160`. 
 If a different string is generated, then the file is corrupted.
 
-# \# Genome build
+## \# Genome build
 The height summary statistic are on the same genome build as the target data that we will be using. 
 You must check that your base and target data are on the same genome build, and if they are not then use a tool such as [LiftOver](https://genome.ucsc.edu/cgi-bin/hgLiftOver) to make the builds consistent across the data sets.
 
-# \# Standard GWAS QC
+## \# Standard GWAS QC
 As described in the paper, both the base and target data should be subjected to the standard stringent QC steps performed in GWAS. 
 If the base data have been obtained as summary statistics from a public source, then the typical QC steps that you will be able to perform on them are to filter the SNPs according to INFO score and MAF. 
 SNPs with low minor allele frequency (MAF) or imputation information score (INFO) are more likely to generate false positive results due to their lower statistical power (and higher probability of genotyping errors in the case of low MAF). 
@@ -132,13 +133,13 @@ The bash code above does the following:
 4. Prints any line with INFO above 0.8 (`$10` because the tenth column of the file contains the INFO information)
 5. Compresses and writes the results to **Height.gz**
 
-# \# Mismatching SNPs
+## \# Mismatching SNPs
 SNPs that have mismatching alleles reported in the base and target data are either resolvable by "strand-flipping" the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target, or non-resolvable, such as for a SNP with C/G in the base and C/T in the target. 
 Most polygenic score software perform strand-flipping automatically for SNPs that are resolvable, and remove non-resolvable mismatching SNPs.
 
 Since we need the target data to know which SNPs have mismatching alleles, we will perform this strand-flipping in the target data.
 
-# \# Duplicate SNPs
+## \# Duplicate SNPs
 If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
 Most PRS software do not allow duplicated SNPs in the base data input and thus they should be removed, using a command such as the one below: 
 
@@ -174,7 +175,7 @@ The above command does the following:
 3. Compresses and writes the results to **Height.nodup.gz**
 
 
-# \# Ambiguous SNPs
+## \# Ambiguous SNPs
 If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) that was used for either is unknown, then it is not possible to pair-up the alleles of ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T SNPs) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. While allele frequencies could be used to infer which alleles are on the same strand, the accuracy of this could be low for SNPs with MAF close to 50% or when the base and target data are from different populations. Therefore, we recommend removing all ambiguous SNPs to avoid introducing this potential source of systematic error.
 
 Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.
@@ -194,13 +195,13 @@ awk '!( ($4=="A" && $5=="T") || \
 
 
 
-# \# Sex chromosomes 
+## \# Sex chromosomes 
 Sometimes sample mislabelling can occur, which may lead to invalid results. One indication of a mislabelled sample is a difference between reported sex and that indicated by the sex chromosomes. While this may be due to a difference in sex and gender identity, it could also reflect mislabeling of samples or misreporting and, thus, individuals in which there is a mismatch between biological and reported sex are typically removed. See the Target Data section in which a sex-check is performed.
 
-# \# Sample overlap
+## \# Sample overlap
 Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper](https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). 
 
-# \# Relatedness
+## \# Relatedness
 Closely related individuals within and between the base and the target data may lead to overfitted results, limiting the generalizability of the results (see the relevant sections of [the paper](https://doi.org/10.1101/416545)). Relatedness within the target data is tested in the Target Data section.
 
 The **Height.QC.gz** base data are now ready for using in downstream analyses.

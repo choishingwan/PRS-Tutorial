@@ -1,9 +1,8 @@
 # Background
-In this section of the tutorial you will use four different software programs to compute PRS from the base and target data that you QC'ed in the previous two sections. 
 On this page, you will compute PRS using the popular genetic analyses tool `plink` - while `plink` is not a dedicated PRS software, you can perform every required steps of the C+T approach with `plink`. 
 This multi-step process is a good way to learn the processes involved in computing PRS, which are typically performed automatically by PRS software.
 
-# Required Data
+## Required Data
 
 In the previous sections, we have generated the following files:
 
@@ -17,7 +16,7 @@ In the previous sections, we have generated the following files:
 |**EUR.covariate**| This file contains the covariates of the samples |
 
 
-# Update Effect Size
+## Update Effect Size
 When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we take the natural logarithm of the OR so that the PRS can be computed using summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with `R`:
 
@@ -43,7 +42,7 @@ We can obtain the transformed summary statistics with `R`:
 !!! warning
     Due to rounding of values, using `awk` to log transform OR can lead to less accurate results. Therefore, we recommend performing the transformation in `R` or allow the PRS software to perform the transformation directly.
 
-# Clumping
+## Clumping
 Linkage disequilibrium, which corresponds to the correlation between the genotypes of genetic variants across the genome, makes identifying the contribution from causal independent genetic variants extremely challenging. 
 One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in ways that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. 
 Clumping can be performed using the following command in `plink`: 
@@ -91,7 +90,7 @@ awk 'NR!=1{print $3}' EUR.clumped >  EUR.valid.snp
     If your target data are small (e.g. N < 500) then you can use the 1000 Genomes Project samples for the LD calculation.
     Make sure to use the population that most closely reflects represents the base sample.
 
-# Generate PRS
+## Generate PRS
 `plink` provides a convenient function `--score` and `--q-score-range` for calculating polygenic scores.
 
 We will need three files:
@@ -159,7 +158,7 @@ The above command and range_list will generate 7 files:
 
     where the effect size of SNP $i$ is $S_i$;  the number of effect alleles observed in sample $j$ is $G_{ij}$; the ploidy of the sample is $P$ (is generally 2 for humans); the total number of SNPs included in the PRS is $N$; and the number of non-missing SNPs observed in sample $j$ is $M_j$. If the sample has a missing genotype for SNP $i$, then the population minor allele frequency multiplied by the ploidy ($MAF_i*P$) is used instead of $G_{ij}$.
 
-# Accounting for Population Stratification
+## Accounting for Population Stratification
 
 Population structure is the principal source of confounding in GWAS and is usually accounted for by incorporating principal components (PCs) as covariates. We can incorporate PCs into our PRS analysis to account for population stratification.
 
@@ -189,7 +188,7 @@ Here the PCs have been stored in the **EUR.eigenvec** file and can be used as co
     If the base and target samples are collected from different worldwide populations then the results from the PRS analysis may be biased (see Section 3.4 of our papper).
 
 
-# Finding the "best-fit" PRS
+## Finding the "best-fit" PRS
 The P-value threshold that provides the "best-fit" PRS under the C+T method is usually unknown. 
 To approximate the "best-fit" PRS, we can perform a regression between PRS calculated at a range of P-value thresholds and then select the PRS that explains the highest phenotypic variance (please see Section 4.6 of our paper on overfitting issues). 
 This can be achieved using `R` as follows:
