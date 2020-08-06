@@ -1,7 +1,6 @@
 # Home
 ## Overview 
-This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our [PRS Guide paper](https://doi.org/10.1101/416545). 
-The aim of this tutorial is to provide a simple introduction of PRS analyses to those new to PRS, while equipping existing users with a better understanding of the processes and implementation "underneath the hood" of popular PRS software.
+This tutorial provides a step-by-step guide to performing basic polygenic risk score (PRS) analyses and accompanies our [PRS Guide paper](https://www.nature.com/articles/s41596-020-0353-1). The aim of this tutorial is to provide a simple introduction of PRS analyses to those new to PRS, while equipping existing users with a better understanding of the processes and implementation "underneath the hood" of popular PRS software.
 
 The tutorial is separated into four main sections and reflects the structure of our [guide paper](https://doi.org/10.1101/416545): 
 the first two sections on QC correspond to Section 2 of the paper and constitute a 'QC checklist' for PRS analyses, the third section on calculating PRS (here with examples using [PLINK](plink.md), [PRSice-2](prsice.md), [LDpred-2](ldpred.md) and [lassosum](lassosum.md)) corresponds to Section 3 of the paper, while the fourth section, which provides some examples of visualising PRS results, accompanies Section 4 of the paper.
@@ -11,12 +10,12 @@ the first two sections on QC correspond to Section 2 of the paper and constitute
 3. [Calculating and analysing PRS](plink.md)
 4. [Visualising PRS Results](plink_visual.md)
 
-We will be referring to our [guide paper](https://doi.org/10.1101/416545) in each section and so you may find it helpful to have the paper open as you go through the tutorial.
+We will be referring to our [guide paper](https://www.nature.com/articles/s41596-020-0353-1) in each section and so you may find it helpful to have the paper open as you go through the tutorial.
 
 If you are only interested in how to perform PRS on previously QC'ed data then you can skip to [Step 3](plink.md). Links to download the required data are provided under each section.
 !!! warning
 
-    Data used in this tutorial are simulated and is intended for demonstration purposes only. Result from this tutorial will not reflect the true performance of different software. 
+    Data used in this tutorial are simulated and intended for demonstration purposes only. The results from this tutorial will not reflect the true performance of different software. 
 
 !!! note
 
