@@ -411,7 +411,7 @@ This will generate a file called **EUR.QC.sexcheck** containing the F-statistics
     - `4` samples were excluded
 
 ## \# Sample overlap
-Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper](https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). 
+Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper](https://www.nature.com/articles/s41596-020-0353-1) for discussion of the importance of avoiding sample overlap). 
 
 ## \# Relatedness
 Closely related individuals in the target data may lead to overfitted results, limiting the generalisability of the results. 
