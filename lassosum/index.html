@@ -199,6 +199,12 @@
 <span style="color: #0000FF">library</span>(data.table)
 <span style="color: #0000FF">library</span>(methods)
 <span style="color: #0000FF">library</span>(magrittr)
+<span style="color: #408080; font-style: italic"># For multi-threading, you can use the parallel package and </span>
+<span style="color: #408080; font-style: italic"># invoke cl which is then passed to lassosum.pipeline</span>
+<span style="color: #0000FF">library</span>(parallel)
+<span style="color: #408080; font-style: italic"># This will invoke 2 threads. </span>
+cl <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">makeCluster</span>(<span style="color: #666666">2</span>)
+
 sum.stat <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;Height.QC.gz&quot;</span>
 bfile <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;EUR.QC&quot;</span>
 <span style="color: #408080; font-style: italic"># Read in and process the covariates</span>
@@ -211,7 +217,7 @@ cov <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge
 
 <span style="color: #408080; font-style: italic"># We will need the EUR.hg19 file provided by lassosum </span>
 <span style="color: #408080; font-style: italic"># which are LD regions defined in Berisa and Pickrell (2015) for the European population and the hg19 genome.</span>
-ld.file <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">system.file</span>(<span style="color: #BA2121">&quot;data&quot;</span>, <span style="color: #BA2121">&quot;Berisa.EUR.hg19.bed&quot;</span>,package<span style="color: #666666">=</span><span style="color: #BA2121">&quot;lassosum&quot;</span>)
+ld.file <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;EUR.hg19&quot;</span>
 <span style="color: #408080; font-style: italic"># output prefix</span>
 prefix <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;EUR&quot;</span>
 <span style="color: #408080; font-style: italic"># Read in the target phenotype file</span>
@@ -220,8 +226,6 @@ target.pheno <span style="color: #666666">&lt;-</span> <span style="color: #0000
 ss <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(sum.stat)
 <span style="color: #408080; font-style: italic"># Remove P-value = 0, which causes problem in the transformation</span>
 ss <span style="color: #666666">&lt;-</span> ss[<span style="color: #666666">!</span>P <span style="color: #666666">==</span> <span style="color: #666666">0</span>]
-<span style="color: #408080; font-style: italic"># Read in the LD blocks</span>
-ld <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(ld.file)
 <span style="color: #408080; font-style: italic"># Transform the P-values into correlation</span>
 cor <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">p2cor</span>(p <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>P,
         n <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>N,
@@ -230,7 +234,10 @@ cor <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">p2cor
 fam <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #0000FF">paste0</span>(bfile, <span style="color: #BA2121">&quot;.fam&quot;</span>))
 fam[,ID<span style="color: #666666">:=</span><span style="color: #0000FF">do.call</span>(paste, <span style="color: #0000FF">c</span>(.SD, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;:&quot;</span>)),.SDcols<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #666666">1:2</span>)]
 
+
 <span style="color: #408080; font-style: italic"># Run the lassosum pipeline</span>
+<span style="color: #408080; font-style: italic"># The cluster parameter is used for multi-threading</span>
+<span style="color: #408080; font-style: italic"># You can ignore that if you do not wish to perform multi-threaded processing</span>
 out <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lassosum.pipeline</span>(
     cor <span style="color: #666666">=</span> cor,
     chr <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>CHR,
@@ -239,7 +246,8 @@ out <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lasso
     A2 <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>A2,
     ref.bfile <span style="color: #666666">=</span> bfile,
     test.bfile <span style="color: #666666">=</span> bfile,
-    LDblocks <span style="color: #666666">=</span> ld
+    LDblocks <span style="color: #666666">=</span> ld.file, 
+    cluster<span style="color: #666666">=</span>cl
 )
 <span style="color: #408080; font-style: italic"># Store the R2 results</span>
 target.res <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">validate</span>(out, pheno <span style="color: #666666">=</span> target.pheno, covar<span style="color: #666666">=</span>cov)
