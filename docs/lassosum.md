@@ -42,6 +42,12 @@ library(lassosum)
 library(data.table)
 library(methods)
 library(magrittr)
+# For multi-threading, you can use the parallel package and 
+# invoke cl which is then passed to lassosum.pipeline
+library(parallel)
+# This will invoke 2 threads. 
+cl <- makeCluster(2)
+
 sum.stat <- "Height.QC.gz"
 bfile <- "EUR.QC"
 # Read in and process the covariates
@@ -54,7 +60,7 @@ cov <- merge(covariate, pcs)
 
 # We will need the EUR.hg19 file provided by lassosum 
 # which are LD regions defined in Berisa and Pickrell (2015) for the European population and the hg19 genome.
-ld.file <- system.file("data", "Berisa.EUR.hg19.bed",package="lassosum")
+ld.file <- "EUR.hg19"
 # output prefix
 prefix <- "EUR"
 # Read in the target phenotype file
@@ -63,8 +69,6 @@ target.pheno <- fread("EUR.height")[,c("FID", "IID", "Height")]
 ss <- fread(sum.stat)
 # Remove P-value = 0, which causes problem in the transformation
 ss <- ss[!P == 0]
-# Read in the LD blocks
-ld <- fread(ld.file)
 # Transform the P-values into correlation
 cor <- p2cor(p = ss$P,
         n = ss$N,
@@ -73,7 +77,10 @@ cor <- p2cor(p = ss$P,
 fam <- fread(paste0(bfile, ".fam"))
 fam[,ID:=do.call(paste, c(.SD, sep=":")),.SDcols=c(1:2)]
 
+
 # Run the lassosum pipeline
+# The cluster parameter is used for multi-threading
+# You can ignore that if you do not wish to perform multi-threaded processing
 out <- lassosum.pipeline(
     cor = cor,
     chr = ss$CHR,
@@ -82,7 +89,8 @@ out <- lassosum.pipeline(
     A2 = ss$A2,
     ref.bfile = bfile,
     test.bfile = bfile,
-    LDblocks = ld
+    LDblocks = ld.file, 
+    cluster=cl
 )
 # Store the R2 results
 target.res <- validate(out, pheno = target.pheno, covar=cov)
