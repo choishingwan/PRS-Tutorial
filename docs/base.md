@@ -7,13 +7,7 @@ The first step in Polygenic Risk Score (PRS) analyses is to generate or obtain t
  
 
 !!! warning
-    If you download the summary statistics on a MAC machine, the gz file will be decompressed automatically, resulting in a **Height.gwas.txt** file instead. 
-    
-    To maintain consistency, we suggest compressing the **Height.gwas.txt** file with 
-    ```
-    gzip Height.gwas.txt
-    ```
-    before starting the tutorial
+    If you download the summary statistics on a MAC machine, the gz file will be decompressed automatically, which might result in a corrupted **Height.gwas.txt** file. You might want to disable automatic decompression when downloading the file following instructions [here](https://octet.oberlin.edu/does-your-mac-unzip-zip-files-automatically/) 
     
 
 
@@ -53,7 +47,7 @@ The column headers correspond to the following:
 
 ## QC checklist: Base data
 
-Below we perform QC on these base data according to the 'QC checklist' in our [guide paper](https://doi.org/10.1101/416545), which we recommend that users follow while going through this tutorial and when performing PRS analyses:
+Below we perform QC on these base data according to the 'QC checklist' in our [guide paper](https://www.nature.com/articles/s41596-020-0353-1), which we recommend that users follow while going through this tutorial and when performing PRS analyses:
 
 ## \# Heritability check
 We recommend that PRS analyses are performed on base data with a chip-heritability estimate $h_{snp}^{2} > 0.05$. 
@@ -199,10 +193,10 @@ awk '!( ($4=="A" && $5=="T") || \
 Sometimes sample mislabelling can occur, which may lead to invalid results. One indication of a mislabelled sample is a difference between reported sex and that indicated by the sex chromosomes. While this may be due to a difference in sex and gender identity, it could also reflect mislabeling of samples or misreporting and, thus, individuals in which there is a mismatch between biological and reported sex are typically removed. See the Target Data section in which a sex-check is performed.
 
 ## \# Sample overlap
-Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper](https://doi.org/10.1101/416545) for discussion of the importance of avoiding sample overlap). 
+Since the target data were simulated there are no overlapping samples between the base and target data here (see the relevant section of [the paper](https://www.nature.com/articles/s41596-020-0353-1) for discussion of the importance of avoiding sample overlap). 
 
 ## \# Relatedness
-Closely related individuals within and between the base and the target data may lead to overfitted results, limiting the generalizability of the results (see the relevant sections of [the paper](https://doi.org/10.1101/416545)). Relatedness within the target data is tested in the Target Data section.
+Closely related individuals within and between the base and the target data may lead to overfitted results, limiting the generalizability of the results (see the relevant sections of [the paper](https://www.nature.com/articles/s41596-020-0353-1)). Relatedness within the target data is tested in the Target Data section.
 
 The **Height.QC.gz** base data are now ready for using in downstream analyses.
 
