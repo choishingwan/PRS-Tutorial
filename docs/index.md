@@ -39,7 +39,7 @@ If you are only interested in how to perform PRS on previously QC'ed data then y
 
     You can click on the tab to change to an alternative code (eg. to a different operation system)
 ## Datasets
-1. [Base data](https://drive.google.com/file/d/1RWjk49QNZj9zvJHc9X_wyZ51fdy6xQjv/view?usp=sharing): GWAS of a simulated height trait
+1. [Base data](base.md)
 2. [Target data](https://drive.google.com/file/d/1uhJR_3sn7RA8U5iYQbcmTp6vFdQiF4F2/view?usp=sharing): Simulated data based on the 1000 Genomes Project European samples
 
 ## Requirements
