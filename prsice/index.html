@@ -150,11 +150,11 @@ On this page you will run a PRS analysis using PRSice-2, which implements the st
 <tbody>
 <tr>
 <td>Linux 64-bit</td>
-<td align="center"><a href="https://github.com/choishingwan/PRSice/releases/download/2.3.2/PRSice_linux.zip">v2.3.2</a></td>
+<td align="center"><a href="https://github.com/choishingwan/PRSice/releases/download/2.3.3/PRSice_linux.zip">v2.3.3</a></td>
 </tr>
 <tr>
 <td>OS X 64-bit</td>
-<td align="center"><a href="https://github.com/choishingwan/PRSice/releases/download/2.3.2/PRSice_mac.zip">v2.3.2</a></td>
+<td align="center"><a href="https://github.com/choishingwan/PRSice/releases/download/2.3.3/PRSice_mac.zip">v2.3.3</a></td>
 </tr>
 </tbody>
 </table>
@@ -191,7 +191,7 @@ On this page you will run a PRS analysis using PRSice-2, which implements the st
 <td align="center">This file contains the phenotype data of the samples</td>
 </tr>
 <tr>
-<td align="center"><strong>EUR.covariate</strong></td>
+<td align="center"><strong>EUR.cov</strong></td>
 <td align="center">This file contains the covariates of the samples</td>
 </tr>
 <tr>
@@ -226,7 +226,7 @@ cov <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge
 </div>
 <p>which generates <strong>EUR.cov</strong>.</p>
 <p>PRSice-2 can then be run to obtain the PRS results as follows:</p>
-<div class="tabbed-set" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Linux</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Linux</label><div class="tabbed-content">
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>Rscript PRSice.R <span style="color: #BB6622; font-weight: bold">\</span>
     --prsice PRSice_linux <span style="color: #BB6622; font-weight: bold">\</span>
     --base Height.QC.gz <span style="color: #BB6622; font-weight: bold">\</span>
@@ -242,25 +242,23 @@ cov <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge
 </code></pre></div>
 
 </div>
-</div>
-<p>==="OS X"</p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>```bash
-Rscript PRSice.R \
-    --prsice PRSice_mac \
-    --base Height.QC.gz \
-    --target EUR.QC \
-    --binary-target F \
-    --pheno EUR.height \
-    --cov EUR.cov \
-    --base-maf MAF:0.01 \
-    --base-info INFO:0.8 \
-    --stat OR \
-    --or \
+<input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">OS X</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>Rscript PRSice.R <span style="color: #BB6622; font-weight: bold">\</span>
+    --prsice PRSice_mac <span style="color: #BB6622; font-weight: bold">\</span>
+    --base Height.QC.gz <span style="color: #BB6622; font-weight: bold">\</span>
+    --target EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
+    --binary-target F <span style="color: #BB6622; font-weight: bold">\</span>
+    --pheno EUR.height <span style="color: #BB6622; font-weight: bold">\</span>
+    --cov EUR.cov <span style="color: #BB6622; font-weight: bold">\</span>
+    --base-maf MAF:0.01 <span style="color: #BB6622; font-weight: bold">\</span>
+    --base-info INFO:0.8 <span style="color: #BB6622; font-weight: bold">\</span>
+    --stat OR <span style="color: #BB6622; font-weight: bold">\</span>
+    --or <span style="color: #BB6622; font-weight: bold">\</span>
     --out EUR
-```
 </code></pre></div>
 
-<div class="tabbed-set" data-tabs="3:1"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><label for="__tabbed_3_1">Windows</label><div class="tabbed-content">
+</div>
+<input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><label for="__tabbed_2_3">Windows</label><div class="tabbed-content">
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>Rscript PRSice.R ^
     --prsice PRSice_win64.exe ^
     --base Height.QC.gz ^
@@ -277,6 +275,73 @@ Rscript PRSice.R \
 
 </div>
 </div>
+<p>The meaning of the parameters are as follow:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Paramter</th>
+<th align="center">Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">prsice</td>
+<td align="center">PRSice_xxx</td>
+<td align="left">Informs <code>PRSice.R</code> that the location of the PRSice binary</td>
+</tr>
+<tr>
+<td align="center">base</td>
+<td align="center">Height.QC.gz</td>
+<td align="left">Informs <code>PRSice</code> that the name of the GWAS summary statistic</td>
+</tr>
+<tr>
+<td align="center">target</td>
+<td align="center">EUR.QC</td>
+<td align="left">Informs <code>PRSice</code> that the input genotype files should have a prefix of <code>EUR.QC</code></td>
+</tr>
+<tr>
+<td align="center">binary-target</td>
+<td align="center">F</td>
+<td align="left">Indicate if the phenotype of interest is a binary trait. F for no</td>
+</tr>
+<tr>
+<td align="center">pheno</td>
+<td align="center">EUR.height</td>
+<td align="left">Provide <code>PRSice</code> with the phenotype file</td>
+</tr>
+<tr>
+<td align="center">cov</td>
+<td align="center">EUR.height</td>
+<td align="left">Provide <code>PRSice</code> with the covariate file</td>
+</tr>
+<tr>
+<td align="center">base-maf</td>
+<td align="center">MAF:0.05</td>
+<td align="left">Filter out SNPs with MAF &lt; 0.05 in the GWAS summary statistics, using information in the <code>MAF</code> column</td>
+</tr>
+<tr>
+<td align="center">base-info</td>
+<td align="center">INFO:0.8</td>
+<td align="left">Filter out SNPs with INFO &lt; 0.8 in the GWAS summary statistics, using information in the <code>INFO</code> column</td>
+</tr>
+<tr>
+<td align="center">stat</td>
+<td align="center">OR</td>
+<td align="left">Column name of the column containing the effect size</td>
+</tr>
+<tr>
+<td align="center">or</td>
+<td align="center">-</td>
+<td align="left">Inform <code>PRSice</code> that the effect size is an Odd Ratio</td>
+</tr>
+<tr>
+<td align="center">out</td>
+<td align="center">EUR</td>
+<td align="left">Informs <code>PRSice</code> that all output should have a prefix of <code>EUR</code></td>
+</tr>
+</tbody>
+</table>
 <p>This will automatically perform "high-resolution scoring" and generate the "best-fit" PRS (in <strong>EUR.best</strong>), with associated plots of the results. 
 Users should read Section 4.6 of our paper to learn more about issues relating to overfitting in PRS analyses.  </p>
 <details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.1388</p>

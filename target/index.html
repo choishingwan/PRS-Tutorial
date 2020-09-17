@@ -248,7 +248,7 @@ individuals with low genotyping rate
 <tr>
 <td align="center">hwe</td>
 <td align="center">1e-6</td>
-<td align="left">Removes SNPs with low P-value from the Hardy-Weinberg Equilibrium Fisher's exact or chi-squared test. SNPs with significant P-values from the HWE test are more likely affected by genotyping error or the effects of natural selection. Filtering should be performed on the control samples to avoid filtering SNPs that are causal (under selection in cases)</td>
+<td align="left">Removes SNPs with low P-value from the Hardy-Weinberg Equilibrium Fisher's exact or chi-squared test. SNPs with significant P-values from the HWE test are more likely affected by genotyping error or the effects of natural selection. Filtering should be performed on the control samples to avoid filtering SNPs that are causal (under selection in cases). When phenotype information is included, plink will automatically perform the filtering in the controls.</td>
 </tr>
 <tr>
 <td align="center">geno</td>
@@ -330,7 +330,7 @@ genotype file, reducing the storage space usage.  </p>
 <tr>
 <td align="center">indep-pairwise</td>
 <td align="center">200 50 0.25</td>
-<td align="left">Informs <code>plink</code> that we wish to perform prunning with a window size of 200kb, sliding across the genome with step size of 50 variants at a time, and filter out any SNPs with LD <span class="arithmatex">\(r^2\)</span> higher than 0.25</td>
+<td align="left">Informs <code>plink</code> that we wish to perform prunning with a window size of 200 variants, sliding across the genome with step size of 50 variants at a time, and filter out any SNPs with LD <span class="arithmatex">\(r^2\)</span> higher than 0.25</td>
 </tr>
 <tr>
 <td align="center">out</td>
