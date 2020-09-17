@@ -122,7 +122,7 @@ The bash code above does the following:
 
 1. Decompresses and reads the **Height.gwas.txt.gz** file
 2. Prints the header line (`NR==1`)
-3. Prints any line with MAF above 0.01 (`$11` because the sixth column of the file contains the MAF information)
+3. Prints any line with MAF above 0.01 (`$11` because the eleventh column of the file contains the MAF information)
 4. Prints any line with INFO above 0.8 (`$10` because the tenth column of the file contains the INFO information)
 5. Compresses and writes the results to **Height.gz**
 

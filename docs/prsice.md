@@ -8,8 +8,8 @@ On this page you will run a PRS analysis using PRSice-2, which implements the st
 
 | Operating System | Link |
 | -----------------|:----:|
-| Linux 64-bit | [v2.3.2](https://github.com/choishingwan/PRSice/releases/download/2.3.2/PRSice_linux.zip) |
-| OS X 64-bit | [v2.3.2](https://github.com/choishingwan/PRSice/releases/download/2.3.2/PRSice_mac.zip) |
+| Linux 64-bit | [v2.3.3](https://github.com/choishingwan/PRSice/releases/download/2.3.3/PRSice_linux.zip) |
+| OS X 64-bit | [v2.3.3](https://github.com/choishingwan/PRSice/releases/download/2.3.3/PRSice_mac.zip) |
 
 and can be directly used after extracting the file. 
 
@@ -26,7 +26,7 @@ This analysis assumes that you have the following files (or you can download it 
 |**EUR.QC.bim**| This file contains the list of SNPs that passed the QC steps |
 |**EUR.QC.fam**| This file contains the samples that passed the QC steps |
 |**EUR.height**| This file contains the phenotype data of the samples |
-|**EUR.covariate**| This file contains the covariates of the samples |
+|**EUR.cov**| This file contains the covariates of the samples |
 |**EUR.eigenvec**| This file contains the principal components (PCs) of the samples |
 
 ## Running PRS analysis
@@ -60,7 +60,6 @@ which generates **EUR.cov**.
 PRSice-2 can then be run to obtain the PRS results as follows:
 
 === "Linux"
-
     ```bash
     Rscript PRSice.R \
         --prsice PRSice_linux \
@@ -76,8 +75,7 @@ PRSice-2 can then be run to obtain the PRS results as follows:
         --out EUR
     ```
 
-==="OS X"
-
+=== "OS X"
     ```bash
     Rscript PRSice.R \
         --prsice PRSice_mac \
@@ -94,7 +92,6 @@ PRSice-2 can then be run to obtain the PRS results as follows:
     ```
 
 === "Windows"
-
     ```bash
     Rscript PRSice.R ^
         --prsice PRSice_win64.exe ^
@@ -109,6 +106,22 @@ PRSice-2 can then be run to obtain the PRS results as follows:
         --or ^
         --out EUR
     ```
+
+The meaning of the parameters are as follow:
+
+| Paramter | Value | Description|
+|:-:|:-:|:-|
+|prsice|PRSice_xxx| Informs `PRSice.R` that the location of the PRSice binary |
+|base| Height.QC.gz| Informs `PRSice` that the name of the GWAS summary statistic |
+|target| EUR.QC| Informs `PRSice` that the input genotype files should have a prefix of `EUR.QC` |
+|binary-target| F| Indicate if the phenotype of interest is a binary trait. F for no |
+|pheno| EUR.height| Provide `PRSice` with the phenotype file |
+|cov| EUR.height| Provide `PRSice` with the covariate file |
+|base-maf| MAF:0.05| Filter out SNPs with MAF < 0.05 in the GWAS summary statistics, using information in the `MAF` column|
+|base-info| INFO:0.8| Filter out SNPs with INFO < 0.8 in the GWAS summary statistics, using information in the `INFO` column|
+|stat| OR| Column name of the column containing the effect size|
+|or|-| Inform `PRSice` that the effect size is an Odd Ratio|
+|out | EUR | Informs `PRSice` that all output should have a prefix of `EUR`|
 
 This will automatically perform "high-resolution scoring" and generate the "best-fit" PRS (in **EUR.best**), with associated plots of the results. 
 Users should read Section 4.6 of our paper to learn more about issues relating to overfitting in PRS analyses.  

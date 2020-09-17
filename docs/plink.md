@@ -13,7 +13,7 @@ In the previous sections, we have generated the following files:
 |**EUR.QC.bim**| This file contains the SNPs that passed the basic filtering |
 |**EUR.QC.fam**| This file contains the samples that passed the basic filtering |
 |**EUR.height**| This file contains the phenotype of the samples |
-|**EUR.covariate**| This file contains the covariates of the samples |
+|**EUR.cov**| This file contains the covariates of the samples |
 
 
 ## Update Effect Size
