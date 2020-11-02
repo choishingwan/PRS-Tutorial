@@ -3,7 +3,7 @@
 The PRS results corresponding to a range of P-value thresholds obtained by application of the C+T PRS method (eg. using PLINK or PRSice-2) can be visualised using `R` as follows:
 
 !!! note
-    We will be using `prs.result`, which was generated in the [previous section](#finding-the-best-p-value-threshold)
+    We will be using `prs.result` variable, which was generated in the [previous section](#finding-the-best-p-value-threshold)
 
 === "Without ggplot2"
 
