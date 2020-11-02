@@ -137,7 +137,7 @@ The meaning of the new parameters are as follows:
 | Paramter | Value | Description|
 |:-:|:-:|:-|
 |score|Height.QC.Transformed 3 4 12 header| We read from the **Height.QC.Transformed** file, assuming that the `3`st column is the SNP ID; `4`th column is the effective allele information; the `12`th column is the effect size estimate; and that the file contains a `header`|
-|q-score-range| range_test SNP.pvalue| We want to calculate PRS based on the thresholds defined in **range_test**, where the threshold values (P-values) were stored in **SNP.pvalue**|
+|q-score-range| range_list SNP.pvalue| We want to calculate PRS based on the thresholds defined in **range_list**, where the threshold values (P-values) were stored in **SNP.pvalue**|
 
 The above command and range_list will generate 7 files:
 
