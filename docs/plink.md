@@ -24,7 +24,7 @@ We can obtain the transformed summary statistics with `R`:
 
     ```R
     dat <- read.table(gzfile("Height.QC.gz"), header=T)
-    dat$OR <- log(dat$OR)
+    dat$BETA <- log(dat$OR)
     write.table(dat, "Height.QC.Transformed", quote=F, row.names=F)
     q() # exit R
     ```
