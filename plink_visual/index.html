@@ -133,123 +133,119 @@
 <p>The PRS results corresponding to a range of P-value thresholds obtained by application of the C+T PRS method (eg. using PLINK or PRSice-2) can be visualised using <code>R</code> as follows:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>We will be using <code>prs.result</code>, which was generated in the <a href="#finding-the-best-p-value-threshold">previous section</a></p>
+<p>We will be using <code>prs.result</code> variable, which was generated in the <a href="#finding-the-best-p-value-threshold">previous section</a></p>
 </div>
 <div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Without ggplot2</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># We strongly recommend the use of ggplot2. Only follow this code if you</span>
-<span style="color: #408080; font-style: italic"># are desperate.</span>
-<span style="color: #408080; font-style: italic"># Specify that we want to generate plot in EUR.height.bar.png</span>
-<span style="color: #0000FF">png</span>(<span style="color: #BA2121">&quot;EUR.height.bar.png&quot;</span>,
-    height<span style="color: #666666">=10</span>, width<span style="color: #666666">=10</span>, res<span style="color: #666666">=300</span>, unit<span style="color: #666666">=</span><span style="color: #BA2121">&quot;in&quot;</span>)
-<span style="color: #408080; font-style: italic"># First, obtain the colorings based on the p-value</span>
-col <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">suppressWarnings</span>(<span style="color: #0000FF">colorRampPalette</span>(<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;dodgerblue&quot;</span>, <span style="color: #BA2121">&quot;firebrick&quot;</span>)))
-<span style="color: #408080; font-style: italic"># We want the color gradient to match the ranking of p-values</span>
-prs.result <span style="color: #666666">&lt;-</span> prs.result[<span style="color: #0000FF">order</span>(<span style="color: #666666">-</span><span style="color: #0000FF">log10</span>(prs.result<span style="color: #666666">$</span>P)),]
-prs.result<span style="color: #666666">$</span>color <span style="color: #666666">&lt;-</span>  <span style="color: #0000FF">col</span>(<span style="color: #0000FF">nrow</span>(prs.result))
-prs.result <span style="color: #666666">&lt;-</span> prs.result[<span style="color: #0000FF">order</span>(prs.result<span style="color: #666666">$</span>Threshold),]
-<span style="color: #408080; font-style: italic"># generate a pretty format for p-value output</span>
-prs.result<span style="color: #666666">$</span>print.p <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">round</span>(prs.result<span style="color: #666666">$</span>P, digits <span style="color: #666666">=</span> <span style="color: #666666">3</span>)
-prs.result<span style="color: #666666">$</span>print.p[<span style="color: #666666">!</span><span style="color: #0000FF">is.na</span>(prs.result<span style="color: #666666">$</span>print.p) <span style="color: #666666">&amp;</span> prs.result<span style="color: #666666">$</span>print.p <span style="color: #666666">==</span> <span style="color: #666666">0</span> ] <span style="color: #666666">&lt;-</span>
-    <span style="color: #0000FF">format</span>(prs.result<span style="color: #666666">$</span>P[<span style="color: #666666">!</span><span style="color: #0000FF">is.na</span>(prs.result<span style="color: #666666">$</span>print.p) <span style="color: #666666">&amp;</span> prs.result<span style="color: #666666">$</span>print.p <span style="color: #666666">==</span> <span style="color: #666666">0</span> ], digits <span style="color: #666666">=</span> <span style="color: #666666">2</span>)
-prs.result<span style="color: #666666">$</span>print.p <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">sub</span>(<span style="color: #BA2121">&quot;e&quot;</span>, <span style="color: #BA2121">&quot;*x*10^&quot;</span>, prs.result<span style="color: #666666">$</span>print.p)
-<span style="color: #408080; font-style: italic"># Generate the axis labels</span>
-xlab <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">expression</span>(<span style="color: #0000FF">italic</span>(P) <span style="color: #666666">-</span> value <span style="color: #666666">~</span> threshold <span style="color: #666666">~</span> (<span style="color: #0000FF">italic</span>(P)[<span style="color: #008000">T</span>]))
-ylab <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">expression</span>(<span style="color: #0000FF">paste</span>(<span style="color: #BA2121">&quot;PRS model fit:  &quot;</span>, R <span style="color: #666666">^</span> <span style="color: #666666">2</span>))
-<span style="color: #408080; font-style: italic"># Setup the drawing area</span>
-<span style="color: #0000FF">layout</span>(<span style="color: #0000FF">t</span>(<span style="color: #666666">1:2</span>), widths<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #666666">8.8</span>,<span style="color: #666666">1.2</span>))
-<span style="color: #0000FF">par</span>( cex.lab<span style="color: #666666">=1.5</span>, cex.axis<span style="color: #666666">=1.25</span>, font.lab<span style="color: #666666">=2</span>, 
-    oma<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #666666">0</span>,<span style="color: #666666">0.5</span>,<span style="color: #666666">0</span>,<span style="color: #666666">0</span>),
-    mar<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #666666">4</span>,<span style="color: #666666">6</span>,<span style="color: #666666">0.5</span>,<span style="color: #666666">0.5</span>))
-<span style="color: #408080; font-style: italic"># Plotting the bars</span>
-b<span style="color: #666666">&lt;-</span> <span style="color: #0000FF">barplot</span>(height<span style="color: #666666">=</span>prs.result<span style="color: #666666">$</span>R2, 
-            col<span style="color: #666666">=</span>prs.result<span style="color: #666666">$</span>color, 
-            border<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">NA</span>, 
-            ylim<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #666666">0</span>, <span style="color: #0000FF">max</span>(prs.result<span style="color: #666666">$</span>R2)<span style="color: #666666">*1.25</span>), 
-            axes <span style="color: #666666">=</span> <span style="color: #008000">F</span>, ann<span style="color: #666666">=</span><span style="color: #008000">F</span>)
-<span style="color: #408080; font-style: italic"># Plot the axis labels and axis ticks</span>
-odd <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">seq</span>(<span style="color: #666666">0</span>,<span style="color: #0000FF">nrow</span>(prs.result)<span style="color: #666666">+1</span>,<span style="color: #666666">2</span>)
-even <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">seq</span>(<span style="color: #666666">1</span>,<span style="color: #0000FF">nrow</span>(prs.result),<span style="color: #666666">2</span>)
-<span style="color: #0000FF">axis</span>(side<span style="color: #666666">=1</span>, at<span style="color: #666666">=</span>b[odd], labels<span style="color: #666666">=</span>prs.result<span style="color: #666666">$</span>Threshold[odd], lwd<span style="color: #666666">=2</span>)
-<span style="color: #0000FF">axis</span>(side<span style="color: #666666">=1</span>, at<span style="color: #666666">=</span>b[even], labels<span style="color: #666666">=</span>prs.result<span style="color: #666666">$</span>Threshold[even],lwd<span style="color: #666666">=2</span>)
-<span style="color: #0000FF">axis</span>(side<span style="color: #666666">=1</span>, at<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #666666">0</span>,b[<span style="color: #666666">1</span>],<span style="color: #666666">2*</span>b[<span style="color: #0000FF">length</span>(b)]<span style="color: #666666">-</span>b[<span style="color: #0000FF">length</span>(b)<span style="color: #666666">-1</span>]), labels<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;&quot;</span>,<span style="color: #BA2121">&quot;&quot;</span>,<span style="color: #BA2121">&quot;&quot;</span>), lwd<span style="color: #666666">=2</span>, lwd.tick<span style="color: #666666">=0</span>)
-<span style="color: #408080; font-style: italic"># Write the p-value on top of each bar</span>
-<span style="color: #0000FF">text</span>( <span style="color: #0000FF">parse</span>(text<span style="color: #666666">=</span><span style="color: #0000FF">paste</span>(
-    prs.result<span style="color: #666666">$</span>print.p)), 
-    x <span style="color: #666666">=</span> b<span style="color: #666666">+0.1</span>, 
-    y <span style="color: #666666">=</span>  prs.result<span style="color: #666666">$</span>R2<span style="color: #666666">+</span> (<span style="color: #0000FF">max</span>(prs.result<span style="color: #666666">$</span>R2)<span style="color: #666666">*1.05-</span><span style="color: #0000FF">max</span>(prs.result<span style="color: #666666">$</span>R2)), 
-    srt <span style="color: #666666">=</span> <span style="color: #666666">45</span>)
-<span style="color: #408080; font-style: italic"># Now plot the axis lines</span>
-<span style="color: #0000FF">box</span>(bty<span style="color: #666666">=</span><span style="color: #BA2121">&#39;L&#39;</span>, lwd<span style="color: #666666">=2</span>)
-<span style="color: #0000FF">axis</span>(<span style="color: #666666">2</span>,las<span style="color: #666666">=2</span>, lwd<span style="color: #666666">=2</span>)
-<span style="color: #408080; font-style: italic"># Plot the axis titles</span>
-<span style="color: #0000FF">title</span>(ylab<span style="color: #666666">=</span>ylab, line<span style="color: #666666">=4</span>, cex.lab<span style="color: #666666">=1.5</span>, font<span style="color: #666666">=2</span> )
-<span style="color: #0000FF">title</span>(xlab<span style="color: #666666">=</span>xlab, line<span style="color: #666666">=2.5</span>, cex.lab<span style="color: #666666">=1.5</span>, font<span style="color: #666666">=2</span> )
-<span style="color: #408080; font-style: italic"># Generate plot area for the legend</span>
-<span style="color: #0000FF">par</span>(cex.lab<span style="color: #666666">=1.5</span>, cex.axis<span style="color: #666666">=1.25</span>, font.lab<span style="color: #666666">=2</span>, 
-    mar<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #666666">20</span>,<span style="color: #666666">0</span>,<span style="color: #666666">20</span>,<span style="color: #666666">4</span>))
-prs.result <span style="color: #666666">&lt;-</span> prs.result[<span style="color: #0000FF">order</span>(<span style="color: #666666">-</span><span style="color: #0000FF">log10</span>(prs.result<span style="color: #666666">$</span>P)),]
-<span style="color: #0000FF">image</span>(<span style="color: #666666">1</span>, <span style="color: #666666">-</span><span style="color: #0000FF">log10</span>(prs.result<span style="color: #666666">$</span>P), <span style="color: #0000FF">t</span>(<span style="color: #0000FF">seq_along</span>(<span style="color: #666666">-</span><span style="color: #0000FF">log10</span>(prs.result<span style="color: #666666">$</span>P))), col<span style="color: #666666">=</span>prs.result<span style="color: #666666">$</span>color, axes<span style="color: #666666">=</span><span style="color: #008000">F</span>,ann<span style="color: #666666">=</span><span style="color: #008000">F</span>)
-<span style="color: #0000FF">axis</span>(<span style="color: #666666">4</span>,las<span style="color: #666666">=2</span>,xaxs<span style="color: #666666">=</span><span style="color: #BA2121">&#39;r&#39;</span>,yaxs<span style="color: #666666">=</span><span style="color: #BA2121">&#39;r&#39;</span>, tck<span style="color: #666666">=0.2</span>, col<span style="color: #666666">=</span><span style="color: #BA2121">&quot;white&quot;</span>)
-<span style="color: #408080; font-style: italic"># plot legend title</span>
-<span style="color: #0000FF">title</span>(<span style="color: #0000FF">bquote</span>(<span style="color: #0000FF">atop</span>(<span style="color: #666666">-</span>log[<span style="color: #666666">10</span>] <span style="color: #666666">~</span> model, <span style="color: #0000FF">italic</span>(P) <span style="color: #666666">-</span> value), ), 
-        line<span style="color: #666666">=2</span>, cex<span style="color: #666666">=1.5</span>, font<span style="color: #666666">=2</span>, adj<span style="color: #666666">=0</span>)
-<span style="color: #408080; font-style: italic"># write the plot to file</span>
-<span style="color: #0000FF">dev.off</span>()
-<span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
-</code></pre></div>
-
+<pre class="highlight"><code class="language-R"># We strongly recommend the use of ggplot2. Only follow this code if you
+# are desperate.
+# Specify that we want to generate plot in EUR.height.bar.png
+png("EUR.height.bar.png",
+    height=10, width=10, res=300, unit="in")
+# First, obtain the colorings based on the p-value
+col &lt;- suppressWarnings(colorRampPalette(c("dodgerblue", "firebrick")))
+# We want the color gradient to match the ranking of p-values
+prs.result &lt;- prs.result[order(-log10(prs.result$P)),]
+prs.result$color &lt;-  col(nrow(prs.result))
+prs.result &lt;- prs.result[order(prs.result$Threshold),]
+# generate a pretty format for p-value output
+prs.result$print.p &lt;- round(prs.result$P, digits = 3)
+prs.result$print.p[!is.na(prs.result$print.p) &amp; prs.result$print.p == 0 ] &lt;-
+    format(prs.result$P[!is.na(prs.result$print.p) &amp; prs.result$print.p == 0 ], digits = 2)
+prs.result$print.p &lt;- sub("e", "*x*10^", prs.result$print.p)
+# Generate the axis labels
+xlab &lt;- expression(italic(P) - value ~ threshold ~ (italic(P)[T]))
+ylab &lt;- expression(paste("PRS model fit:  ", R ^ 2))
+# Setup the drawing area
+layout(t(1:2), widths=c(8.8,1.2))
+par( cex.lab=1.5, cex.axis=1.25, font.lab=2, 
+    oma=c(0,0.5,0,0),
+    mar=c(4,6,0.5,0.5))
+# Plotting the bars
+b&lt;- barplot(height=prs.result$R2, 
+            col=prs.result$color, 
+            border=NA, 
+            ylim=c(0, max(prs.result$R2)*1.25), 
+            axes = F, ann=F)
+# Plot the axis labels and axis ticks
+odd &lt;- seq(0,nrow(prs.result)+1,2)
+even &lt;- seq(1,nrow(prs.result),2)
+axis(side=1, at=b[odd], labels=prs.result$Threshold[odd], lwd=2)
+axis(side=1, at=b[even], labels=prs.result$Threshold[even],lwd=2)
+axis(side=1, at=c(0,b[1],2*b[length(b)]-b[length(b)-1]), labels=c("","",""), lwd=2, lwd.tick=0)
+# Write the p-value on top of each bar
+text( parse(text=paste(
+    prs.result$print.p)), 
+    x = b+0.1, 
+    y =  prs.result$R2+ (max(prs.result$R2)*1.05-max(prs.result$R2)), 
+    srt = 45)
+# Now plot the axis lines
+box(bty='L', lwd=2)
+axis(2,las=2, lwd=2)
+# Plot the axis titles
+title(ylab=ylab, line=4, cex.lab=1.5, font=2 )
+title(xlab=xlab, line=2.5, cex.lab=1.5, font=2 )
+# Generate plot area for the legend
+par(cex.lab=1.5, cex.axis=1.25, font.lab=2, 
+    mar=c(20,0,20,4))
+prs.result &lt;- prs.result[order(-log10(prs.result$P)),]
+image(1, -log10(prs.result$P), t(seq_along(-log10(prs.result$P))), col=prs.result$color, axes=F,ann=F)
+axis(4,las=2,xaxs='r',yaxs='r', tck=0.2, col="white")
+# plot legend title
+title(bquote(atop(-log[10] ~ model, italic(P) - value), ), 
+        line=2, cex=1.5, font=2, adj=0)
+# write the plot to file
+dev.off()
+q() # exit R</code></pre>
 </div>
 <input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">ggplot2</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># ggplot2 is a handy package for plotting</span>
-<span style="color: #0000FF">library</span>(ggplot2)
-<span style="color: #408080; font-style: italic"># generate a pretty format for p-value output</span>
-prs.result<span style="color: #666666">$</span>print.p <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">round</span>(prs.result<span style="color: #666666">$</span>P, digits <span style="color: #666666">=</span> <span style="color: #666666">3</span>)
-prs.result<span style="color: #666666">$</span>print.p[<span style="color: #666666">!</span><span style="color: #0000FF">is.na</span>(prs.result<span style="color: #666666">$</span>print.p) <span style="color: #666666">&amp;</span>
-                    prs.result<span style="color: #666666">$</span>print.p <span style="color: #666666">==</span> <span style="color: #666666">0</span>] <span style="color: #666666">&lt;-</span>
-    <span style="color: #0000FF">format</span>(prs.result<span style="color: #666666">$</span>P[<span style="color: #666666">!</span><span style="color: #0000FF">is.na</span>(prs.result<span style="color: #666666">$</span>print.p) <span style="color: #666666">&amp;</span>
-                            prs.result<span style="color: #666666">$</span>print.p <span style="color: #666666">==</span> <span style="color: #666666">0</span>], digits <span style="color: #666666">=</span> <span style="color: #666666">2</span>)
-prs.result<span style="color: #666666">$</span>print.p <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">sub</span>(<span style="color: #BA2121">&quot;e&quot;</span>, <span style="color: #BA2121">&quot;*x*10^&quot;</span>, prs.result<span style="color: #666666">$</span>print.p)
-<span style="color: #408080; font-style: italic"># Initialize ggplot, requiring the threshold as the x-axis (use factor so that it is uniformly distributed)</span>
-<span style="color: #0000FF">ggplot</span>(data <span style="color: #666666">=</span> prs.result, <span style="color: #0000FF">aes</span>(x <span style="color: #666666">=</span> <span style="color: #0000FF">factor</span>(Threshold), y <span style="color: #666666">=</span> R2)) <span style="color: #666666">+</span>
-    <span style="color: #408080; font-style: italic"># Specify that we want to print p-value on top of the bars</span>
-    <span style="color: #0000FF">geom_text</span>(
-        <span style="color: #0000FF">aes</span>(label <span style="color: #666666">=</span> <span style="color: #0000FF">paste</span>(print.p)),
-        vjust <span style="color: #666666">=</span> <span style="color: #666666">-1.5</span>,
-        hjust <span style="color: #666666">=</span> <span style="color: #666666">0</span>,
-        angle <span style="color: #666666">=</span> <span style="color: #666666">45</span>,
-        cex <span style="color: #666666">=</span> <span style="color: #666666">4</span>,
-        parse <span style="color: #666666">=</span> <span style="color: #008000">T</span>
-    )  <span style="color: #666666">+</span>
-    <span style="color: #408080; font-style: italic"># Specify the range of the plot, *1.25 to provide enough space for the p-values</span>
-    <span style="color: #0000FF">scale_y_continuous</span>(limits <span style="color: #666666">=</span> <span style="color: #0000FF">c</span>(<span style="color: #666666">0</span>, <span style="color: #0000FF">max</span>(prs.result<span style="color: #666666">$</span>R2) <span style="color: #666666">*</span> <span style="color: #666666">1.25</span>)) <span style="color: #666666">+</span>
-    <span style="color: #408080; font-style: italic"># Specify the axis labels</span>
-    <span style="color: #0000FF">xlab</span>(<span style="color: #0000FF">expression</span>(<span style="color: #0000FF">italic</span>(P) <span style="color: #666666">-</span> value <span style="color: #666666">~</span> threshold <span style="color: #666666">~</span> (<span style="color: #0000FF">italic</span>(P)[<span style="color: #008000">T</span>]))) <span style="color: #666666">+</span>
-    <span style="color: #0000FF">ylab</span>(<span style="color: #0000FF">expression</span>(<span style="color: #0000FF">paste</span>(<span style="color: #BA2121">&quot;PRS model fit:  &quot;</span>, R <span style="color: #666666">^</span> <span style="color: #666666">2</span>))) <span style="color: #666666">+</span>
-    <span style="color: #408080; font-style: italic"># Draw a bar plot</span>
-    <span style="color: #0000FF">geom_bar</span>(<span style="color: #0000FF">aes</span>(fill <span style="color: #666666">=</span> <span style="color: #666666">-</span><span style="color: #0000FF">log10</span>(P)), stat <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;identity&quot;</span>) <span style="color: #666666">+</span>
-    <span style="color: #408080; font-style: italic"># Specify the colors</span>
-    <span style="color: #0000FF">scale_fill_gradient2</span>(
-        low <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;dodgerblue&quot;</span>,
-        high <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;firebrick&quot;</span>,
-        mid <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;dodgerblue&quot;</span>,
-        midpoint <span style="color: #666666">=</span> <span style="color: #666666">1e-4</span>,
-        name <span style="color: #666666">=</span> <span style="color: #0000FF">bquote</span>(<span style="color: #0000FF">atop</span>(<span style="color: #666666">-</span>log[<span style="color: #666666">10</span>] <span style="color: #666666">~</span> model, <span style="color: #0000FF">italic</span>(P) <span style="color: #666666">-</span> value),)
-    ) <span style="color: #666666">+</span>
-    <span style="color: #408080; font-style: italic"># Some beautification of the plot</span>
-    <span style="color: #0000FF">theme_classic</span>() <span style="color: #666666">+</span> <span style="color: #0000FF">theme</span>(
-        axis.title <span style="color: #666666">=</span> <span style="color: #0000FF">element_text</span>(face <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;bold&quot;</span>, size <span style="color: #666666">=</span> <span style="color: #666666">18</span>),
-        axis.text <span style="color: #666666">=</span> <span style="color: #0000FF">element_text</span>(size <span style="color: #666666">=</span> <span style="color: #666666">14</span>),
-        legend.title <span style="color: #666666">=</span> <span style="color: #0000FF">element_text</span>(face <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;bold&quot;</span>, size <span style="color: #666666">=</span>
-                                        <span style="color: #666666">18</span>),
-        legend.text <span style="color: #666666">=</span> <span style="color: #0000FF">element_text</span>(size <span style="color: #666666">=</span> <span style="color: #666666">14</span>),
-        axis.text.x <span style="color: #666666">=</span> <span style="color: #0000FF">element_text</span>(angle <span style="color: #666666">=</span> <span style="color: #666666">45</span>, hjust <span style="color: #666666">=</span>
-                                    <span style="color: #666666">1</span>)
+<pre class="highlight"><code class="language-R"># ggplot2 is a handy package for plotting
+library(ggplot2)
+# generate a pretty format for p-value output
+prs.result$print.p &lt;- round(prs.result$P, digits = 3)
+prs.result$print.p[!is.na(prs.result$print.p) &amp;
+                    prs.result$print.p == 0] &lt;-
+    format(prs.result$P[!is.na(prs.result$print.p) &amp;
+                            prs.result$print.p == 0], digits = 2)
+prs.result$print.p &lt;- sub("e", "*x*10^", prs.result$print.p)
+# Initialize ggplot, requiring the threshold as the x-axis (use factor so that it is uniformly distributed)
+ggplot(data = prs.result, aes(x = factor(Threshold), y = R2)) +
+    # Specify that we want to print p-value on top of the bars
+    geom_text(
+        aes(label = paste(print.p)),
+        vjust = -1.5,
+        hjust = 0,
+        angle = 45,
+        cex = 4,
+        parse = T
+    )  +
+    # Specify the range of the plot, *1.25 to provide enough space for the p-values
+    scale_y_continuous(limits = c(0, max(prs.result$R2) * 1.25)) +
+    # Specify the axis labels
+    xlab(expression(italic(P) - value ~ threshold ~ (italic(P)[T]))) +
+    ylab(expression(paste("PRS model fit:  ", R ^ 2))) +
+    # Draw a bar plot
+    geom_bar(aes(fill = -log10(P)), stat = "identity") +
+    # Specify the colors
+    scale_fill_gradient2(
+        low = "dodgerblue",
+        high = "firebrick",
+        mid = "dodgerblue",
+        midpoint = 1e-4,
+        name = bquote(atop(-log[10] ~ model, italic(P) - value),)
+    ) +
+    # Some beautification of the plot
+    theme_classic() + theme(
+        axis.title = element_text(face = "bold", size = 18),
+        axis.text = element_text(size = 14),
+        legend.title = element_text(face = "bold", size =
+                                        18),
+        legend.text = element_text(size = 14),
+        axis.text.x = element_text(angle = 45, hjust =
+                                    1)
     )
-<span style="color: #408080; font-style: italic"># save the plot</span>
-<span style="color: #0000FF">ggsave</span>(<span style="color: #BA2121">&quot;EUR.height.bar.png&quot;</span>, height <span style="color: #666666">=</span> <span style="color: #666666">7</span>, width <span style="color: #666666">=</span> <span style="color: #666666">7</span>)
-<span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
-</code></pre></div>
-
+# save the plot
+ggsave("EUR.height.bar.png", height = 7, width = 7)
+q() # exit R</code></pre>
 </div>
 </div>
 <p><img alt="Example Bar Plot" src="../img/EUR.height.bar.png" /></p>
@@ -258,43 +254,39 @@ prs.result<span style="color: #666666">$</span>print.p <span style="color: #6666
 </blockquote>
 <p>In addition, we can visualise the relationship between the "best-fit" PRS (which may have been obtained from any of the PRS programs) and the phenotype of interest, coloured according to sex:</p>
 <div class="tabbed-set" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Without ggplot2</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># Read in the files</span>
-prs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.0.3.profile&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-height <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-sex <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-<span style="color: #408080; font-style: italic"># Rename the sex</span>
-sex<span style="color: #666666">$</span>Sex <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">as.factor</span>(sex<span style="color: #666666">$</span>Sex)
-<span style="color: #0000FF">levels</span>(sex<span style="color: #666666">$</span>Sex) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;Male&quot;</span>, <span style="color: #BA2121">&quot;Female&quot;</span>)
-<span style="color: #408080; font-style: italic"># Merge the files</span>
-dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(<span style="color: #0000FF">merge</span>(prs, height), sex)
-<span style="color: #408080; font-style: italic"># Start plotting</span>
-<span style="color: #0000FF">plot</span>(x<span style="color: #666666">=</span>dat<span style="color: #666666">$</span>SCORE, y<span style="color: #666666">=</span>dat<span style="color: #666666">$</span>Height, col<span style="color: #666666">=</span><span style="color: #BA2121">&quot;white&quot;</span>,
-    xlab<span style="color: #666666">=</span><span style="color: #BA2121">&quot;Polygenic Score&quot;</span>, ylab<span style="color: #666666">=</span><span style="color: #BA2121">&quot;Height&quot;</span>)
-<span style="color: #0000FF">with</span>(<span style="color: #0000FF">subset</span>(dat, Sex<span style="color: #666666">==</span><span style="color: #BA2121">&quot;Male&quot;</span>), <span style="color: #0000FF">points</span>(x<span style="color: #666666">=</span>SCORE, y<span style="color: #666666">=</span>Height, col<span style="color: #666666">=</span><span style="color: #BA2121">&quot;red&quot;</span>))
-<span style="color: #0000FF">with</span>(<span style="color: #0000FF">subset</span>(dat, Sex<span style="color: #666666">==</span><span style="color: #BA2121">&quot;Female&quot;</span>), <span style="color: #0000FF">points</span>(x<span style="color: #666666">=</span>SCORE, y<span style="color: #666666">=</span>Height, col<span style="color: #666666">=</span><span style="color: #BA2121">&quot;blue&quot;</span>))
-<span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
-</code></pre></div>
-
+<pre class="highlight"><code class="language-R"># Read in the files
+prs &lt;- read.table("EUR.0.3.profile", header=T)
+height &lt;- read.table("EUR.height", header=T)
+sex &lt;- read.table("EUR.cov", header=T)
+# Rename the sex
+sex$Sex &lt;- as.factor(sex$Sex)
+levels(sex$Sex) &lt;- c("Male", "Female")
+# Merge the files
+dat &lt;- merge(merge(prs, height), sex)
+# Start plotting
+plot(x=dat$SCORE, y=dat$Height, col="white",
+    xlab="Polygenic Score", ylab="Height")
+with(subset(dat, Sex=="Male"), points(x=SCORE, y=Height, col="red"))
+with(subset(dat, Sex=="Female"), points(x=SCORE, y=Height, col="blue"))
+q() # exit R</code></pre>
 </div>
 <input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">ggplot2</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #0000FF">library</span>(ggplot2)
-<span style="color: #408080; font-style: italic"># Read in the files</span>
-prs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.0.3.profile&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-height <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-sex <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-<span style="color: #408080; font-style: italic"># Rename the sex</span>
-sex<span style="color: #666666">$</span>Sex <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">as.factor</span>(sex<span style="color: #666666">$</span>Sex)
-<span style="color: #0000FF">levels</span>(sex<span style="color: #666666">$</span>Sex) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;Male&quot;</span>, <span style="color: #BA2121">&quot;Female&quot;</span>)
-<span style="color: #408080; font-style: italic"># Merge the files</span>
-dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(<span style="color: #0000FF">merge</span>(prs, height), sex)
-<span style="color: #408080; font-style: italic"># Start plotting</span>
-<span style="color: #0000FF">ggplot</span>(dat, <span style="color: #0000FF">aes</span>(x<span style="color: #666666">=</span>SCORE, y<span style="color: #666666">=</span>Height, color<span style="color: #666666">=</span>Sex))<span style="color: #666666">+</span>
-    <span style="color: #0000FF">geom_point</span>()<span style="color: #666666">+</span>
-    <span style="color: #0000FF">theme_classic</span>()<span style="color: #666666">+</span>
-    <span style="color: #0000FF">labs</span>(x<span style="color: #666666">=</span><span style="color: #BA2121">&quot;Polygenic Score&quot;</span>, y<span style="color: #666666">=</span><span style="color: #BA2121">&quot;Height&quot;</span>)
-<span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
-</code></pre></div>
-
+<pre class="highlight"><code class="language-R">library(ggplot2)
+# Read in the files
+prs &lt;- read.table("EUR.0.3.profile", header=T)
+height &lt;- read.table("EUR.height", header=T)
+sex &lt;- read.table("EUR.cov", header=T)
+# Rename the sex
+sex$Sex &lt;- as.factor(sex$Sex)
+levels(sex$Sex) &lt;- c("Male", "Female")
+# Merge the files
+dat &lt;- merge(merge(prs, height), sex)
+# Start plotting
+ggplot(dat, aes(x=SCORE, y=Height, color=Sex))+
+    geom_point()+
+    theme_classic()+
+    labs(x="Polygenic Score", y="Height")
+q() # exit R</code></pre>
 </div>
 </div>
 <p><img alt="Example Scatter Plot" src="../img/EUR.height.scatter.png" /></p>

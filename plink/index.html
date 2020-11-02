@@ -184,20 +184,16 @@ This multi-step process is a good way to learn the processes involved in computi
 <p>When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we take the natural logarithm of the OR so that the PRS can be computed using summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with <code>R</code>:</p>
 <div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Without data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #0000FF">gzfile</span>(<span style="color: #BA2121">&quot;Height.QC.gz&quot;</span>), header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-dat<span style="color: #666666">$</span>OR <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">log</span>(dat<span style="color: #666666">$</span>OR)
-<span style="color: #0000FF">write.table</span>(dat, <span style="color: #BA2121">&quot;Height.QC.Transformed&quot;</span>, quote<span style="color: #666666">=</span><span style="color: #008000">F</span>, row.names<span style="color: #666666">=</span><span style="color: #008000">F</span>)
-<span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
-</code></pre></div>
-
+<pre class="highlight"><code class="language-R">dat &lt;- read.table(gzfile("Height.QC.gz"), header=T)
+dat$BETA &lt;- log(dat$OR)
+write.table(dat, "Height.QC.Transformed", quote=F, row.names=F)
+q() # exit R</code></pre>
 </div>
 <input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">With data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #0000FF">library</span>(data.table)
-dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;Height.QC.gz&quot;</span>)
-<span style="color: #0000FF">fwrite</span>(dat[,BETA<span style="color: #666666">:=</span><span style="color: #0000FF">log</span>(OR)], <span style="color: #BA2121">&quot;Height.QC.Transformed&quot;</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>)
-<span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
-</code></pre></div>
-
+<pre class="highlight"><code class="language-R">library(data.table)
+dat &lt;- fread("Height.QC.gz")
+fwrite(dat[,BETA:=log(OR)], "Height.QC.Transformed", sep="\t")
+q() # exit R</code></pre>
 </div>
 </div>
 <div class="admonition warning">
@@ -208,17 +204,15 @@ dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread
 <p>Linkage disequilibrium, which corresponds to the correlation between the genotypes of genetic variants across the genome, makes identifying the contribution from causal independent genetic variants extremely challenging. 
 One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in ways that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. 
 Clumping can be performed using the following command in <code>plink</code>: </p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
-    --bfile EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
-    --clump-p1 <span style="color: #666666">1</span> <span style="color: #BB6622; font-weight: bold">\</span>
-    --clump-r2 <span style="color: #666666">0</span>.1 <span style="color: #BB6622; font-weight: bold">\</span>
-    --clump-kb <span style="color: #666666">250</span> <span style="color: #BB6622; font-weight: bold">\</span>
-    --clump Height.QC.Transformed <span style="color: #BB6622; font-weight: bold">\</span>
-    --clump-snp-field SNP <span style="color: #BB6622; font-weight: bold">\</span>
-    --clump-field P <span style="color: #BB6622; font-weight: bold">\</span>
-    --out EUR
-</code></pre></div>
-
+<pre class="highlight"><code class="language-bash">plink \
+    --bfile EUR.QC \
+    --clump-p1 1 \
+    --clump-r2 0.1 \
+    --clump-kb 250 \
+    --clump Height.QC.Transformed \
+    --clump-snp-field SNP \
+    --clump-field P \
+    --out EUR</code></pre>
 <p>Each of the new parameters corresponds to the following</p>
 <table>
 <thead>
@@ -268,9 +262,7 @@ Clumping can be performed using the following command in <code>plink</code>: </p
 </div>
 <p>This will generate <strong>EUR.clumped</strong>, containing the index SNPs after clumping is performed.
 We can extract the index SNP ID by performing the following command:</p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>awk <span style="color: #BA2121">&#39;NR!=1{print $3}&#39;</span> EUR.clumped <span style="color: #666666">&gt;</span>  EUR.valid.snp
-</code></pre></div>
-
+<pre class="highlight"><code class="language-awk">awk 'NR!=1{print $3}' EUR.clumped &gt;  EUR.valid.snp</code></pre>
 <blockquote>
 <p><code>$3</code> because the third column contains the SNP ID</p>
 </blockquote>
@@ -286,20 +278,17 @@ Make sure to use the population that most closely reflects represents the base s
 <li>The base data file: <strong>Height.QC.Transformed</strong></li>
 <li>A file containing SNP IDs and their corresponding P-values (<code>$3</code> because SNP ID is located in the third column; <code>$8</code> because the P-value is located in the eighth column)</li>
 </ol>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>awk <span style="color: #BA2121">&#39;{print $3,$8}&#39;</span> Height.QC.Transformed <span style="color: #666666">&gt;</span> SNP.pvalue
-</code></pre></div>
-
+<pre class="highlight"><code class="language-awk">awk '{print $3,$8}' Height.QC.Transformed &gt; SNP.pvalue</code></pre>
 <ol>
 <li>A file containing the different P-value thresholds for inclusion of SNPs in the PRS. Here calculate PRS corresponding to a few thresholds for illustration purposes:</li>
 </ol>
-<p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.001 0 0.001&quot;</span> &gt; range_list 
-<span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.05 0 0.05&quot;</span> &gt;&gt; range_list
-<span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.1 0 0.1&quot;</span> &gt;&gt; range_list
-<span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.2 0 0.2&quot;</span> &gt;&gt; range_list
-<span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.3 0 0.3&quot;</span> &gt;&gt; range_list
-<span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.4 0 0.4&quot;</span> &gt;&gt; range_list
-<span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.5 0 0.5&quot;</span> &gt;&gt; range_list
-</code></pre></div>
+<p><pre class="highlight"><code class="language-bash">echo "0.001 0 0.001" &gt; range_list 
+echo "0.05 0 0.05" &gt;&gt; range_list
+echo "0.1 0 0.1" &gt;&gt; range_list
+echo "0.2 0 0.2" &gt;&gt; range_list
+echo "0.3 0 0.3" &gt;&gt; range_list
+echo "0.4 0 0.4" &gt;&gt; range_list
+echo "0.5 0 0.5" &gt;&gt; range_list</code></pre>
 The format of the <strong>range_list</strong> file should be as follows:</p>
 <table>
 <thead>
@@ -323,13 +312,12 @@ The format of the <strong>range_list</strong> file should be as follows:</p>
 <code>0</code> to <code>0.05</code>, <strong>including</strong> any SNPs with P-value equal to <code>0.05</code>.</p>
 </div>
 <p>We can then calculate the PRS with the following <code>plink</code> command:</p>
-<p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
-    --bfile EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
-    --score Height.QC.Transformed <span style="color: #666666">3</span> <span style="color: #666666">4</span> <span style="color: #666666">12</span> header <span style="color: #BB6622; font-weight: bold">\</span>
-    --q-score-range range_list SNP.pvalue <span style="color: #BB6622; font-weight: bold">\</span>
-    --extract EUR.valid.snp <span style="color: #BB6622; font-weight: bold">\</span>
-    --out EUR
-</code></pre></div>
+<p><pre class="highlight"><code class="language-bash">plink \
+    --bfile EUR.QC \
+    --score Height.QC.Transformed 3 4 12 header \
+    --q-score-range range_list SNP.pvalue \
+    --extract EUR.valid.snp \
+    --out EUR</code></pre>
 The meaning of the new parameters are as follows:</p>
 <table>
 <thead>
@@ -347,8 +335,8 @@ The meaning of the new parameters are as follows:</p>
 </tr>
 <tr>
 <td align="center">q-score-range</td>
-<td align="center">range_test SNP.pvalue</td>
-<td align="left">We want to calculate PRS based on the thresholds defined in <strong>range_test</strong>, where the threshold values (P-values) were stored in <strong>SNP.pvalue</strong></td>
+<td align="center">range_list SNP.pvalue</td>
+<td align="left">We want to calculate PRS based on the thresholds defined in <strong>range_list</strong>, where the threshold values (P-values) were stored in <strong>SNP.pvalue</strong></td>
 </tr>
 </tbody>
 </table>
@@ -373,19 +361,17 @@ PRS_j =\frac{ \sum_i^NS_i*G_{ij}}{P*M_j}
 <h2 id="accounting-for-population-stratification">Accounting for Population Stratification<a class="headerlink" href="#accounting-for-population-stratification" title="Permanent link">&para;</a></h2>
 <p>Population structure is the principal source of confounding in GWAS and is usually accounted for by incorporating principal components (PCs) as covariates. We can incorporate PCs into our PRS analysis to account for population stratification.</p>
 <p>Again, we can calculate the PCs using <code>plink</code>: </p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># First, we need to perform prunning</span>
-plink <span style="color: #BB6622; font-weight: bold">\</span>
-    --bfile EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
-    --indep-pairwise <span style="color: #666666">200</span> <span style="color: #666666">50</span> <span style="color: #666666">0</span>.25 <span style="color: #BB6622; font-weight: bold">\</span>
+<pre class="highlight"><code class="language-bash"># First, we need to perform prunning
+plink \
+    --bfile EUR.QC \
+    --indep-pairwise 200 50 0.25 \
     --out EUR
-<span style="color: #408080; font-style: italic"># Then we calculate the first 6 PCs</span>
-plink <span style="color: #BB6622; font-weight: bold">\</span>
-    --bfile EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
-    --extract EUR.prune.in <span style="color: #BB6622; font-weight: bold">\</span>
-    --pca <span style="color: #666666">6</span> <span style="color: #BB6622; font-weight: bold">\</span>
-    --out EUR
-</code></pre></div>
-
+# Then we calculate the first 6 PCs
+plink \
+    --bfile EUR.QC \
+    --extract EUR.prune.in \
+    --pca 6 \
+    --out EUR</code></pre>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>One way to select the appropriate number of PCs is to perform GWAS on the phenotype under study with different numbers of PCs.
@@ -401,114 +387,108 @@ plink <span style="color: #BB6622; font-weight: bold">\</span>
 To approximate the "best-fit" PRS, we can perform a regression between PRS calculated at a range of P-value thresholds and then select the PRS that explains the highest phenotypic variance (please see Section 4.6 of our paper on overfitting issues). 
 This can be achieved using <code>R</code> as follows:</p>
 <div class="tabbed-set" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">detail</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>p.threshold <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #666666">0.001</span>,<span style="color: #666666">0.05</span>,<span style="color: #666666">0.1</span>,<span style="color: #666666">0.2</span>,<span style="color: #666666">0.3</span>,<span style="color: #666666">0.4</span>,<span style="color: #666666">0.5</span>)
-<span style="color: #408080; font-style: italic"># Read in the phenotype file </span>
-phenotype <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-<span style="color: #408080; font-style: italic"># Read in the PCs</span>
-pcs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.eigenvec&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">F</span>)
-<span style="color: #408080; font-style: italic"># The default output from plink does not include a header</span>
-<span style="color: #408080; font-style: italic"># To make things simple, we will add the appropriate headers</span>
-<span style="color: #408080; font-style: italic"># (1:6 because there are 6 PCs)</span>
-<span style="color: #0000FF">colnames</span>(pcs) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;PC&quot;</span>,<span style="color: #666666">1:6</span>)) 
-<span style="color: #408080; font-style: italic"># Read in the covariates (here, it is sex)</span>
-covariate <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-<span style="color: #408080; font-style: italic"># Now merge the files</span>
-pheno <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(<span style="color: #0000FF">merge</span>(phenotype, covariate, by<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>)), pcs, by<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>))
-<span style="color: #408080; font-style: italic"># We can then calculate the null model (model with PRS) using a linear regression </span>
-<span style="color: #408080; font-style: italic"># (as height is quantitative)</span>
-null.model <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lm</span>(Height<span style="color: #666666">~</span>., data<span style="color: #666666">=</span>pheno[,<span style="color: #666666">!</span><span style="color: #0000FF">colnames</span>(pheno)<span style="color: #666666">%in%</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>)])
-<span style="color: #408080; font-style: italic"># And the R2 of the null model is </span>
-null.r2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">summary</span>(null.model)<span style="color: #666666">$</span>r.squared
-prs.result <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
-<span style="color: #0000FF">for</span>(i in p.threshold){
-    <span style="color: #408080; font-style: italic"># Go through each p-value threshold</span>
-    prs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;EUR.&quot;</span>,i,<span style="color: #BA2121">&quot;.profile&quot;</span>), header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-    <span style="color: #408080; font-style: italic"># Merge the prs with the phenotype matrix</span>
-    <span style="color: #408080; font-style: italic"># We only want the FID, IID and PRS from the PRS file, therefore we only select the </span>
-    <span style="color: #408080; font-style: italic"># relevant columns</span>
-    pheno.prs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(pheno, prs[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #BA2121">&quot;SCORE&quot;</span>)], by<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>))
-    <span style="color: #408080; font-style: italic"># Now perform a linear regression on Height with PRS and the covariates</span>
-    <span style="color: #408080; font-style: italic"># ignoring the FID and IID from our model</span>
-    model <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lm</span>(Height<span style="color: #666666">~</span>., data<span style="color: #666666">=</span>pheno.prs[,<span style="color: #666666">!</span><span style="color: #0000FF">colnames</span>(pheno.prs)<span style="color: #666666">%in%</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>)])
-    <span style="color: #408080; font-style: italic"># model R2 is obtained as </span>
-    model.r2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">summary</span>(model)<span style="color: #666666">$</span>r.squared
-    <span style="color: #408080; font-style: italic"># R2 of PRS is simply calculated as the model R2 minus the null R2</span>
-    prs.r2 <span style="color: #666666">&lt;-</span> model.r2<span style="color: #666666">-</span>null.r2
-    <span style="color: #408080; font-style: italic"># We can also obtain the coeffcient and p-value of association of PRS as follow</span>
-    prs.coef <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">summary</span>(model)<span style="color: #666666">$</span>coeff[<span style="color: #BA2121">&quot;SCORE&quot;</span>,]
-    prs.beta <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">as.numeric</span>(prs.coef[<span style="color: #666666">1</span>])
-    prs.se <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">as.numeric</span>(prs.coef[<span style="color: #666666">2</span>])
-    prs.p <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">as.numeric</span>(prs.coef[<span style="color: #666666">4</span>])
-    <span style="color: #408080; font-style: italic"># We can then store the results</span>
-    prs.result <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">rbind</span>(prs.result, <span style="color: #0000FF">data.frame</span>(Threshold<span style="color: #666666">=</span>i, R2<span style="color: #666666">=</span>prs.r2, P<span style="color: #666666">=</span>prs.p, BETA<span style="color: #666666">=</span>prs.beta,SE<span style="color: #666666">=</span>prs.se))
+<pre class="highlight"><code class="language-R">p.threshold &lt;- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
+# Read in the phenotype file 
+phenotype &lt;- read.table("EUR.height", header=T)
+# Read in the PCs
+pcs &lt;- read.table("EUR.eigenvec", header=F)
+# The default output from plink does not include a header
+# To make things simple, we will add the appropriate headers
+# (1:6 because there are 6 PCs)
+colnames(pcs) &lt;- c("FID", "IID", paste0("PC",1:6)) 
+# Read in the covariates (here, it is sex)
+covariate &lt;- read.table("EUR.cov", header=T)
+# Now merge the files
+pheno &lt;- merge(merge(phenotype, covariate, by=c("FID", "IID")), pcs, by=c("FID","IID"))
+# We can then calculate the null model (model with PRS) using a linear regression 
+# (as height is quantitative)
+null.model &lt;- lm(Height~., data=pheno[,!colnames(pheno)%in%c("FID","IID")])
+# And the R2 of the null model is 
+null.r2 &lt;- summary(null.model)$r.squared
+prs.result &lt;- NULL
+for(i in p.threshold){
+    # Go through each p-value threshold
+    prs &lt;- read.table(paste0("EUR.",i,".profile"), header=T)
+    # Merge the prs with the phenotype matrix
+    # We only want the FID, IID and PRS from the PRS file, therefore we only select the 
+    # relevant columns
+    pheno.prs &lt;- merge(pheno, prs[,c("FID","IID", "SCORE")], by=c("FID", "IID"))
+    # Now perform a linear regression on Height with PRS and the covariates
+    # ignoring the FID and IID from our model
+    model &lt;- lm(Height~., data=pheno.prs[,!colnames(pheno.prs)%in%c("FID","IID")])
+    # model R2 is obtained as 
+    model.r2 &lt;- summary(model)$r.squared
+    # R2 of PRS is simply calculated as the model R2 minus the null R2
+    prs.r2 &lt;- model.r2-null.r2
+    # We can also obtain the coeffcient and p-value of association of PRS as follow
+    prs.coef &lt;- summary(model)$coeff["SCORE",]
+    prs.beta &lt;- as.numeric(prs.coef[1])
+    prs.se &lt;- as.numeric(prs.coef[2])
+    prs.p &lt;- as.numeric(prs.coef[4])
+    # We can then store the results
+    prs.result &lt;- rbind(prs.result, data.frame(Threshold=i, R2=prs.r2, P=prs.p, BETA=prs.beta,SE=prs.se))
 }
-<span style="color: #408080; font-style: italic"># Best result is:</span>
-prs.result[<span style="color: #0000FF">which.max</span>(prs.result<span style="color: #666666">$</span>R2),]
-<span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
-</code></pre></div>
-
+# Best result is:
+prs.result[which.max(prs.result$R2),]
+q() # exit R</code></pre>
 </div>
 <input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">quick</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>p.threshold <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #666666">0.001</span>,<span style="color: #666666">0.05</span>,<span style="color: #666666">0.1</span>,<span style="color: #666666">0.2</span>,<span style="color: #666666">0.3</span>,<span style="color: #666666">0.4</span>,<span style="color: #666666">0.5</span>)
-phenotype <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-pcs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.eigenvec&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">F</span>)
-<span style="color: #0000FF">colnames</span>(pcs) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;PC&quot;</span>,<span style="color: #666666">1:6</span>)) 
-covariate <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
-pheno <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(<span style="color: #0000FF">merge</span>(phenotype, covariate, by<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>)), pcs, by<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>))
-null.r2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">summary</span>(<span style="color: #0000FF">lm</span>(Height<span style="color: #666666">~</span>., data<span style="color: #666666">=</span>pheno[,<span style="color: #666666">!</span><span style="color: #0000FF">colnames</span>(pheno)<span style="color: #666666">%in%</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>)]))<span style="color: #666666">$</span>r.squared
-prs.result <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
-<span style="color: #0000FF">for</span>(i in p.threshold){
-    pheno.prs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(pheno, 
-                        <span style="color: #0000FF">read.table</span>(<span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;EUR.&quot;</span>,i,<span style="color: #BA2121">&quot;.profile&quot;</span>), header<span style="color: #666666">=</span><span style="color: #008000">T</span>)[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #BA2121">&quot;SCORE&quot;</span>)],
-                        by<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>))
-    model <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">summary</span>(<span style="color: #0000FF">lm</span>(Height<span style="color: #666666">~</span>., data<span style="color: #666666">=</span>pheno.prs[,<span style="color: #666666">!</span><span style="color: #0000FF">colnames</span>(pheno.prs)<span style="color: #666666">%in%</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>)]))
-    model.r2 <span style="color: #666666">&lt;-</span> model<span style="color: #666666">$</span>r.squared
-    prs.r2 <span style="color: #666666">&lt;-</span> model.r2<span style="color: #666666">-</span>null.r2
-    prs.coef <span style="color: #666666">&lt;-</span> model<span style="color: #666666">$</span>coeff[<span style="color: #BA2121">&quot;SCORE&quot;</span>,]
-    prs.result <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">rbind</span>(prs.result, 
-        <span style="color: #0000FF">data.frame</span>(Threshold<span style="color: #666666">=</span>i, R2<span style="color: #666666">=</span>prs.r2, 
-                    P<span style="color: #666666">=</span><span style="color: #0000FF">as.numeric</span>(prs.coef[<span style="color: #666666">4</span>]), 
-                    BETA<span style="color: #666666">=</span><span style="color: #0000FF">as.numeric</span>(prs.coef[<span style="color: #666666">1</span>]),
-                    SE<span style="color: #666666">=</span><span style="color: #0000FF">as.numeric</span>(prs.coef[<span style="color: #666666">2</span>])))
+<pre class="highlight"><code class="language-R">p.threshold &lt;- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
+phenotype &lt;- read.table("EUR.height", header=T)
+pcs &lt;- read.table("EUR.eigenvec", header=F)
+colnames(pcs) &lt;- c("FID", "IID", paste0("PC",1:6)) 
+covariate &lt;- read.table("EUR.cov", header=T)
+pheno &lt;- merge(merge(phenotype, covariate, by=c("FID", "IID")), pcs, by=c("FID","IID"))
+null.r2 &lt;- summary(lm(Height~., data=pheno[,!colnames(pheno)%in%c("FID","IID")]))$r.squared
+prs.result &lt;- NULL
+for(i in p.threshold){
+    pheno.prs &lt;- merge(pheno, 
+                        read.table(paste0("EUR.",i,".profile"), header=T)[,c("FID","IID", "SCORE")],
+                        by=c("FID", "IID"))
+    model &lt;- summary(lm(Height~., data=pheno.prs[,!colnames(pheno.prs)%in%c("FID","IID")]))
+    model.r2 &lt;- model$r.squared
+    prs.r2 &lt;- model.r2-null.r2
+    prs.coef &lt;- model$coeff["SCORE",]
+    prs.result &lt;- rbind(prs.result, 
+        data.frame(Threshold=i, R2=prs.r2, 
+                    P=as.numeric(prs.coef[4]), 
+                    BETA=as.numeric(prs.coef[1]),
+                    SE=as.numeric(prs.coef[2])))
 }
-<span style="color: #0000FF">print</span>(prs.result[<span style="color: #0000FF">which.max</span>(prs.result<span style="color: #666666">$</span>R2),])
-<span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
-</code></pre></div>
-
+print(prs.result[which.max(prs.result$R2),])
+q() # exit R</code></pre>
 </div>
 <input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><label for="__tabbed_2_3">with data.table and magrittr</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #0000FF">library</span>(data.table)
-<span style="color: #0000FF">library</span>(magrittr)
-p.threshold <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #666666">0.001</span>,<span style="color: #666666">0.05</span>,<span style="color: #666666">0.1</span>,<span style="color: #666666">0.2</span>,<span style="color: #666666">0.3</span>,<span style="color: #666666">0.4</span>,<span style="color: #666666">0.5</span>)
-phenotype <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>)
-pcs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.eigenvec&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">F</span>) <span style="color: #666666">%&gt;%</span>
-    <span style="color: #0000FF">setnames</span>(., <span style="color: #0000FF">colnames</span>(.), <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;PC&quot;</span>,<span style="color: #666666">1:6</span>)) )
-covariate <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>)
-pheno <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(phenotype, covariate) <span style="color: #666666">%&gt;%</span>
-        <span style="color: #0000FF">merge</span>(., pcs)
-null.r2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">summary</span>(<span style="color: #0000FF">lm</span>(Height<span style="color: #666666">~</span>., data<span style="color: #666666">=</span>pheno[,<span style="color: #666666">-</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>)]))<span style="color: #666666">$</span>r.squared
-prs.result <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
-<span style="color: #0000FF">for</span>(i in p.threshold){
-    pheno.prs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;EUR.&quot;</span>, i, <span style="color: #BA2121">&quot;.profile&quot;</span>) <span style="color: #666666">%&gt;%</span>
-        <span style="color: #0000FF">fread</span>(.) <span style="color: #666666">%&gt;%</span>
-        .[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #BA2121">&quot;SCORE&quot;</span>)] <span style="color: #666666">%&gt;%</span>
-        <span style="color: #0000FF">merge</span>(., pheno, by<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>))
+<pre class="highlight"><code class="language-R">library(data.table)
+library(magrittr)
+p.threshold &lt;- c(0.001,0.05,0.1,0.2,0.3,0.4,0.5)
+phenotype &lt;- fread("EUR.height")
+pcs &lt;- fread("EUR.eigenvec", header=F) %&gt;%
+    setnames(., colnames(.), c("FID", "IID", paste0("PC",1:6)) )
+covariate &lt;- fread("EUR.cov")
+pheno &lt;- merge(phenotype, covariate) %&gt;%
+        merge(., pcs)
+null.r2 &lt;- summary(lm(Height~., data=pheno[,-c("FID", "IID")]))$r.squared
+prs.result &lt;- NULL
+for(i in p.threshold){
+    pheno.prs &lt;- paste0("EUR.", i, ".profile") %&gt;%
+        fread(.) %&gt;%
+        .[,c("FID", "IID", "SCORE")] %&gt;%
+        merge(., pheno, by=c("FID", "IID"))
 
-    model <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lm</span>(Height<span style="color: #666666">~</span>., data<span style="color: #666666">=</span>pheno.prs[,<span style="color: #666666">-</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>)]) <span style="color: #666666">%&gt;%</span>
+    model &lt;- lm(Height~., data=pheno.prs[,-c("FID","IID")]) %&gt;%
             summary
-    model.r2 <span style="color: #666666">&lt;-</span> model<span style="color: #666666">$</span>r.squared
-    prs.r2 <span style="color: #666666">&lt;-</span> model.r2<span style="color: #666666">-</span>null.r2
-    prs.coef <span style="color: #666666">&lt;-</span> model<span style="color: #666666">$</span>coeff[<span style="color: #BA2121">&quot;SCORE&quot;</span>,]
-    prs.result <span style="color: #666666">%&lt;&gt;%</span> <span style="color: #0000FF">rbind</span>(.,
-        <span style="color: #0000FF">data.frame</span>(Threshold<span style="color: #666666">=</span>i, R2<span style="color: #666666">=</span>prs.r2, 
-                    P<span style="color: #666666">=</span><span style="color: #0000FF">as.numeric</span>(prs.coef[<span style="color: #666666">4</span>]), 
-                    BETA<span style="color: #666666">=</span><span style="color: #0000FF">as.numeric</span>(prs.coef[<span style="color: #666666">1</span>]),
-                    SE<span style="color: #666666">=</span><span style="color: #0000FF">as.numeric</span>(prs.coef[<span style="color: #666666">2</span>])))
+    model.r2 &lt;- model$r.squared
+    prs.r2 &lt;- model.r2-null.r2
+    prs.coef &lt;- model$coeff["SCORE",]
+    prs.result %&lt;&gt;% rbind(.,
+        data.frame(Threshold=i, R2=prs.r2, 
+                    P=as.numeric(prs.coef[4]), 
+                    BETA=as.numeric(prs.coef[1]),
+                    SE=as.numeric(prs.coef[2])))
 }
-<span style="color: #0000FF">print</span>(prs.result[<span style="color: #0000FF">which.max</span>(prs.result<span style="color: #666666">$</span>R2),])
-<span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
-</code></pre></div>
-
+print(prs.result[which.max(prs.result$R2),])
+q() # exit R</code></pre>
 </div>
 </div>
 <details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.3</p>
