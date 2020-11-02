@@ -67,7 +67,7 @@ PRSice-2 can then be run to obtain the PRS results as follows:
         --target EUR.QC \
         --binary-target F \
         --pheno EUR.height \
-        --cov EUR.cov \
+        --cov EUR.covariate \
         --base-maf MAF:0.01 \
         --base-info INFO:0.8 \
         --stat OR \
@@ -83,7 +83,7 @@ PRSice-2 can then be run to obtain the PRS results as follows:
         --target EUR.QC \
         --binary-target F \
         --pheno EUR.height \
-        --cov EUR.cov \
+        --cov EUR.covariate \
         --base-maf MAF:0.01 \
         --base-info INFO:0.8 \
         --stat OR \
@@ -99,7 +99,7 @@ PRSice-2 can then be run to obtain the PRS results as follows:
         --target EUR.QC ^
         --binary-target F ^
         --pheno EUR.height ^
-        --cov EUR.cov ^
+        --cov EUR.covariate ^
         --base-maf MAF:0.05 ^
         --base-info INFO:0.8 ^
         --stat OR ^
@@ -116,7 +116,7 @@ The meaning of the parameters are as follow:
 |target| EUR.QC| Informs `PRSice` that the input genotype files should have a prefix of `EUR.QC` |
 |binary-target| F| Indicate if the phenotype of interest is a binary trait. F for no |
 |pheno| EUR.height| Provide `PRSice` with the phenotype file |
-|cov| EUR.height| Provide `PRSice` with the covariate file |
+|cov| EUR.covariate| Provide `PRSice` with the covariate file |
 |base-maf| MAF:0.05| Filter out SNPs with MAF < 0.05 in the GWAS summary statistics, using information in the `MAF` column|
 |base-info| INFO:0.8| Filter out SNPs with INFO < 0.8 in the GWAS summary statistics, using information in the `INFO` column|
 |stat| OR| Column name of the column containing the effect size|
@@ -127,7 +127,7 @@ This will automatically perform "high-resolution scoring" and generate the "best
 Users should read Section 4.6 of our paper to learn more about issues relating to overfitting in PRS analyses.  
 
 ??? note "Which P-value threshold generates the "best-fit" PRS?"
-    0.1388
+    0.13995
 
 ??? note "How much phenotypic variation does the "best-fit" PRS explain?"
-    0.174227
+    0.166117
