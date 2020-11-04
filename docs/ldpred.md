@@ -184,14 +184,14 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
     for (chr in 1:22) {
         # preprocess the bed file (only need to do once for each data set)
         # Assuming the file naming is EUR_chr#.bed
-        snp_readBed(paste0("EUR_chr",i,".bed"))
+        snp_readBed(paste0("EUR_chr",chr,".bed"))
         # now attach the genotype object
-        obj.bigSNP <- snp_attach(paste0("EUR_chr",i,".rds"))
+        obj.bigSNP <- snp_attach(paste0("EUR_chr",chr,".rds"))
         # extract the SNP information from the genotype
         map <- obj.bigSNP$map[-3]
         names(map) <- c("chr", "rsid", "pos", "a1", "a0")
         # perform SNP matching
-        info_snp <- snp_match(sumstats, map)
+        info_snp <- snp_match(sumstats[sumstats$chr == chr,], map)
         # Assign the genotype to a variable for easier downstream analysis
         genotype <- obj.bigSNP$genotypes
         # Rename the data structures
@@ -261,9 +261,6 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
         lm(., data = y) %>%
         summary
     null.r2 <- null.model$r.squared
-    reg.formula <- paste("PC", 1:6, sep = "", collapse = "+") %>%
-        paste0("Height~PRS+Sex+", .) %>%
-        as.formula
     ```
 
 === "Calculate the null R2 (binary trait)"
@@ -282,9 +279,6 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
         glm(., data = y, family=binomial) %>%
         summary
     null.r2 <- fmsb::NagelkerkeR2(null.model)
-    reg.formula <- paste("PC", 1:6, sep = "", collapse = "+") %>%
-        paste0("Height~PRS+Sex+", .) %>%
-        as.formula
     ```
 
 !!! important
@@ -332,6 +326,7 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
 #### Using Genome wide bed file
 
 === "infinitesimal model"
+
     ```R
     if(is.null(obj.bigSNP)){
         obj.bigSNP <- snp_attach("EUR.QC.rds")
@@ -346,6 +341,7 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
     ```
 
 === "grid model"
+
     ```R
     if(is.null(obj.bigSNP)){
         obj.bigSNP <- snp_attach("EUR.QC.rds")
@@ -353,9 +349,13 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
     genotype <- obj.bigSNP$genotypes
     # calculate PRS for all samples
     ind.test <- 1:nrow(genotype)
+    pred_grid <- big_prodMat(   genotype, 
+                                beta_grid, 
+                                ind.col = info_snp$`_NUM_ID_`)
     ```
 
 === "auto model"
+
     ```R
     if(is.null(obj.bigSNP)){
         obj.bigSNP <- snp_attach("EUR.QC.rds")
@@ -363,382 +363,173 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
     genotype <- obj.bigSNP$genotypes
     # calculate PRS for all samples
     ind.test <- 1:nrow(genotype)
+    pred_auto <-
+        big_prodMat(genotype,
+                    beta_auto,
+                    ind.row = ind.test,
+                    ind.col = info_snp$`_NUM_ID_`)
+    # scale the PRS generated from AUTO
+    pred_scaled <- apply(pred_auto, 2, sd)
+    final_beta_auto <-
+        rowMeans(beta_auto[,
+                    abs(pred_scaled -
+                        median(pred_scaled)) <
+                        3 * mad(pred_scaled)])
+    pred_auto <-
+        big_prodVec(genotype,
+            final_beta_auto,
+            ind.row = ind.test,
+            ind.col = info_snp$`_NUM_ID_`)
     ```
 
 #### Using chromosome separated bed files
 
 === "infinitesimal model"
-    ```R
-    Test
-    ```
-
-=== "grid model"
-    ```R
-    Test
-    ```
-
-=== "auto model"
-    ```R
-    Test
-    ```
-
-    
-
-### 4. Start running LDpred 2
-
-
-=== "infinitesimal model"
 
     ```R
-    # Get maximum amount of cores
-    NCORES <- nb_cores()
-    # Start doing analysis on each chromosome
-    y[, Inf.est := 0]
-    # add progress bar
-    pb = txtProgressBar(min = 0, max = 22, initial = 0)
-    for (chr in 1:22) {
-        setTxtProgressBar(pb, chr)
-        # extract current chromosome
+    pred_inf <- NULL
+    for(chr in 1:22){
+        obj.bigSNP <- snp_attach(paste0("EUR_chr",chr,"_.rds"))
+        genotype <- obj.bigSNP$genotypes
+        # calculate PRS for all samples
+        ind.test <- 1:nrow(genotype)
+        # Extract SNPs in this chromosome
         chr.idx <- which(info_snp$chr == chr)
-        df_beta <- info_snp[chr.idx,
-                            c("beta", "beta_se", "n_eff")]
         ind.chr <- info_snp$`_NUM_ID_`[chr.idx]
-        # calculate LD
-        corr0 <- snp_cor(
-            genotype,
-            ind.col = ind.chr,
-            ncores = NCORES,
-            infos.pos = POS2[ind.chr],
-            size = 3 / 1000
-        )
-        corr <- bigsparser::as_SFBM(as(corr0, "dgCMatrix"))
-        # Perform LDSC analysis to get h2 estimate
-        ldsc <- snp_ldsc2(corr0, df_beta)
-        h2_est <- ldsc[["h2"]]
-        # Get adjusted beta from infinitesimal model
-        beta_inf <- snp_ldpred2_inf(corr, df_beta, h2 = h2_est)
-        # Get infinitesimal PRS
-        pred_inf <- big_prodVec(genotype,
-                                beta_inf,
+        tmp <- big_prodVec(genotype,
+                                beta_inf[chr.idx],
                                 ind.row = ind.test,
                                 ind.col = ind.chr)
-        # add up the calculated PRS
-        y[, Inf.est := Inf.est + pred_inf]
+        if(is.null(pred_inf)){
+            pred_inf <- tmp
+        }else{
+            pred_inf <- pred_inf + tmp
+        }
     }
-    print("Completed")
     ```
 
 === "grid model"
 
     ```R
-    # Get maximum amount of cores
-    NCORES <- nb_cores()
-    # Prepare data for grid model
-    p_seq <- signif(seq_log(1e-4, 1, length.out = 17), 2)
-    # Start doing analysis on each chromosome
-    y[, grid := 0]
-    # add progress bar
-    pb = txtProgressBar(min = 0, max = 22, initial = 0)
-    for (chr in 1:22) {
-        setTxtProgressBar(pb, chr)
-        # extract current chromosome
+    pred_grid <- NULL
+    for(chr in 1:22){
+        obj.bigSNP <- snp_attach(paste0("EUR_chr",chr,"_.rds"))
+        genotype <- obj.bigSNP$genotypes
+        # calculate PRS for all samples
+        ind.test <- 1:nrow(genotype)
+        # Extract SNPs in this chromosome
         chr.idx <- which(info_snp$chr == chr)
-        df_beta <- info_snp[chr.idx,
-                            c("beta", "beta_se", "n_eff")]
         ind.chr <- info_snp$`_NUM_ID_`[chr.idx]
-        # calculate LD
-        corr0 <- snp_cor(
-            genotype,
-            ind.col = ind.chr,
-            ncores = NCORES,
-            infos.pos = POS2[ind.chr],
-            size = 3 / 1000
-        )
-        corr <- bigsparser::as_SFBM(as(corr0, "dgCMatrix"))
-        # Perform LDSC analysis to get h2 estimate
-        ldsc <- snp_ldsc2(corr0, df_beta)
-        h2_est <- ldsc[["h2"]]
-        h2_seq <- round(h2_est * c(0.7, 1, 1.4), 4)
-        grid.param <-
-            expand.grid(p = p_seq,
-                        h2 = h2_seq,
-                        sparse = c(FALSE, TRUE))
-        # Get adjusted beta from grid model
-        beta_grid <-
-            snp_ldpred2_grid(corr, df_beta, grid.param, ncores = NCORES)
-        # Get the grid PRSs
-        pred_grid <- big_prodMat(genotype, beta_grid, ind.col = ind.chr)
-        # Find the current "best" PRS
-        indep <- copy(y)
-        max.grid.r2 <- 0
-        max.grid.id <- 0
-        for (i in 1:ncol(pred_grid)) {
-            indep[, PRS := pred_grid[, i]]
-            model <- lm(reg.formula, data = indep) %>%
-                summary
-            prs.r2 <- model$r.squared - null.r2
-            if (max.grid.r2 < prs.r2) {
-                max.grid.r2 <- prs.r2
-                max.grid.id <- i
-            }
+
+        tmp <- big_prodMat( genotype, 
+                            beta_grid[chr.idx], 
+                            ind.col = ind.chr)
+
+        if(is.null(pred_grid)){
+            pred_grid <- tmp
+        }else{
+            pred_grid <- pred_grid + tmp
         }
-        # add up the calculated grid PRS
-        y[, grid := grid + pred_grid[, max.grid.id]]
     }
-    print("Completed")
     ```
 
 === "auto model"
 
     ```R
-    # Get maximum amount of cores
-    NCORES <- nb_cores()
-    # Start doing analysis on each chromosome
-    y[, auto := 0]
-    # add progress bar
-    pb = txtProgressBar(min = 0, max = 22, initial = 0)
-    for (chr in 1:22) {
-        setTxtProgressBar(pb, chr)
-        # extract current chromosome
+    pred_auto <- NULL
+    for(chr in 1:22){
+        obj.bigSNP <- snp_attach(paste0("EUR_chr",chr,"_.rds"))
+        genotype <- obj.bigSNP$genotypes
+        # calculate PRS for all samples
+        ind.test <- 1:nrow(genotype)
+        # Extract SNPs in this chromosome
         chr.idx <- which(info_snp$chr == chr)
-        df_beta <- info_snp[chr.idx,
-                            c("beta", "beta_se", "n_eff")]
         ind.chr <- info_snp$`_NUM_ID_`[chr.idx]
-        # calculate LD
-        corr0 <- snp_cor(
-            genotype,
-            ind.col = ind.chr,
-            ncores = NCORES,
-            infos.pos = POS2[ind.chr],
-            size = 3 / 1000
-        )
-        corr <- bigsparser::as_SFBM(as(corr0, "dgCMatrix"))
-        # Perform LDSC analysis to get h2 estimate
-        ldsc <- snp_ldsc2(corr0, df_beta)
-        h2_est <- ldsc[["h2"]]
-        # Get adjusted beta from the auto model
-        multi_auto <- snp_ldpred2_auto(
-            corr,
-            df_beta,
-            h2_init = h2_est,
-            vec_p_init = seq_log(1e-4, 0.9, length.out = NCORES),
-            ncores = NCORES
-        )
-        beta_auto <- sapply(multi_auto, function(auto)
-            auto$beta_est)
-        pred_auto <-
+
+        tmp <-
             big_prodMat(genotype,
-                        beta_auto,
+                        beta_auto[chr.idx],
                         ind.row = ind.test,
                         ind.col = ind.chr)
         # scale the PRS generated from AUTO
-        pred_scaled <- apply(pred_auto, 2, sd)
+        pred_scaled <- apply(tmp, 2, sd)
         final_beta_auto <-
-            rowMeans(beta_auto[,
-                            abs(pred_scaled -
-                                    median(pred_scaled)) <
-                                3 * mad(pred_scaled)])
-        pred_auto <-
+            rowMeans(tmp[,
+                        abs(pred_scaled -
+                            median(pred_scaled)) <
+                            3 * mad(pred_scaled)])
+        tmp <-
             big_prodVec(genotype,
-                        final_beta_auto,
-                        ind.row = ind.test,
-                        ind.col = ind.chr)
-        # add up the calculated auto PRS
-        y[, auto := auto + pred_auto]
-    }
-    print("Completed")
-    ```
-
-=== "all model"
-
-    ```R
-
-    # Get maximum amount of cores
-    NCORES <- nb_cores()
-    # Prepare data for grid model
-    p_seq <- signif(seq_log(1e-4, 1, length.out = 17), 2)
-    # Start doing analysis on each chromosome
-    y[, Inf.est := 0]
-    y[, auto := 0]
-    y[, grid := 0]
-    # add progress bar
-    pb = txtProgressBar(min = 0, max = 22, initial = 0)
-    for (chr in 1:22) {
-        setTxtProgressBar(pb, chr)
-        # Extract current chromosome
-        chr.idx <- which(info_snp$chr == chr)
-        df_beta <- info_snp[chr.idx,
-                            c("beta", "beta_se", "n_eff")]
-        ind.chr <- info_snp$`_NUM_ID_`[chr.idx]
-        # Calculate LD
-        corr0 <- snp_cor(
-            genotype,
-            ind.col = ind.chr,
-            ncores = NCORES,
-            infos.pos = POS2[ind.chr],
-            size = 3 / 1000
-        )
-        corr <- bigsparser::as_SFBM(as(corr0, "dgCMatrix"))
-        # Perform LDSC analysis
-        ldsc <- snp_ldsc2(corr0, df_beta)
-        h2_est <- ldsc[["h2"]]
-        h2_seq <- round(h2_est * c(0.7, 1, 1.4), 4)
-        grid.param <-
-            expand.grid(p = p_seq,
-                        h2 = h2_seq,
-                        sparse = c(FALSE, TRUE))
-        # Get adjusted beta from infinitesimal model
-        beta_inf <- snp_ldpred2_inf(corr, df_beta, h2 = h2_est)
-        # Get adjusted beta from grid model
-        beta_grid <-
-            snp_ldpred2_grid(corr, df_beta, grid.param, ncores = NCORES)
-        # Get adjusted beta from the auto model
-        multi_auto <- snp_ldpred2_auto(
-            corr,
-            df_beta,
-            h2_init = h2_est,
-            vec_p_init = seq_log(1e-4, 0.9, length.out = NCORES),
-            ncores = NCORES
-        )
-        beta_auto <- sapply(multi_auto, function(auto)
-            auto$beta_est)
-        pred_auto <-
-            big_prodMat(genotype,
-                        beta_auto,
-                        ind.row = ind.test,
-                        ind.col = ind.chr)
-        # scale the PRS generated from AUTO
-        pred_scaled <- apply(pred_auto, 2, sd)
-        final_beta_auto <-
-            rowMeans(beta_auto[,
-                            abs(pred_scaled -
-                                    median(pred_scaled)) <
-                                3 * mad(pred_scaled)])
-        # Get the auto PRS
-        pred_auto <-
-            big_prodVec(genotype,
-                        final_beta_auto,
-                        ind.row = ind.test,
-                        ind.col = ind.chr)
-        # Get infinitesimal PRS
-        pred_inf <-
-            big_prodVec(genotype,
-                        beta_inf,
-                        ind.row = ind.test,
-                        ind.col = ind.chr)
-        # Get the grid PRSs
-        pred_grid <- big_prodMat(genotype, beta_grid, ind.col = ind.chr)
-        # add up the calculated PRS
-        y[, Inf.est := Inf.est + pred_inf]
-        # for grid, we want to retain the "best" prs only
-        indep <- copy(y)
-        max.grid.r2 <- 0
-        max.grid.id <- 0
-        for (i in 1:ncol(pred_grid)) {
-            indep[, PRS := pred_grid[, i]]
-            model <- lm(reg.formula, data = indep) %>%
-                summary
-            prs.r2 <- model$r.squared - null.r2
-            if (max.grid.r2 < prs.r2) {
-                max.grid.r2 <- prs.r2
-                max.grid.id <- i
-            }
+                final_beta_auto,
+                ind.row = ind.test,
+                ind.col = ind.chr)
+        if(is.null(pred_auto)){
+            pred_auto <- tmp
+        }else{
+            pred_auto <- pred_auto + tmp
         }
-        # add up the calculated grid PRS
-        y[, grid := grid + pred_grid[, max.grid.id]]
-        # add up the calculated auto PRS
-        y[, auto := auto + pred_auto]
     }
-    print("Completed")
     ```
 
-###5. Get the final performance of the LDpred models
+### 8. Get the final performance of the LDpred models
 
 === "infinitesimal model"
 
     ```R
-    # there are 3 models: inf, auto and grid
-    inf.model <- paste("PC", 1:6, sep = "", collapse = "+") %>%
-        paste0("Height~Inf.est+Sex+", .) %>%
-        as.formula %>%
-        lm(., data = y) %>%
+    reg.formula <- paste("PC", 1:6, sep = "", collapse = "+") %>%
+        paste0("Height~PRS+Sex+", .) %>%
+        as.formula
+    reg.dat <- y
+    reg.dat$PRS <- pred_inf
+    inf.model <- lm(reg.formula, dat=reg.dat) %>%
         summary
-        
-    result <- data.table(
+    (result <- data.table(
         infinitesimal = inf.model$r.squared - null.r2,
         null = null.r2
-    )
-    print(result)
+    ))
     ```
 
 === "grid model"
 
     ```R
-    grid.model <- paste("PC", 1:6, sep = "", collapse = "+") %>%
-        paste0("Height~grid+Sex+", .) %>%
-        as.formula %>%
-        lm(., data = y) %>%
-        summary
-
-    result <- data.table(
-        grid = grid.model$r.squared - null.r2,
+    reg.formula <- paste("PC", 1:6, sep = "", collapse = "+") %>%
+        paste0("Height~PRS+Sex+", .) %>%
+        as.formula
+    reg.dat <- y
+    max.r2 <- 0
+    for(i in 1:ncol(pred_grid)){
+        reg.dat$PRS <- pred_grid[,i]
+        grid.model <- lm(reg.formula, dat=reg.dat) %>%
+            summary  
+        if(max.r2 < grid.model$r.squared){
+            max.r2 <- grid.model$r.squared
+        }
+    }
+    (result <- data.table(
+        grid = max.r2 - null.r2,
         null = null.r2
-    )
-    print(result)
+    ))
     ```
 
 === "auto model"
 
     ```R
-    auto.model <- paste("PC", 1:6, sep = "", collapse = "+") %>%
-        paste0("Height~auto+Sex+", .) %>%
-        as.formula %>%
-        lm(., data = y) %>%
+    reg.formula <- paste("PC", 1:6, sep = "", collapse = "+") %>%
+        paste0("Height~PRS+Sex+", .) %>%
+        as.formula
+    reg.dat <- y
+    reg.dat$PRS <- pred_auto
+    auto.model <- lm(reg.formula, dat=reg.dat) %>%
         summary
-
-    result <- data.table(
-        infinitesimal = inf.model$r.squared - null.r2,
-        grid = grid.model$r.squared - null.r2,
+    (result <- data.table(
         auto = auto.model$r.squared - null.r2,
         null = null.r2
-    )
-    print(result)
+    ))
     ```
-
-=== "all model"
-
-    ```R
-    # there are 3 models: inf, auto and grid
-    inf.model <- paste("PC", 1:6, sep = "", collapse = "+") %>%
-        paste0("Height~Inf.est+Sex+", .) %>%
-        as.formula %>%
-        lm(., data = y) %>%
-        summary
-    auto.model <- paste("PC", 1:6, sep = "", collapse = "+") %>%
-        paste0("Height~auto+Sex+", .) %>%
-        as.formula %>%
-        lm(., data = y) %>%
-        summary
-    grid.model <- paste("PC", 1:6, sep = "", collapse = "+") %>%
-        paste0("Height~grid+Sex+", .) %>%
-        as.formula %>%
-        lm(., data = y) %>%
-        summary
-
-    result <- data.table(
-        infinitesimal = inf.model$r.squared - null.r2,
-        grid = grid.model$r.squared - null.r2,
-        auto = auto.model$r.squared - null.r2,
-        null = null.r2
-    )
-    print(result)
-    ```
-
-
 
 ??? note "How much phenotypic variation does the PRS from each model explain?"
-    Infinitesimal = 0.1717342
+    Infinitesimal = 0.0100
     
-    Grid Model = 0.002945278
+    Grid Model = 0.00180
 
-    Auto Model = 0.2532782
+    Auto Model = 0.171
