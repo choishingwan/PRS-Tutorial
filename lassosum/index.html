@@ -147,9 +147,10 @@
 <p>For more details, please refer to <a href="https://github.com/tshmak/lassosum/">lassosum's homepage</a></p>
 </div>
 <p>You can install <code>lassosum</code> and its dependencies in <code>R</code> with the following command:</p>
-<pre class="highlight"><code class="language-R">install.packages(c("devtools","RcppArmadillo", "data.table", "Matrix"), dependencies=TRUE)
-library(devtools)
-install_github("tshmak/lassosum")</code></pre>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #0000FF">install.packages</span>(<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;devtools&quot;</span>,<span style="color: #BA2121">&quot;RcppArmadillo&quot;</span>, <span style="color: #BA2121">&quot;data.table&quot;</span>, <span style="color: #BA2121">&quot;Matrix&quot;</span>), dependencies<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">TRUE</span>)
+<span style="color: #0000FF">library</span>(devtools)
+<span style="color: #0000FF">install_github</span>(<span style="color: #BA2121">&quot;tshmak/lassosum&quot;</span>)
+</code></pre></div>
 <h2 id="required-data">Required Data<a class="headerlink" href="#required-data" title="Permanent link">&para;</a></h2>
 <p>Again, we assume that we have the following files (or you can download it from <a href="https://drive.google.com/file/d/1x_G0Gxk9jFMY-PMqwtg6-vdEyUPp5p5u/view?usp=sharing">here</a>): </p>
 <table>
@@ -192,65 +193,66 @@ install_github("tshmak/lassosum")</code></pre>
 </table>
 <h2 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h2>
 <p>We can run lassosum as follows: </p>
-<pre class="highlight"><code class="language-R">library(lassosum)
-# Prefer to work with data.table as it speeds up file reading
-library(data.table)
-library(methods)
-library(magrittr)
-# For multi-threading, you can use the parallel package and 
-# invoke cl which is then passed to lassosum.pipeline
-library(parallel)
-# This will invoke 2 threads. 
-cl &lt;- makeCluster(2)
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #0000FF">library</span>(lassosum)
+<span style="color: #408080; font-style: italic"># Prefer to work with data.table as it speeds up file reading</span>
+<span style="color: #0000FF">library</span>(data.table)
+<span style="color: #0000FF">library</span>(methods)
+<span style="color: #0000FF">library</span>(magrittr)
+<span style="color: #408080; font-style: italic"># For multi-threading, you can use the parallel package and </span>
+<span style="color: #408080; font-style: italic"># invoke cl which is then passed to lassosum.pipeline</span>
+<span style="color: #0000FF">library</span>(parallel)
+<span style="color: #408080; font-style: italic"># This will invoke 2 threads. </span>
+cl <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">makeCluster</span>(<span style="color: #666666">2</span>)
 
-sum.stat &lt;- "Height.QC.gz"
-bfile &lt;- "EUR.QC"
-# Read in and process the covariates
-covariate &lt;- fread("EUR.cov")
-pcs &lt;- fread("EUR.eigenvec") %&gt;%
-    setnames(., colnames(.), c("FID","IID", paste0("PC",1:6)))
-# Need as.data.frame here as lassosum doesn't handle data.table 
-# covariates very well
-cov &lt;- merge(covariate, pcs)
+sum.stat <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;Height.QC.gz&quot;</span>
+bfile <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;EUR.QC&quot;</span>
+<span style="color: #408080; font-style: italic"># Read in and process the covariates</span>
+covariate <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>)
+pcs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.eigenvec&quot;</span>) <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">setnames</span>(., <span style="color: #0000FF">colnames</span>(.), <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;PC&quot;</span>,<span style="color: #666666">1:6</span>)))
+<span style="color: #408080; font-style: italic"># Need as.data.frame here as lassosum doesn&#39;t handle data.table </span>
+<span style="color: #408080; font-style: italic"># covariates very well</span>
+cov <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(covariate, pcs)
 
-# We will need the EUR.hg19 file provided by lassosum 
-# which are LD regions defined in Berisa and Pickrell (2015) for the European population and the hg19 genome.
-ld.file &lt;- "EUR.hg19"
-# output prefix
-prefix &lt;- "EUR"
-# Read in the target phenotype file
-target.pheno &lt;- fread("EUR.height")[,c("FID", "IID", "Height")]
-# Read in the summary statistics
-ss &lt;- fread(sum.stat)
-# Remove P-value = 0, which causes problem in the transformation
-ss &lt;- ss[!P == 0]
-# Transform the P-values into correlation
-cor &lt;- p2cor(p = ss$P,
-        n = ss$N,
-        sign = log(ss$OR)
+<span style="color: #408080; font-style: italic"># We will need the EUR.hg19 file provided by lassosum </span>
+<span style="color: #408080; font-style: italic"># which are LD regions defined in Berisa and Pickrell (2015) for the European population and the hg19 genome.</span>
+ld.file <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;EUR.hg19&quot;</span>
+<span style="color: #408080; font-style: italic"># output prefix</span>
+prefix <span style="color: #666666">&lt;-</span> <span style="color: #BA2121">&quot;EUR&quot;</span>
+<span style="color: #408080; font-style: italic"># Read in the target phenotype file</span>
+target.pheno <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>)[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #BA2121">&quot;Height&quot;</span>)]
+<span style="color: #408080; font-style: italic"># Read in the summary statistics</span>
+ss <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(sum.stat)
+<span style="color: #408080; font-style: italic"># Remove P-value = 0, which causes problem in the transformation</span>
+ss <span style="color: #666666">&lt;-</span> ss[<span style="color: #666666">!</span>P <span style="color: #666666">==</span> <span style="color: #666666">0</span>]
+<span style="color: #408080; font-style: italic"># Transform the P-values into correlation</span>
+cor <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">p2cor</span>(p <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>P,
+        n <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>N,
+        sign <span style="color: #666666">=</span> <span style="color: #0000FF">log</span>(ss<span style="color: #666666">$</span>OR)
         )
-fam &lt;- fread(paste0(bfile, ".fam"))
-fam[,ID:=do.call(paste, c(.SD, sep=":")),.SDcols=c(1:2)]
+fam <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #0000FF">paste0</span>(bfile, <span style="color: #BA2121">&quot;.fam&quot;</span>))
+fam[,ID<span style="color: #666666">:=</span><span style="color: #0000FF">do.call</span>(paste, <span style="color: #0000FF">c</span>(.SD, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;:&quot;</span>)),.SDcols<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #666666">1:2</span>)]
 
 
-# Run the lassosum pipeline
-# The cluster parameter is used for multi-threading
-# You can ignore that if you do not wish to perform multi-threaded processing
-out &lt;- lassosum.pipeline(
-    cor = cor,
-    chr = ss$CHR,
-    pos = ss$BP,
-    A1 = ss$A1,
-    A2 = ss$A2,
-    ref.bfile = bfile,
-    test.bfile = bfile,
-    LDblocks = ld.file, 
-    cluster=cl
+<span style="color: #408080; font-style: italic"># Run the lassosum pipeline</span>
+<span style="color: #408080; font-style: italic"># The cluster parameter is used for multi-threading</span>
+<span style="color: #408080; font-style: italic"># You can ignore that if you do not wish to perform multi-threaded processing</span>
+out <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lassosum.pipeline</span>(
+    cor <span style="color: #666666">=</span> cor,
+    chr <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>CHR,
+    pos <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>BP,
+    A1 <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>A1,
+    A2 <span style="color: #666666">=</span> ss<span style="color: #666666">$</span>A2,
+    ref.bfile <span style="color: #666666">=</span> bfile,
+    test.bfile <span style="color: #666666">=</span> bfile,
+    LDblocks <span style="color: #666666">=</span> ld.file, 
+    cluster<span style="color: #666666">=</span>cl
 )
-# Store the R2 results
-target.res &lt;- validate(out, pheno = target.pheno, covar=cov)
-# Get the maximum R2
-r2 &lt;- max(target.res$validation.table$value)^2</code></pre>
+<span style="color: #408080; font-style: italic"># Store the R2 results</span>
+target.res <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">validate</span>(out, pheno <span style="color: #666666">=</span> target.pheno, covar<span style="color: #666666">=</span>cov)
+<span style="color: #408080; font-style: italic"># Get the maximum R2</span>
+r2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">max</span>(target.res<span style="color: #666666">$</span>validation.table<span style="color: #666666">$</span>value)<span style="color: #666666">^2</span>
+</code></pre></div>
 <details class="note"><summary>How much phenotypic variation does the "best-fit" PRS explain?</summary><p>0.2395471</p>
 </details>
               

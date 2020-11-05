@@ -86,20 +86,30 @@
     <li class="toctree-l2"><a class="reference internal" href="#installing-ldpred-2">Installing LDpred-2</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#required-data">Required Data</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#running-prs-analysis">Running PRS analysis</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#0-prepare-workspace">0. Prepare workspace</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#1-read-in-the-phenotype-and-covariate-files">1. Read in the phenotype and covariate files</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#2-load-in-the-genotype-and-summary-statistic-file-using-bigsnpr">2. Load in the genotype and summary statistic file using bigsnpr</a>
+    <li class="toctree-l3"><a class="reference internal" href="#2-obtain-hapmap3-snps">2. Obtain HapMap3 SNPs</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#3-reformat-data-in-preparation-of-ldpred2">3. Reformat data in preparation of LDpred2</a>
+    <li class="toctree-l3"><a class="reference internal" href="#3-load-and-transform-the-summary-statistic-file">3. Load and transform the summary statistic file</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#4-start-running-ldpred-2">4. Start running LDpred 2</a>
+    <li class="toctree-l3"><a class="reference internal" href="#3-calculate-the-ld-matrix">3. Calculate the LD matrix</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#5-get-the-final-performance-of-the-ldpred-models">5. Get the final performance of the LDpred models</a>
+    <li class="toctree-l3"><a class="reference internal" href="#4-perform-ld-score-regression">4. Perform LD score regression</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-calculate-the-null-r2">5. Calculate the null R2</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-obtain-model-prs">7. Obtain model PRS</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#using-genome-wide-bed-file">Using Genome wide bed file</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#using-chromosome-separated-bed-files">Using chromosome separated bed files</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#8-get-the-final-performance-of-the-ldpred-models">8. Get the final performance of the LDpred models</a>
     </li>
         </ul>
     </li>
@@ -161,9 +171,10 @@
 <p>For more details, please refer to <a href="https://privefl.github.io/bigsnpr/articles/LDpred2.html">LDpred 2's homepage</a></p>
 </div>
 <p>You can install <code>LDpred</code> and its dependencies in <code>R</code> with the following command:</p>
-<pre class="highlight"><code class="language-R">install.packages("remotes")
-library(remotes)
-remotes::install_github("https://github.com/privefl/bigsnpr.git")</code></pre>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #0000FF">install.packages</span>(<span style="color: #BA2121">&quot;remotes&quot;</span>)
+<span style="color: #0000FF">library</span>(remotes)
+remotes<span style="color: #666666">::</span><span style="color: #0000FF">install_github</span>(<span style="color: #BA2121">&quot;https://github.com/privefl/bigsnpr.git&quot;</span>)
+</code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For mac users, you might need to follow the guide <a href="https://thecoatlessprofessor.com/programming/cpp/openmp-in-r-on-os-x/">here</a> to be able to install LDpred2</p>
@@ -208,421 +219,461 @@ remotes::install_github("https://github.com/privefl/bigsnpr.git")</code></pre>
 </tr>
 </tbody>
 </table>
-<h2 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>While we do provide a rough guide on how to perform LDpred on bed files separated into individual chromosomes, this script is untested and extra caution is required</p>
+</div>
 <h3 id="0-prepare-workspace">0. Prepare workspace<a class="headerlink" href="#0-prepare-workspace" title="Permanent link">&para;</a></h3>
 <p>On some server, you might need to first use the following code in order to run LDpred with multi-thread</p>
-<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">prepare workspace</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R">options(bigstatsr.check.parallel.blas = FALSE)
-options(default.nproc.blas = NULL)</code></pre>
+<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">prepare workspace and load bigsnpr</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #0000FF">library</span>(bigsnpr)
+<span style="color: #0000FF">options</span>(bigstatsr.check.parallel.blas <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">FALSE</span>)
+<span style="color: #0000FF">options</span>(default.nproc.blas <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">NULL</span>)
+</code></pre></div>
 </div>
 </div>
 <h3 id="1-read-in-the-phenotype-and-covariate-files">1. Read in the phenotype and covariate files<a class="headerlink" href="#1-read-in-the-phenotype-and-covariate-files" title="Permanent link">&para;</a></h3>
 <div class="tabbed-set" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">read in phenotype and covariates</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R">library(data.table)
-library(magrittr)
-phenotype &lt;- fread("EUR.height")
-covariate &lt;- fread("EUR.cov")
-pcs &lt;- fread("EUR.eigenvec")
-# rename columns
-colnames(pcs) &lt;- c("FID","IID", paste0("PC",1:6))
-# generate required table
-pheno &lt;- merge(phenotype, covariate) %&gt;%
-    merge(., pcs)</code></pre>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #0000FF">library</span>(data.table)
+<span style="color: #0000FF">library</span>(magrittr)
+phenotype <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>)
+covariate <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>)
+pcs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.eigenvec&quot;</span>)
+<span style="color: #408080; font-style: italic"># rename columns</span>
+<span style="color: #0000FF">colnames</span>(pcs) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;PC&quot;</span>,<span style="color: #666666">1:6</span>))
+<span style="color: #408080; font-style: italic"># generate required table</span>
+pheno <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(phenotype, covariate) <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">merge</span>(., pcs)
+</code></pre></div>
 </div>
 </div>
-<h3 id="2-load-in-the-genotype-and-summary-statistic-file-using-bigsnpr">2. Load in the genotype and summary statistic file using bigsnpr<a class="headerlink" href="#2-load-in-the-genotype-and-summary-statistic-file-using-bigsnpr" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set" data-tabs="3:1"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><label for="__tabbed_3_1">Load genotype with bigsnpr</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R"># load the library
-library(bigsnpr)
-# now preprocess the bed file. Only need to do once for each data set
-snp_readBed("EUR.QC.bed")
-# now attach the genotype object
-obj.bigSNP &lt;- snp_attach("EUR.QC.rds")
-# Next, read in the summary statistic file
-sumstats &lt;- bigreadr::fread2("Height.QC.gz")</code></pre>
+<h3 id="2-obtain-hapmap3-snps">2. Obtain HapMap3 SNPs<a class="headerlink" href="#2-obtain-hapmap3-snps" title="Permanent link">&para;</a></h3>
+<p>LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs</p>
+<div class="tabbed-set" data-tabs="3:1"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><label for="__tabbed_3_1">load HapMap3 SNPs</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>info <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">readRDS</span>(<span style="color: #0000FF">url</span>(<span style="color: #BA2121">&quot;https://github.com/privefl/bigsnpr/raw/master/data-raw/hm3_variants.rds&quot;</span>))
+</code></pre></div>
 </div>
 </div>
-<h3 id="3-reformat-data-in-preparation-of-ldpred2">3. Reformat data in preparation of LDpred2<a class="headerlink" href="#3-reformat-data-in-preparation-of-ldpred2" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set" data-tabs="4:1"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><label for="__tabbed_4_1">data reformating</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R"># LDpred 2 require the header to follow the exact naming
-names(sumstats) &lt;-
-    c("chr",
-    "pos",
-    "rsid",
-    "a1",
-    "a0",
-    "n_eff",
-    "beta_se",
-    "p",
-    "OR",
-    "INFO",
-    "MAF")
-# Transform the OR into log(OR)
-sumstats$beta &lt;- log(sumstats$OR)
-# extract the SNP information from the genotype
-map &lt;- obj.bigSNP$map[-2]
-names(map) &lt;- c("chr", "rsid", "pos", "a1", "a0")
-# perform SNP matching
-info_snp &lt;- snp_match(sumstats, map)
-# Rename the data structures
-CHR &lt;- map$chr
-POS &lt;- map$pos
-# get the CM information from 1000 Genome
-# will download the 1000G file to the current directory (".")
-POS2 &lt;- snp_asGeneticPos(CHR, POS, dir = ".")
-# Reformat the phenotype information to match the fam order
-fam.order &lt;- as.data.table(obj.bigSNP$fam)
-setnames(fam.order,
-        c("family.ID", "sample.ID"),
-        c("FID", "IID"))
-# This will ensure our phenotype vector y is of the same order as the
-# family object generated by bigsnpr
-y &lt;- pheno[fam.order, on = c("FID", "IID")]
-genotype &lt;- obj.bigSNP$genotypes
-# Use all sample for test
-ind.test &lt;- 1:nrow(genotype)
-# Calculate the null R2
-# use glm for binary trait 
-# (will also need the fmsb package to calculate the pseudo R2)
-null.model &lt;- paste("PC", 1:6, sep = "", collapse = "+") %&gt;%
-    paste0("Height~Sex+", .) %&gt;%
-    as.formula %&gt;%
-    lm(., data = y) %&gt;%
+<h3 id="3-load-and-transform-the-summary-statistic-file">3. Load and transform the summary statistic file<a class="headerlink" href="#3-load-and-transform-the-summary-statistic-file" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set" data-tabs="4:1"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><label for="__tabbed_4_1">Load summary statistic file</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #408080; font-style: italic"># Read in the summary statistic file</span>
+sumstats <span style="color: #666666">&lt;-</span> bigreadr<span style="color: #666666">::</span><span style="color: #0000FF">fread2</span>(<span style="color: #BA2121">&quot;Height.QC.gz&quot;</span>) 
+<span style="color: #408080; font-style: italic"># LDpred 2 require the header to follow the exact naming</span>
+<span style="color: #0000FF">names</span>(sumstats) <span style="color: #666666">&lt;-</span>
+    <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;chr&quot;</span>,
+    <span style="color: #BA2121">&quot;pos&quot;</span>,
+    <span style="color: #BA2121">&quot;rsid&quot;</span>,
+    <span style="color: #BA2121">&quot;a1&quot;</span>,
+    <span style="color: #BA2121">&quot;a0&quot;</span>,
+    <span style="color: #BA2121">&quot;n_eff&quot;</span>,
+    <span style="color: #BA2121">&quot;beta_se&quot;</span>,
+    <span style="color: #BA2121">&quot;p&quot;</span>,
+    <span style="color: #BA2121">&quot;OR&quot;</span>,
+    <span style="color: #BA2121">&quot;INFO&quot;</span>,
+    <span style="color: #BA2121">&quot;MAF&quot;</span>)
+<span style="color: #408080; font-style: italic"># Transform the OR into log(OR)</span>
+sumstats<span style="color: #666666">$</span>beta <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">log</span>(sumstats<span style="color: #666666">$</span>OR)
+<span style="color: #408080; font-style: italic"># Filter out hapmap SNPs</span>
+sumstats <span style="color: #666666">&lt;-</span> sumstats[sumstats<span style="color: #666666">$</span>rsid<span style="color: #666666">%in%</span> info<span style="color: #666666">$</span>rsid,]
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Here, we know the exact ordering of the summary statistics file. 
+However, in many cases, the ordering of the summary statistics differ, 
+thus one must rename the columns according to their actual ordering</p>
+</div>
+</div>
+</div>
+<h3 id="3-calculate-the-ld-matrix">3. Calculate the LD matrix<a class="headerlink" href="#3-calculate-the-ld-matrix" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><label for="__tabbed_5_1">Genome Wide bed file</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #408080; font-style: italic"># Get maximum amount of cores</span>
+NCORES <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">nb_cores</span>()
+<span style="color: #408080; font-style: italic"># Open a temporary file</span>
+tmp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">tempfile</span>(tmpdir <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;tmp-data&quot;</span>)
+<span style="color: #0000FF">on.exit</span>(<span style="color: #0000FF">file.remove</span>(<span style="color: #0000FF">paste0</span>(tmp, <span style="color: #BA2121">&quot;.sbk&quot;</span>)), add <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">TRUE</span>)
+<span style="color: #408080; font-style: italic"># Initialize variables for storing the LD score and LD matrix</span>
+corr <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
+ld <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
+<span style="color: #408080; font-style: italic"># We want to know the ordering of samples in the bed file </span>
+fam.order <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
+<span style="color: #408080; font-style: italic"># preprocess the bed file (only need to do once for each data set)</span>
+<span style="color: #0000FF">snp_readBed</span>(<span style="color: #BA2121">&quot;EUR.QC.bed&quot;</span>)
+<span style="color: #408080; font-style: italic"># now attach the genotype object</span>
+obj.bigSNP <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_attach</span>(<span style="color: #BA2121">&quot;EUR.QC.rds&quot;</span>)
+<span style="color: #408080; font-style: italic"># extract the SNP information from the genotype</span>
+map <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>map[<span style="color: #666666">-3</span>]
+<span style="color: #0000FF">names</span>(map) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;chr&quot;</span>, <span style="color: #BA2121">&quot;rsid&quot;</span>, <span style="color: #BA2121">&quot;pos&quot;</span>, <span style="color: #BA2121">&quot;a1&quot;</span>, <span style="color: #BA2121">&quot;a0&quot;</span>)
+<span style="color: #408080; font-style: italic"># perform SNP matching</span>
+info_snp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_match</span>(sumstats, map)
+<span style="color: #408080; font-style: italic"># Assign the genotype to a variable for easier downstream analysis</span>
+genotype <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>genotypes
+<span style="color: #408080; font-style: italic"># Rename the data structures</span>
+CHR <span style="color: #666666">&lt;-</span> map<span style="color: #666666">$</span>chr
+POS <span style="color: #666666">&lt;-</span> map<span style="color: #666666">$</span>pos
+<span style="color: #408080; font-style: italic"># get the CM information from 1000 Genome</span>
+<span style="color: #408080; font-style: italic"># will download the 1000G file to the current directory (&quot;.&quot;)</span>
+POS2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_asGeneticPos</span>(CHR, POS, dir <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;.&quot;</span>)
+<span style="color: #408080; font-style: italic"># calculate LD</span>
+<span style="color: #0000FF">for </span>(chr in <span style="color: #666666">1:22</span>) {
+    <span style="color: #408080; font-style: italic"># Extract SNPs that are included in the chromosome</span>
+    ind.chr <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">which</span>(info_snp<span style="color: #666666">$</span>chr <span style="color: #666666">==</span> chr)
+    ind.chr2 <span style="color: #666666">&lt;-</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`[ind.chr]
+    <span style="color: #408080; font-style: italic"># Calculate the LD</span>
+    corr0 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_cor</span>(
+            genotype,
+            ind.col <span style="color: #666666">=</span> ind.chr2,
+            ncores <span style="color: #666666">=</span> NCORES,
+            infos.pos <span style="color: #666666">=</span> POS2[ind.chr2],
+            size <span style="color: #666666">=</span> <span style="color: #666666">3</span> <span style="color: #666666">/</span> <span style="color: #666666">1000</span>
+        )
+    <span style="color: #0000FF">if </span>(chr <span style="color: #666666">==</span> <span style="color: #666666">1</span>) {
+        ld <span style="color: #666666">&lt;-</span> Matrix<span style="color: #666666">::</span><span style="color: #0000FF">colSums</span>(corr0<span style="color: #666666">^2</span>)
+        corr <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">as_SFBM</span>(corr0, tmp)
+    } else {
+        ld <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(ld, Matrix<span style="color: #666666">::</span><span style="color: #0000FF">colSums</span>(corr0<span style="color: #666666">^2</span>))
+        corr<span style="color: #666666">$</span><span style="color: #0000FF">add_columns</span>(corr0, <span style="color: #0000FF">nrow</span>(corr))
+    }
+}
+<span style="color: #408080; font-style: italic"># We assume the fam order is the same across different chromosomes</span>
+fam.order <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">as.data.table</span>(obj.bigSNP<span style="color: #666666">$</span>fam)
+<span style="color: #408080; font-style: italic"># Rename fam order</span>
+<span style="color: #0000FF">setnames</span>(fam.order,
+        <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;family.ID&quot;</span>, <span style="color: #BA2121">&quot;sample.ID&quot;</span>),
+        <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>))
+</code></pre></div>
+</div>
+<input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><label for="__tabbed_5_2">Chromosome separated bed files</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #408080; font-style: italic"># Get maximum amount of cores</span>
+NCORES <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">nb_cores</span>()
+<span style="color: #408080; font-style: italic"># Open a temporary file</span>
+tmp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">tempfile</span>(tmpdir <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;tmp-data&quot;</span>)
+<span style="color: #0000FF">on.exit</span>(<span style="color: #0000FF">file.remove</span>(<span style="color: #0000FF">paste0</span>(tmp, <span style="color: #BA2121">&quot;.sbk&quot;</span>)), add <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">TRUE</span>)
+<span style="color: #408080; font-style: italic"># Initialize variables for storing the LD score and LD matrix</span>
+corr <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
+ld <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
+<span style="color: #408080; font-style: italic"># We want to know the ordering of samples in the bed file </span>
+fam.order <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
+<span style="color: #0000FF">for </span>(chr in <span style="color: #666666">1:22</span>) {
+    <span style="color: #408080; font-style: italic"># preprocess the bed file (only need to do once for each data set)</span>
+    <span style="color: #408080; font-style: italic"># Assuming the file naming is EUR_chr#.bed</span>
+    <span style="color: #0000FF">snp_readBed</span>(<span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;EUR_chr&quot;</span>,chr,<span style="color: #BA2121">&quot;.bed&quot;</span>))
+    <span style="color: #408080; font-style: italic"># now attach the genotype object</span>
+    obj.bigSNP <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_attach</span>(<span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;EUR_chr&quot;</span>,chr,<span style="color: #BA2121">&quot;.rds&quot;</span>))
+    <span style="color: #408080; font-style: italic"># extract the SNP information from the genotype</span>
+    map <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>map[<span style="color: #666666">-3</span>]
+    <span style="color: #0000FF">names</span>(map) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;chr&quot;</span>, <span style="color: #BA2121">&quot;rsid&quot;</span>, <span style="color: #BA2121">&quot;pos&quot;</span>, <span style="color: #BA2121">&quot;a1&quot;</span>, <span style="color: #BA2121">&quot;a0&quot;</span>)
+    <span style="color: #408080; font-style: italic"># perform SNP matching</span>
+    info_snp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_match</span>(sumstats[sumstats<span style="color: #666666">$</span>chr <span style="color: #666666">==</span> chr,], map)
+    <span style="color: #408080; font-style: italic"># Assign the genotype to a variable for easier downstream analysis</span>
+    genotype <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>genotypes
+    <span style="color: #408080; font-style: italic"># Rename the data structures</span>
+    CHR <span style="color: #666666">&lt;-</span> map<span style="color: #666666">$</span>chr
+    POS <span style="color: #666666">&lt;-</span> map<span style="color: #666666">$</span>pos
+    <span style="color: #408080; font-style: italic"># get the CM information from 1000 Genome</span>
+    <span style="color: #408080; font-style: italic"># will download the 1000G file to the current directory (&quot;.&quot;)</span>
+    POS2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_asGeneticPos</span>(CHR, POS, dir <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;.&quot;</span>)
+    <span style="color: #408080; font-style: italic"># calculate LD</span>
+    <span style="color: #408080; font-style: italic"># Extract SNPs that are included in the chromosome</span>
+    ind.chr <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">which</span>(info_snp<span style="color: #666666">$</span>chr <span style="color: #666666">==</span> chr)
+    ind.chr2 <span style="color: #666666">&lt;-</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`[ind.chr]
+    <span style="color: #408080; font-style: italic"># Calculate the LD</span>
+    corr0 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_cor</span>(
+            genotype,
+            ind.col <span style="color: #666666">=</span> ind.chr2,
+            ncores <span style="color: #666666">=</span> NCORES,
+            infos.pos <span style="color: #666666">=</span> POS2[ind.chr2],
+            size <span style="color: #666666">=</span> <span style="color: #666666">3</span> <span style="color: #666666">/</span> <span style="color: #666666">1000</span>
+        )
+    <span style="color: #0000FF">if </span>(chr <span style="color: #666666">==</span> <span style="color: #666666">1</span>) {
+        ld <span style="color: #666666">&lt;-</span> Matrix<span style="color: #666666">::</span><span style="color: #0000FF">colSums</span>(corr0<span style="color: #666666">^2</span>)
+        corr <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">as_SFBM</span>(corr0, tmp)
+    } else {
+        ld <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(ld, Matrix<span style="color: #666666">::</span><span style="color: #0000FF">colSums</span>(corr0<span style="color: #666666">^2</span>))
+        corr<span style="color: #666666">$</span><span style="color: #0000FF">add_columns</span>(corr0, <span style="color: #0000FF">nrow</span>(corr))
+    }
+    <span style="color: #408080; font-style: italic"># We assume the fam order is the same across different chromosomes</span>
+    <span style="color: #0000FF">if</span>(<span style="color: #0000FF">is.null</span>(fam.order)){
+        fam.order <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">as.data.table</span>(obj.bigSNP<span style="color: #666666">$</span>fam)
+    }
+}
+<span style="color: #408080; font-style: italic"># Rename fam order</span>
+<span style="color: #0000FF">setnames</span>(fam.order,
+        <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;family.ID&quot;</span>, <span style="color: #BA2121">&quot;sample.ID&quot;</span>),
+        <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>))
+</code></pre></div>
+</div>
+</div>
+<h3 id="4-perform-ld-score-regression">4. Perform LD score regression<a class="headerlink" href="#4-perform-ld-score-regression" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set" data-tabs="6:1"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><label for="__tabbed_6_1">Perform LD score regression</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>df_beta <span style="color: #666666">&lt;-</span> info_snp[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;beta&quot;</span>, <span style="color: #BA2121">&quot;beta_se&quot;</span>, <span style="color: #BA2121">&quot;n_eff&quot;</span>, <span style="color: #BA2121">&quot;_NUM_ID_&quot;</span>)]
+ldsc <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_ldsc</span>(   ld, 
+                    <span style="color: #0000FF">length</span>(ld), 
+                    chi2 <span style="color: #666666">=</span> (df_beta<span style="color: #666666">$</span>beta <span style="color: #666666">/</span> df_beta<span style="color: #666666">$</span>beta_se)<span style="color: #666666">^2</span>,
+                    sample_size <span style="color: #666666">=</span> df_beta<span style="color: #666666">$</span>n_eff, 
+                    blocks <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">NULL</span>)
+h2_est <span style="color: #666666">&lt;-</span> ldsc[[<span style="color: #BA2121">&quot;h2&quot;</span>]]
+</code></pre></div>
+</div>
+</div>
+<h3 id="5-calculate-the-null-r2">5. Calculate the null R2<a class="headerlink" href="#5-calculate-the-null-r2" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><label for="__tabbed_7_1">Calculate the null R2 (quantitative trait)</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #408080; font-style: italic"># Reformat the phenotype file such that y is of the same order as the </span>
+<span style="color: #408080; font-style: italic"># sample ordering in the genotype file</span>
+y <span style="color: #666666">&lt;-</span> pheno[fam.order, on <span style="color: #666666">=</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>)]
+<span style="color: #408080; font-style: italic"># Calculate the null R2</span>
+<span style="color: #408080; font-style: italic"># use glm for binary trait </span>
+<span style="color: #408080; font-style: italic"># (will also need the fmsb package to calculate the pseudo R2)</span>
+null.model <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">paste</span>(<span style="color: #BA2121">&quot;PC&quot;</span>, <span style="color: #666666">1:6</span>, sep <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;&quot;</span>, collapse <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;+&quot;</span>) <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;Height~Sex+&quot;</span>, .) <span style="color: #666666">%&gt;%</span>
+    as.formula <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">lm</span>(., data <span style="color: #666666">=</span> y) <span style="color: #666666">%&gt;%</span>
     summary
-null.r2 &lt;- null.model$r.squared
-reg.formula &lt;- paste("PC", 1:6, sep = "", collapse = "+") %&gt;%
-    paste0("Height~PRS+Sex+", .) %&gt;%
-    as.formula</code></pre>
+null.r2 <span style="color: #666666">&lt;-</span> null.model<span style="color: #666666">$</span>r.squared
+</code></pre></div>
+</div>
+<input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><label for="__tabbed_7_2">Calculate the null R2 (binary trait)</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #0000FF">library</span>(fmsb)
+<span style="color: #408080; font-style: italic"># Reformat the phenotype file such that y is of the same order as the </span>
+<span style="color: #408080; font-style: italic"># sample ordering in the genotype file</span>
+y <span style="color: #666666">&lt;-</span> pheno[fam.order, on <span style="color: #666666">=</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>)]
+<span style="color: #408080; font-style: italic"># Calculate the null R2</span>
+<span style="color: #408080; font-style: italic"># use glm for binary trait </span>
+<span style="color: #408080; font-style: italic"># (will also need the fmsb package to calculate the pseudo R2)</span>
+null.model <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">paste</span>(<span style="color: #BA2121">&quot;PC&quot;</span>, <span style="color: #666666">1:6</span>, sep <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;&quot;</span>, collapse <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;+&quot;</span>) <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;Height~Sex+&quot;</span>, .) <span style="color: #666666">%&gt;%</span>
+    as.formula <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">glm</span>(., data <span style="color: #666666">=</span> y, family<span style="color: #666666">=</span>binomial) <span style="color: #666666">%&gt;%</span>
+    summary
+null.r2 <span style="color: #666666">&lt;-</span> fmsb<span style="color: #666666">::</span><span style="color: #0000FF">NagelkerkeR2</span>(null.model)
+</code></pre></div>
 </div>
 </div>
-<h3 id="4-start-running-ldpred-2">4. Start running LDpred 2<a class="headerlink" href="#4-start-running-ldpred-2" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set" data-tabs="5:4"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><label for="__tabbed_5_1">infinitesimal model</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R"># Get maximum amount of cores
-NCORES &lt;- nb_cores()
-# Start doing analysis on each chromosome
-y[, Inf.est := 0]
-# add progress bar
-pb = txtProgressBar(min = 0, max = 22, initial = 0)
-for (chr in 1:22) {
-    setTxtProgressBar(pb, chr)
-    # extract current chromosome
-    chr.idx &lt;- which(info_snp$chr == chr)
-    df_beta &lt;- info_snp[chr.idx,
-                        c("beta", "beta_se", "n_eff")]
-    ind.chr &lt;- info_snp$`_NUM_ID_`[chr.idx]
-    # calculate LD
-    corr0 &lt;- snp_cor(
-        genotype,
-        ind.col = ind.chr,
-        ncores = NCORES,
-        infos.pos = POS2[ind.chr],
-        size = 3 / 1000
-    )
-    corr &lt;- bigsparser::as_SFBM(as(corr0, "dgCMatrix"))
-    # Perform LDSC analysis to get h2 estimate
-    ldsc &lt;- snp_ldsc2(corr0, df_beta)
-    h2_est &lt;- ldsc[["h2"]]
-    # Get adjusted beta from infinitesimal model
-    beta_inf &lt;- snp_ldpred2_inf(corr, df_beta, h2 = h2_est)
-    # Get infinitesimal PRS
-    pred_inf &lt;- big_prodVec(genotype,
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Scripts for binary trait analysis only serve as a reference as we have not simulate any binary traits. 
+In addition, Nagelkerke <span class="arithmatex">\(R^2\)</span> is biased when there are ascertainment of samples. For more information, please refer to <a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/gepi.21614">this paper</a></p>
+</div>
+<div class="tabbed-set" data-tabs="8:3"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><label for="__tabbed_8_1">infinitesimal model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>beta_inf <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_ldpred2_inf</span>(corr, df_beta, h2 <span style="color: #666666">=</span> h2_est)
+</code></pre></div>
+</div>
+<input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><label for="__tabbed_8_2">grid model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #408080; font-style: italic"># Prepare data for grid model</span>
+p_seq <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">signif</span>(<span style="color: #0000FF">seq_log</span>(<span style="color: #666666">1e-4</span>, <span style="color: #666666">1</span>, length.out <span style="color: #666666">=</span> <span style="color: #666666">17</span>), <span style="color: #666666">2</span>)
+h2_seq <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">round</span>(h2_est <span style="color: #666666">*</span> <span style="color: #0000FF">c</span>(<span style="color: #666666">0.7</span>, <span style="color: #666666">1</span>, <span style="color: #666666">1.4</span>), <span style="color: #666666">4</span>)
+grid.param <span style="color: #666666">&lt;-</span>
+    <span style="color: #0000FF">expand.grid</span>(p <span style="color: #666666">=</span> p_seq,
+            h2 <span style="color: #666666">=</span> h2_seq,
+            sparse <span style="color: #666666">=</span> <span style="color: #0000FF">c</span>(<span style="color: #008000; font-weight: bold">FALSE</span>, <span style="color: #008000; font-weight: bold">TRUE</span>))
+<span style="color: #408080; font-style: italic"># Get adjusted beta from grid model</span>
+beta_grid <span style="color: #666666">&lt;-</span>
+    <span style="color: #0000FF">snp_ldpred2_grid</span>(corr, df_beta, grid.param, ncores <span style="color: #666666">=</span> NCORES)
+</code></pre></div>
+</div>
+<input id="__tabbed_8_3" name="__tabbed_8" type="radio" /><label for="__tabbed_8_3">auto model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #408080; font-style: italic"># Get adjusted beta from the auto model</span>
+multi_auto <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_ldpred2_auto</span>(
+    corr,
+    df_beta,
+    h2_init <span style="color: #666666">=</span> h2_est,
+    vec_p_init <span style="color: #666666">=</span> <span style="color: #0000FF">seq_log</span>(<span style="color: #666666">1e-4</span>, <span style="color: #666666">0.9</span>, length.out <span style="color: #666666">=</span> NCORES),
+    ncores <span style="color: #666666">=</span> NCORES
+)
+beta_auto <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">sapply</span>(multi_auto, <span style="color: #0000FF">function</span>(auto)
+    auto<span style="color: #666666">$</span>beta_est)
+</code></pre></div>
+</div>
+</div>
+<h3 id="7-obtain-model-prs">7. Obtain model PRS<a class="headerlink" href="#7-obtain-model-prs" title="Permanent link">&para;</a></h3>
+<h4 id="using-genome-wide-bed-file">Using Genome wide bed file<a class="headerlink" href="#using-genome-wide-bed-file" title="Permanent link">&para;</a></h4>
+<div class="tabbed-set" data-tabs="9:3"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><label for="__tabbed_9_1">infinitesimal model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #0000FF">if</span>(<span style="color: #0000FF">is.null</span>(obj.bigSNP)){
+    obj.bigSNP <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_attach</span>(<span style="color: #BA2121">&quot;EUR.QC.rds&quot;</span>)
+}
+genotype <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>genotypes
+<span style="color: #408080; font-style: italic"># calculate PRS for all samples</span>
+ind.test <span style="color: #666666">&lt;-</span> <span style="color: #666666">1:</span><span style="color: #0000FF">nrow</span>(genotype)
+pred_inf <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">big_prodVec</span>(    genotype,
                             beta_inf,
-                            ind.row = ind.test,
-                            ind.col = ind.chr)
-    # add up the calculated PRS
-    y[, Inf.est := Inf.est + pred_inf]
-}
-print("Completed")</code></pre>
+                            ind.row <span style="color: #666666">=</span> ind.test,
+                            ind.col <span style="color: #666666">=</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`)
+</code></pre></div>
 </div>
-<input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><label for="__tabbed_5_2">grid model</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R"># Get maximum amount of cores
-NCORES &lt;- nb_cores()
-# Prepare data for grid model
-p_seq &lt;- signif(seq_log(1e-4, 1, length.out = 17), 2)
-# Start doing analysis on each chromosome
-y[, grid := 0]
-# add progress bar
-pb = txtProgressBar(min = 0, max = 22, initial = 0)
-for (chr in 1:22) {
-    setTxtProgressBar(pb, chr)
-    # extract current chromosome
-    chr.idx &lt;- which(info_snp$chr == chr)
-    df_beta &lt;- info_snp[chr.idx,
-                        c("beta", "beta_se", "n_eff")]
-    ind.chr &lt;- info_snp$`_NUM_ID_`[chr.idx]
-    # calculate LD
-    corr0 &lt;- snp_cor(
-        genotype,
-        ind.col = ind.chr,
-        ncores = NCORES,
-        infos.pos = POS2[ind.chr],
-        size = 3 / 1000
-    )
-    corr &lt;- bigsparser::as_SFBM(as(corr0, "dgCMatrix"))
-    # Perform LDSC analysis to get h2 estimate
-    ldsc &lt;- snp_ldsc2(corr0, df_beta)
-    h2_est &lt;- ldsc[["h2"]]
-    h2_seq &lt;- round(h2_est * c(0.7, 1, 1.4), 4)
-    grid.param &lt;-
-        expand.grid(p = p_seq,
-                    h2 = h2_seq,
-                    sparse = c(FALSE, TRUE))
-    # Get adjusted beta from grid model
-    beta_grid &lt;-
-        snp_ldpred2_grid(corr, df_beta, grid.param, ncores = NCORES)
-    # Get the grid PRSs
-    pred_grid &lt;- big_prodMat(genotype, beta_grid, ind.col = ind.chr)
-    # Find the current "best" PRS
-    indep &lt;- copy(y)
-    max.grid.r2 &lt;- 0
-    max.grid.id &lt;- 0
-    for (i in 1:ncol(pred_grid)) {
-        indep[, PRS := pred_grid[, i]]
-        model &lt;- lm(reg.formula, data = indep) %&gt;%
-            summary
-        prs.r2 &lt;- model$r.squared - null.r2
-        if (max.grid.r2 &lt; prs.r2) {
-            max.grid.r2 &lt;- prs.r2
-            max.grid.id &lt;- i
-        }
+<input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><label for="__tabbed_9_2">grid model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #0000FF">if</span>(<span style="color: #0000FF">is.null</span>(obj.bigSNP)){
+    obj.bigSNP <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_attach</span>(<span style="color: #BA2121">&quot;EUR.QC.rds&quot;</span>)
+}
+genotype <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>genotypes
+<span style="color: #408080; font-style: italic"># calculate PRS for all samples</span>
+ind.test <span style="color: #666666">&lt;-</span> <span style="color: #666666">1:</span><span style="color: #0000FF">nrow</span>(genotype)
+pred_grid <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">big_prodMat</span>(   genotype, 
+                            beta_grid, 
+                            ind.col <span style="color: #666666">=</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`)
+</code></pre></div>
+</div>
+<input id="__tabbed_9_3" name="__tabbed_9" type="radio" /><label for="__tabbed_9_3">auto model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #0000FF">if</span>(<span style="color: #0000FF">is.null</span>(obj.bigSNP)){
+    obj.bigSNP <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_attach</span>(<span style="color: #BA2121">&quot;EUR.QC.rds&quot;</span>)
+}
+genotype <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>genotypes
+<span style="color: #408080; font-style: italic"># calculate PRS for all samples</span>
+ind.test <span style="color: #666666">&lt;-</span> <span style="color: #666666">1:</span><span style="color: #0000FF">nrow</span>(genotype)
+pred_auto <span style="color: #666666">&lt;-</span>
+    <span style="color: #0000FF">big_prodMat</span>(genotype,
+                beta_auto,
+                ind.row <span style="color: #666666">=</span> ind.test,
+                ind.col <span style="color: #666666">=</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`)
+<span style="color: #408080; font-style: italic"># scale the PRS generated from AUTO</span>
+pred_scaled <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">apply</span>(pred_auto, <span style="color: #666666">2</span>, sd)
+final_beta_auto <span style="color: #666666">&lt;-</span>
+    <span style="color: #0000FF">rowMeans</span>(beta_auto[,
+                <span style="color: #0000FF">abs</span>(pred_scaled <span style="color: #666666">-</span>
+                    <span style="color: #0000FF">median</span>(pred_scaled)) <span style="color: #666666">&lt;</span>
+                    <span style="color: #666666">3</span> <span style="color: #666666">*</span> <span style="color: #0000FF">mad</span>(pred_scaled)])
+pred_auto <span style="color: #666666">&lt;-</span>
+    <span style="color: #0000FF">big_prodVec</span>(genotype,
+        final_beta_auto,
+        ind.row <span style="color: #666666">=</span> ind.test,
+        ind.col <span style="color: #666666">=</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`)
+</code></pre></div>
+</div>
+</div>
+<h4 id="using-chromosome-separated-bed-files">Using chromosome separated bed files<a class="headerlink" href="#using-chromosome-separated-bed-files" title="Permanent link">&para;</a></h4>
+<div class="tabbed-set" data-tabs="10:3"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><label for="__tabbed_10_1">infinitesimal model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>pred_inf <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
+<span style="color: #0000FF">for</span>(chr in <span style="color: #666666">1:22</span>){
+    obj.bigSNP <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_attach</span>(<span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;EUR_chr&quot;</span>,chr,<span style="color: #BA2121">&quot;_.rds&quot;</span>))
+    genotype <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>genotypes
+    <span style="color: #408080; font-style: italic"># calculate PRS for all samples</span>
+    ind.test <span style="color: #666666">&lt;-</span> <span style="color: #666666">1:</span><span style="color: #0000FF">nrow</span>(genotype)
+    <span style="color: #408080; font-style: italic"># Extract SNPs in this chromosome</span>
+    chr.idx <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">which</span>(info_snp<span style="color: #666666">$</span>chr <span style="color: #666666">==</span> chr)
+    ind.chr <span style="color: #666666">&lt;-</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`[chr.idx]
+    tmp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">big_prodVec</span>(genotype,
+                            beta_inf[chr.idx],
+                            ind.row <span style="color: #666666">=</span> ind.test,
+                            ind.col <span style="color: #666666">=</span> ind.chr)
+    <span style="color: #0000FF">if</span>(<span style="color: #0000FF">is.null</span>(pred_inf)){
+        pred_inf <span style="color: #666666">&lt;-</span> tmp
+    }else{
+        pred_inf <span style="color: #666666">&lt;-</span> pred_inf <span style="color: #666666">+</span> tmp
     }
-    # add up the calculated grid PRS
-    y[, grid := grid + pred_grid[, max.grid.id]]
 }
-print("Completed")</code></pre>
+</code></pre></div>
 </div>
-<input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><label for="__tabbed_5_3">auto model</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R"># Get maximum amount of cores
-NCORES &lt;- nb_cores()
-# Start doing analysis on each chromosome
-y[, auto := 0]
-# add progress bar
-pb = txtProgressBar(min = 0, max = 22, initial = 0)
-for (chr in 1:22) {
-    setTxtProgressBar(pb, chr)
-    # extract current chromosome
-    chr.idx &lt;- which(info_snp$chr == chr)
-    df_beta &lt;- info_snp[chr.idx,
-                        c("beta", "beta_se", "n_eff")]
-    ind.chr &lt;- info_snp$`_NUM_ID_`[chr.idx]
-    # calculate LD
-    corr0 &lt;- snp_cor(
-        genotype,
-        ind.col = ind.chr,
-        ncores = NCORES,
-        infos.pos = POS2[ind.chr],
-        size = 3 / 1000
-    )
-    corr &lt;- bigsparser::as_SFBM(as(corr0, "dgCMatrix"))
-    # Perform LDSC analysis to get h2 estimate
-    ldsc &lt;- snp_ldsc2(corr0, df_beta)
-    h2_est &lt;- ldsc[["h2"]]
-    # Get adjusted beta from the auto model
-    multi_auto &lt;- snp_ldpred2_auto(
-        corr,
-        df_beta,
-        h2_init = h2_est,
-        vec_p_init = seq_log(1e-4, 0.9, length.out = NCORES),
-        ncores = NCORES
-    )
-    beta_auto &lt;- sapply(multi_auto, function(auto)
-        auto$beta_est)
-    pred_auto &lt;-
-        big_prodMat(genotype,
-                    beta_auto,
-                    ind.row = ind.test,
-                    ind.col = ind.chr)
-    # scale the PRS generated from AUTO
-    pred_scaled &lt;- apply(pred_auto, 2, sd)
-    final_beta_auto &lt;-
-        rowMeans(beta_auto[,
-                        abs(pred_scaled -
-                                median(pred_scaled)) &lt;
-                            3 * mad(pred_scaled)])
-    pred_auto &lt;-
-        big_prodVec(genotype,
-                    final_beta_auto,
-                    ind.row = ind.test,
-                    ind.col = ind.chr)
-    # add up the calculated auto PRS
-    y[, auto := auto + pred_auto]
-}
-print("Completed")</code></pre>
-</div>
-<input id="__tabbed_5_4" name="__tabbed_5" type="radio" /><label for="__tabbed_5_4">all model</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R">
-# Get maximum amount of cores
-NCORES &lt;- nb_cores()
-# Prepare data for grid model
-p_seq &lt;- signif(seq_log(1e-4, 1, length.out = 17), 2)
-# Start doing analysis on each chromosome
-y[, Inf.est := 0]
-y[, auto := 0]
-y[, grid := 0]
-# add progress bar
-pb = txtProgressBar(min = 0, max = 22, initial = 0)
-for (chr in 1:22) {
-    setTxtProgressBar(pb, chr)
-    # Extract current chromosome
-    chr.idx &lt;- which(info_snp$chr == chr)
-    df_beta &lt;- info_snp[chr.idx,
-                        c("beta", "beta_se", "n_eff")]
-    ind.chr &lt;- info_snp$`_NUM_ID_`[chr.idx]
-    # Calculate LD
-    corr0 &lt;- snp_cor(
-        genotype,
-        ind.col = ind.chr,
-        ncores = NCORES,
-        infos.pos = POS2[ind.chr],
-        size = 3 / 1000
-    )
-    corr &lt;- bigsparser::as_SFBM(as(corr0, "dgCMatrix"))
-    # Perform LDSC analysis
-    ldsc &lt;- snp_ldsc2(corr0, df_beta)
-    h2_est &lt;- ldsc[["h2"]]
-    h2_seq &lt;- round(h2_est * c(0.7, 1, 1.4), 4)
-    grid.param &lt;-
-        expand.grid(p = p_seq,
-                    h2 = h2_seq,
-                    sparse = c(FALSE, TRUE))
-    # Get adjusted beta from infinitesimal model
-    beta_inf &lt;- snp_ldpred2_inf(corr, df_beta, h2 = h2_est)
-    # Get adjusted beta from grid model
-    beta_grid &lt;-
-        snp_ldpred2_grid(corr, df_beta, grid.param, ncores = NCORES)
-    # Get adjusted beta from the auto model
-    multi_auto &lt;- snp_ldpred2_auto(
-        corr,
-        df_beta,
-        h2_init = h2_est,
-        vec_p_init = seq_log(1e-4, 0.9, length.out = NCORES),
-        ncores = NCORES
-    )
-    beta_auto &lt;- sapply(multi_auto, function(auto)
-        auto$beta_est)
-    pred_auto &lt;-
-        big_prodMat(genotype,
-                    beta_auto,
-                    ind.row = ind.test,
-                    ind.col = ind.chr)
-    # scale the PRS generated from AUTO
-    pred_scaled &lt;- apply(pred_auto, 2, sd)
-    final_beta_auto &lt;-
-        rowMeans(beta_auto[,
-                        abs(pred_scaled -
-                                median(pred_scaled)) &lt;
-                            3 * mad(pred_scaled)])
-    # Get the auto PRS
-    pred_auto &lt;-
-        big_prodVec(genotype,
-                    final_beta_auto,
-                    ind.row = ind.test,
-                    ind.col = ind.chr)
-    # Get infinitesimal PRS
-    pred_inf &lt;-
-        big_prodVec(genotype,
-                    beta_inf,
-                    ind.row = ind.test,
-                    ind.col = ind.chr)
-    # Get the grid PRSs
-    pred_grid &lt;- big_prodMat(genotype, beta_grid, ind.col = ind.chr)
-    # add up the calculated PRS
-    y[, Inf.est := Inf.est + pred_inf]
-    # for grid, we want to retain the "best" prs only
-    indep &lt;- copy(y)
-    max.grid.r2 &lt;- 0
-    max.grid.id &lt;- 0
-    for (i in 1:ncol(pred_grid)) {
-        indep[, PRS := pred_grid[, i]]
-        model &lt;- lm(reg.formula, data = indep) %&gt;%
-            summary
-        prs.r2 &lt;- model$r.squared - null.r2
-        if (max.grid.r2 &lt; prs.r2) {
-            max.grid.r2 &lt;- prs.r2
-            max.grid.id &lt;- i
-        }
+<input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><label for="__tabbed_10_2">grid model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>pred_grid <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
+<span style="color: #0000FF">for</span>(chr in <span style="color: #666666">1:22</span>){
+    obj.bigSNP <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_attach</span>(<span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;EUR_chr&quot;</span>,chr,<span style="color: #BA2121">&quot;_.rds&quot;</span>))
+    genotype <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>genotypes
+    <span style="color: #408080; font-style: italic"># calculate PRS for all samples</span>
+    ind.test <span style="color: #666666">&lt;-</span> <span style="color: #666666">1:</span><span style="color: #0000FF">nrow</span>(genotype)
+    <span style="color: #408080; font-style: italic"># Extract SNPs in this chromosome</span>
+    chr.idx <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">which</span>(info_snp<span style="color: #666666">$</span>chr <span style="color: #666666">==</span> chr)
+    ind.chr <span style="color: #666666">&lt;-</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`[chr.idx]
+
+    tmp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">big_prodMat</span>( genotype, 
+                        beta_grid[chr.idx], 
+                        ind.col <span style="color: #666666">=</span> ind.chr)
+
+    <span style="color: #0000FF">if</span>(<span style="color: #0000FF">is.null</span>(pred_grid)){
+        pred_grid <span style="color: #666666">&lt;-</span> tmp
+    }else{
+        pred_grid <span style="color: #666666">&lt;-</span> pred_grid <span style="color: #666666">+</span> tmp
     }
-    # add up the calculated grid PRS
-    y[, grid := grid + pred_grid[, max.grid.id]]
-    # add up the calculated auto PRS
-    y[, auto := auto + pred_auto]
 }
-print("Completed")</code></pre>
+</code></pre></div>
 </div>
-</div>
-<h3 id="5-get-the-final-performance-of-the-ldpred-models">5. Get the final performance of the LDpred models<a class="headerlink" href="#5-get-the-final-performance-of-the-ldpred-models" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set" data-tabs="6:4"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><label for="__tabbed_6_1">infinitesimal model</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R"># there are 3 models: inf, auto and grid
-inf.model &lt;- paste("PC", 1:6, sep = "", collapse = "+") %&gt;%
-    paste0("Height~Inf.est+Sex+", .) %&gt;%
-    as.formula %&gt;%
-    lm(., data = y) %&gt;%
-    summary
+<input id="__tabbed_10_3" name="__tabbed_10" type="radio" /><label for="__tabbed_10_3">auto model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>pred_auto <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
+<span style="color: #0000FF">for</span>(chr in <span style="color: #666666">1:22</span>){
+    obj.bigSNP <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_attach</span>(<span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;EUR_chr&quot;</span>,chr,<span style="color: #BA2121">&quot;_.rds&quot;</span>))
+    genotype <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>genotypes
+    <span style="color: #408080; font-style: italic"># calculate PRS for all samples</span>
+    ind.test <span style="color: #666666">&lt;-</span> <span style="color: #666666">1:</span><span style="color: #0000FF">nrow</span>(genotype)
+    <span style="color: #408080; font-style: italic"># Extract SNPs in this chromosome</span>
+    chr.idx <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">which</span>(info_snp<span style="color: #666666">$</span>chr <span style="color: #666666">==</span> chr)
+    ind.chr <span style="color: #666666">&lt;-</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`[chr.idx]
 
-result &lt;- data.table(
-    infinitesimal = inf.model$r.squared - null.r2,
-    null = null.r2
-)
-print(result)</code></pre>
-</div>
-<input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><label for="__tabbed_6_2">grid model</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R">grid.model &lt;- paste("PC", 1:6, sep = "", collapse = "+") %&gt;%
-    paste0("Height~grid+Sex+", .) %&gt;%
-    as.formula %&gt;%
-    lm(., data = y) %&gt;%
-    summary
-
-result &lt;- data.table(
-    grid = grid.model$r.squared - null.r2,
-    null = null.r2
-)
-print(result)</code></pre>
-</div>
-<input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><label for="__tabbed_6_3">auto model</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R">auto.model &lt;- paste("PC", 1:6, sep = "", collapse = "+") %&gt;%
-    paste0("Height~auto+Sex+", .) %&gt;%
-    as.formula %&gt;%
-    lm(., data = y) %&gt;%
-    summary
-
-result &lt;- data.table(
-    infinitesimal = inf.model$r.squared - null.r2,
-    grid = grid.model$r.squared - null.r2,
-    auto = auto.model$r.squared - null.r2,
-    null = null.r2
-)
-print(result)</code></pre>
-</div>
-<input id="__tabbed_6_4" name="__tabbed_6" type="radio" /><label for="__tabbed_6_4">all model</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R"># there are 3 models: inf, auto and grid
-inf.model &lt;- paste("PC", 1:6, sep = "", collapse = "+") %&gt;%
-    paste0("Height~Inf.est+Sex+", .) %&gt;%
-    as.formula %&gt;%
-    lm(., data = y) %&gt;%
-    summary
-auto.model &lt;- paste("PC", 1:6, sep = "", collapse = "+") %&gt;%
-    paste0("Height~auto+Sex+", .) %&gt;%
-    as.formula %&gt;%
-    lm(., data = y) %&gt;%
-    summary
-grid.model &lt;- paste("PC", 1:6, sep = "", collapse = "+") %&gt;%
-    paste0("Height~grid+Sex+", .) %&gt;%
-    as.formula %&gt;%
-    lm(., data = y) %&gt;%
-    summary
-
-result &lt;- data.table(
-    infinitesimal = inf.model$r.squared - null.r2,
-    grid = grid.model$r.squared - null.r2,
-    auto = auto.model$r.squared - null.r2,
-    null = null.r2
-)
-print(result)</code></pre>
+    tmp <span style="color: #666666">&lt;-</span>
+        <span style="color: #0000FF">big_prodMat</span>(genotype,
+                    beta_auto[chr.idx],
+                    ind.row <span style="color: #666666">=</span> ind.test,
+                    ind.col <span style="color: #666666">=</span> ind.chr)
+    <span style="color: #408080; font-style: italic"># scale the PRS generated from AUTO</span>
+    pred_scaled <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">apply</span>(tmp, <span style="color: #666666">2</span>, sd)
+    final_beta_auto <span style="color: #666666">&lt;-</span>
+        <span style="color: #0000FF">rowMeans</span>(beta_auto[chr.idx,
+                    <span style="color: #0000FF">abs</span>(pred_scaled <span style="color: #666666">-</span>
+                        <span style="color: #0000FF">median</span>(pred_scaled)) <span style="color: #666666">&lt;</span>
+                        <span style="color: #666666">3</span> <span style="color: #666666">*</span> <span style="color: #0000FF">mad</span>(pred_scaled)])
+    tmp <span style="color: #666666">&lt;-</span>
+        <span style="color: #0000FF">big_prodVec</span>(genotype,
+            final_beta_auto,
+            ind.row <span style="color: #666666">=</span> ind.test,
+            ind.col <span style="color: #666666">=</span> ind.chr)
+    <span style="color: #0000FF">if</span>(<span style="color: #0000FF">is.null</span>(pred_auto)){
+        pred_auto <span style="color: #666666">&lt;-</span> tmp
+    }else{
+        pred_auto <span style="color: #666666">&lt;-</span> pred_auto <span style="color: #666666">+</span> tmp
+    }
+}
+</code></pre></div>
 </div>
 </div>
-<details class="note"><summary>How much phenotypic variation does the PRS from each model explain?</summary><p>Infinitesimal = 0.1717342</p>
-<p>Grid Model = 0.002945278</p>
-<p>Auto Model = 0.2532782</p>
+<h3 id="8-get-the-final-performance-of-the-ldpred-models">8. Get the final performance of the LDpred models<a class="headerlink" href="#8-get-the-final-performance-of-the-ldpred-models" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set" data-tabs="11:3"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio" /><label for="__tabbed_11_1">infinitesimal model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>reg.formula <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">paste</span>(<span style="color: #BA2121">&quot;PC&quot;</span>, <span style="color: #666666">1:6</span>, sep <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;&quot;</span>, collapse <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;+&quot;</span>) <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;Height~PRS+Sex+&quot;</span>, .) <span style="color: #666666">%&gt;%</span>
+    as.formula
+reg.dat <span style="color: #666666">&lt;-</span> y
+reg.dat<span style="color: #666666">$</span>PRS <span style="color: #666666">&lt;-</span> pred_inf
+inf.model <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lm</span>(reg.formula, dat<span style="color: #666666">=</span>reg.dat) <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">summary</span>
+(result <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">data.table</span>(
+    infinitesimal <span style="color: #666666">=</span> inf.model<span style="color: #666666">$</span>r.squared <span style="color: #666666">-</span> null.r2,
+    null <span style="color: #666666">=</span> null.r2
+))
+</code></pre></div>
+</div>
+<input id="__tabbed_11_2" name="__tabbed_11" type="radio" /><label for="__tabbed_11_2">grid model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>reg.formula <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">paste</span>(<span style="color: #BA2121">&quot;PC&quot;</span>, <span style="color: #666666">1:6</span>, sep <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;&quot;</span>, collapse <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;+&quot;</span>) <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;Height~PRS+Sex+&quot;</span>, .) <span style="color: #666666">%&gt;%</span>
+    as.formula
+reg.dat <span style="color: #666666">&lt;-</span> y
+max.r2 <span style="color: #666666">&lt;-</span> <span style="color: #666666">0</span>
+<span style="color: #0000FF">for</span>(i in <span style="color: #666666">1:</span><span style="color: #0000FF">ncol</span>(pred_grid)){
+    reg.dat<span style="color: #666666">$</span>PRS <span style="color: #666666">&lt;-</span> pred_grid[,i]
+    grid.model <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lm</span>(reg.formula, dat<span style="color: #666666">=</span>reg.dat) <span style="color: #666666">%&gt;%</span>
+        summary  
+    <span style="color: #0000FF">if</span>(max.r2 <span style="color: #666666">&lt;</span> grid.model<span style="color: #666666">$</span>r.squared){
+        max.r2 <span style="color: #666666">&lt;-</span> grid.model<span style="color: #666666">$</span>r.squared
+    }
+}
+(result <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">data.table</span>(
+    grid <span style="color: #666666">=</span> max.r2 <span style="color: #666666">-</span> null.r2,
+    null <span style="color: #666666">=</span> null.r2
+))
+</code></pre></div>
+</div>
+<input id="__tabbed_11_3" name="__tabbed_11" type="radio" /><label for="__tabbed_11_3">auto model</label><div class="tabbed-content">
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>reg.formula <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">paste</span>(<span style="color: #BA2121">&quot;PC&quot;</span>, <span style="color: #666666">1:6</span>, sep <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;&quot;</span>, collapse <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;+&quot;</span>) <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;Height~PRS+Sex+&quot;</span>, .) <span style="color: #666666">%&gt;%</span>
+    as.formula
+reg.dat <span style="color: #666666">&lt;-</span> y
+reg.dat<span style="color: #666666">$</span>PRS <span style="color: #666666">&lt;-</span> pred_auto
+auto.model <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lm</span>(reg.formula, dat<span style="color: #666666">=</span>reg.dat) <span style="color: #666666">%&gt;%</span>
+    <span style="color: #0000FF">summary</span>
+(result <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">data.table</span>(
+    auto <span style="color: #666666">=</span> auto.model<span style="color: #666666">$</span>r.squared <span style="color: #666666">-</span> null.r2,
+    null <span style="color: #666666">=</span> null.r2
+))
+</code></pre></div>
+</div>
+</div>
+<details class="note"><summary>How much phenotypic variation does the PRS from each model explain?</summary><p>Infinitesimal = 0.0100</p>
+<p>Grid Model = 0.00180</p>
+<p>Auto Model = 0.171</p>
 </details>
               
             </div>

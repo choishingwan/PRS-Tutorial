@@ -203,55 +203,59 @@ On this page you will run a PRS analysis using PRSice-2, which implements the st
 <h2 id="running-prs-analysis">Running PRS analysis<a class="headerlink" href="#running-prs-analysis" title="Permanent link">&para;</a></h2>
 <p>To run PRSice-2 we need a single covariate file, and therefore our covariate file and PCs file should be combined. This can be done with <code>R</code> as follows:</p>
 <div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">without data.table</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R">covariate &lt;- read.table("EUR.cov", header=T)
-pcs &lt;- read.table("EUR.eigenvec", header=F)
-colnames(pcs) &lt;- c("FID","IID", paste0("PC",1:6))
-cov &lt;- merge(covariate, pcs, by=c("FID", "IID"))
-write.table(cov,"EUR.covariate", quote=F, row.names=F)
-q()</code></pre>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>covariate <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
+pcs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.eigenvec&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">F</span>)
+<span style="color: #0000FF">colnames</span>(pcs) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;PC&quot;</span>,<span style="color: #666666">1:6</span>))
+cov <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(covariate, pcs, by<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>))
+<span style="color: #0000FF">write.table</span>(cov,<span style="color: #BA2121">&quot;EUR.covariate&quot;</span>, quote<span style="color: #666666">=</span><span style="color: #008000">F</span>, row.names<span style="color: #666666">=</span><span style="color: #008000">F</span>)
+<span style="color: #0000FF">q</span>()
+</code></pre></div>
 </div>
 <input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">with data.table</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-R">library(data.table)
-covariate &lt;- fread("EUR.cov")
-pcs &lt;- fread("EUR.eigenvec", header=F)
-colnames(pcs) &lt;- c("FID","IID", paste0("PC",1:6))
-cov &lt;- merge(covariate, pcs)
-fwrite(cov,"EUR.covariate", sep="\t")
-q()</code></pre>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #0000FF">library</span>(data.table)
+covariate <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>)
+pcs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.eigenvec&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">F</span>)
+<span style="color: #0000FF">colnames</span>(pcs) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;PC&quot;</span>,<span style="color: #666666">1:6</span>))
+cov <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(covariate, pcs)
+<span style="color: #0000FF">fwrite</span>(cov,<span style="color: #BA2121">&quot;EUR.covariate&quot;</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>)
+<span style="color: #0000FF">q</span>()
+</code></pre></div>
 </div>
 </div>
 <p>which generates <strong>EUR.cov</strong>.</p>
 <p>PRSice-2 can then be run to obtain the PRS results as follows:</p>
 <div class="tabbed-set" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Linux</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-bash">Rscript PRSice.R \
-    --prsice PRSice_linux \
-    --base Height.QC.gz \
-    --target EUR.QC \
-    --binary-target F \
-    --pheno EUR.height \
-    --cov EUR.covariate \
-    --base-maf MAF:0.01 \
-    --base-info INFO:0.8 \
-    --stat OR \
-    --or \
-    --out EUR</code></pre>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>Rscript PRSice.R <span style="color: #BB6622; font-weight: bold">\</span>
+    --prsice PRSice_linux <span style="color: #BB6622; font-weight: bold">\</span>
+    --base Height.QC.gz <span style="color: #BB6622; font-weight: bold">\</span>
+    --target EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
+    --binary-target F <span style="color: #BB6622; font-weight: bold">\</span>
+    --pheno EUR.height <span style="color: #BB6622; font-weight: bold">\</span>
+    --cov EUR.covariate <span style="color: #BB6622; font-weight: bold">\</span>
+    --base-maf MAF:0.01 <span style="color: #BB6622; font-weight: bold">\</span>
+    --base-info INFO:0.8 <span style="color: #BB6622; font-weight: bold">\</span>
+    --stat OR <span style="color: #BB6622; font-weight: bold">\</span>
+    --or <span style="color: #BB6622; font-weight: bold">\</span>
+    --out EUR
+</code></pre></div>
 </div>
 <input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">OS X</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-bash">Rscript PRSice.R \
-    --prsice PRSice_mac \
-    --base Height.QC.gz \
-    --target EUR.QC \
-    --binary-target F \
-    --pheno EUR.height \
-    --cov EUR.covariate \
-    --base-maf MAF:0.01 \
-    --base-info INFO:0.8 \
-    --stat OR \
-    --or \
-    --out EUR</code></pre>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>Rscript PRSice.R <span style="color: #BB6622; font-weight: bold">\</span>
+    --prsice PRSice_mac <span style="color: #BB6622; font-weight: bold">\</span>
+    --base Height.QC.gz <span style="color: #BB6622; font-weight: bold">\</span>
+    --target EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
+    --binary-target F <span style="color: #BB6622; font-weight: bold">\</span>
+    --pheno EUR.height <span style="color: #BB6622; font-weight: bold">\</span>
+    --cov EUR.covariate <span style="color: #BB6622; font-weight: bold">\</span>
+    --base-maf MAF:0.01 <span style="color: #BB6622; font-weight: bold">\</span>
+    --base-info INFO:0.8 <span style="color: #BB6622; font-weight: bold">\</span>
+    --stat OR <span style="color: #BB6622; font-weight: bold">\</span>
+    --or <span style="color: #BB6622; font-weight: bold">\</span>
+    --out EUR
+</code></pre></div>
 </div>
 <input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><label for="__tabbed_2_3">Windows</label><div class="tabbed-content">
-<pre class="highlight"><code class="language-bash">Rscript PRSice.R ^
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>Rscript PRSice.R ^
     --prsice PRSice_win64.exe ^
     --base Height.QC.gz ^
     --target EUR.QC ^
@@ -262,7 +266,8 @@ q()</code></pre>
     --base-info INFO:0.8 ^
     --stat OR ^
     --or ^
-    --out EUR</code></pre>
+    --out EUR
+</code></pre></div>
 </div>
 </div>
 <p>The meaning of the parameters are as follow:</p>
