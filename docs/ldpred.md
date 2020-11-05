@@ -454,7 +454,7 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
         # scale the PRS generated from AUTO
         pred_scaled <- apply(tmp, 2, sd)
         final_beta_auto <-
-            rowMeans(tmp[,
+            rowMeans(beta_auto[chr.idx,
                         abs(pred_scaled -
                             median(pred_scaled)) <
                             3 * mad(pred_scaled)])
