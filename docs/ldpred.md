@@ -180,6 +180,7 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
     corr <- NULL
     ld <- NULL
     # We want to know the ordering of samples in the bed file 
+    info_snp <- NULL
     fam.order <- NULL
     for (chr in 1:22) {
         # preprocess the bed file (only need to do once for each data set)
@@ -191,7 +192,8 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
         map <- obj.bigSNP$map[-3]
         names(map) <- c("chr", "rsid", "pos", "a1", "a0")
         # perform SNP matching
-        info_snp <- snp_match(sumstats[sumstats$chr == chr,], map)
+        tmp_snp <- snp_match(sumstats[sumstats\$chr==chr,], map)
+        info_snp <- rbind(info_snp, tmp_snp)
         # Assign the genotype to a variable for easier downstream analysis
         genotype <- obj.bigSNP$genotypes
         # Rename the data structures
@@ -202,8 +204,8 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
         POS2 <- snp_asGeneticPos(CHR, POS, dir = ".")
         # calculate LD
         # Extract SNPs that are included in the chromosome
-        ind.chr <- which(info_snp$chr == chr)
-        ind.chr2 <- info_snp$`_NUM_ID_`[ind.chr]
+        ind.chr <- which(tmp_snp$chr == chr)
+        ind.chr2 <- tmp_snp$`_NUM_ID_`[ind.chr]
         # Calculate the LD
         corr0 <- snp_cor(
                 genotype,
