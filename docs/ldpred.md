@@ -192,7 +192,7 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
         map <- obj.bigSNP$map[-3]
         names(map) <- c("chr", "rsid", "pos", "a1", "a0")
         # perform SNP matching
-        tmp_snp <- snp_match(sumstats[sumstats\$chr==chr,], map)
+        tmp_snp <- snp_match(sumstats[sumstats$chr==chr,], map)
         info_snp <- rbind(info_snp, tmp_snp)
         # Assign the genotype to a variable for easier downstream analysis
         genotype <- obj.bigSNP$genotypes
@@ -391,7 +391,7 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
     ```R
     pred_inf <- NULL
     for(chr in 1:22){
-        obj.bigSNP <- snp_attach(paste0("EUR_chr",chr,"_.rds"))
+        obj.bigSNP <- snp_attach(paste0("EUR_chr",chr,".rds"))
         genotype <- obj.bigSNP$genotypes
         # calculate PRS for all samples
         ind.test <- 1:nrow(genotype)
