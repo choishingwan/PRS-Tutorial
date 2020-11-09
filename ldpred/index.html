@@ -352,6 +352,7 @@ tmp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">tempf
 corr <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
 ld <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
 <span style="color: #408080; font-style: italic"># We want to know the ordering of samples in the bed file </span>
+info_snp <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
 fam.order <span style="color: #666666">&lt;-</span> <span style="color: #008000; font-weight: bold">NULL</span>
 <span style="color: #0000FF">for </span>(chr in <span style="color: #666666">1:22</span>) {
     <span style="color: #408080; font-style: italic"># preprocess the bed file (only need to do once for each data set)</span>
@@ -363,7 +364,8 @@ fam.order <span style="color: #666666">&lt;-</span> <span style="color: #008000;
     map <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>map[<span style="color: #666666">-3</span>]
     <span style="color: #0000FF">names</span>(map) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;chr&quot;</span>, <span style="color: #BA2121">&quot;rsid&quot;</span>, <span style="color: #BA2121">&quot;pos&quot;</span>, <span style="color: #BA2121">&quot;a1&quot;</span>, <span style="color: #BA2121">&quot;a0&quot;</span>)
     <span style="color: #408080; font-style: italic"># perform SNP matching</span>
-    info_snp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_match</span>(sumstats[sumstats<span style="color: #666666">$</span>chr <span style="color: #666666">==</span> chr,], map)
+    tmp_snp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_match</span>(sumstats[sumstats\<span style="color: #666666">$</span>chr<span style="color: #666666">==</span>chr,], map)
+    info_snp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">rbind</span>(info_snp, tmp_snp)
     <span style="color: #408080; font-style: italic"># Assign the genotype to a variable for easier downstream analysis</span>
     genotype <span style="color: #666666">&lt;-</span> obj.bigSNP<span style="color: #666666">$</span>genotypes
     <span style="color: #408080; font-style: italic"># Rename the data structures</span>
@@ -374,8 +376,8 @@ fam.order <span style="color: #666666">&lt;-</span> <span style="color: #008000;
     POS2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_asGeneticPos</span>(CHR, POS, dir <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;.&quot;</span>)
     <span style="color: #408080; font-style: italic"># calculate LD</span>
     <span style="color: #408080; font-style: italic"># Extract SNPs that are included in the chromosome</span>
-    ind.chr <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">which</span>(info_snp<span style="color: #666666">$</span>chr <span style="color: #666666">==</span> chr)
-    ind.chr2 <span style="color: #666666">&lt;-</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`[ind.chr]
+    ind.chr <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">which</span>(tmp_snp<span style="color: #666666">$</span>chr <span style="color: #666666">==</span> chr)
+    ind.chr2 <span style="color: #666666">&lt;-</span> tmp_snp<span style="color: #666666">$</span>`_NUM_ID_`[ind.chr]
     <span style="color: #408080; font-style: italic"># Calculate the LD</span>
     corr0 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">snp_cor</span>(
             genotype,
