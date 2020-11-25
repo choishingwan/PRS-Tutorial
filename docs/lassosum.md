@@ -93,7 +93,7 @@ out <- lassosum.pipeline(
     cluster=cl
 )
 # Store the R2 results
-target.res <- validate(out, pheno = target.pheno, covar=cov)
+target.res <- validate(out, pheno = as.data.frame(target.pheno), covar=as.data.frame(cov))
 # Get the maximum R2
 r2 <- max(target.res$validation.table$value)^2
 ```
