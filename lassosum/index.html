@@ -249,7 +249,7 @@ out <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">lasso
     cluster<span style="color: #666666">=</span>cl
 )
 <span style="color: #408080; font-style: italic"># Store the R2 results</span>
-target.res <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">validate</span>(out, pheno <span style="color: #666666">=</span> target.pheno, covar<span style="color: #666666">=</span>cov)
+target.res <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">validate</span>(out, pheno <span style="color: #666666">=</span> <span style="color: #0000FF">as.data.frame</span>(target.pheno), covar<span style="color: #666666">=</span><span style="color: #0000FF">as.data.frame</span>(cov))
 <span style="color: #408080; font-style: italic"># Get the maximum R2</span>
 r2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">max</span>(target.res<span style="color: #666666">$</span>validation.table<span style="color: #666666">$</span>value)<span style="color: #666666">^2</span>
 </code></pre></div>
