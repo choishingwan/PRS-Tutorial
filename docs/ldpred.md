@@ -399,7 +399,7 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
         chr.idx <- which(info_snp$chr == chr)
         ind.chr <- info_snp$`_NUM_ID_`[chr.idx]
         tmp <- big_prodVec(genotype,
-                                beta_inf[chr.idx],
+                                beta_inf,
                                 ind.row = ind.test,
                                 ind.col = ind.chr)
         if(is.null(pred_inf)){
@@ -424,7 +424,7 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
         ind.chr <- info_snp$`_NUM_ID_`[chr.idx]
 
         tmp <- big_prodMat( genotype, 
-                            beta_grid[chr.idx], 
+                            beta_grid, 
                             ind.col = ind.chr)
 
         if(is.null(pred_grid)){
@@ -450,13 +450,13 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
 
         tmp <-
             big_prodMat(genotype,
-                        beta_auto[chr.idx],
+                        beta_auto,
                         ind.row = ind.test,
                         ind.col = ind.chr)
         # scale the PRS generated from AUTO
         pred_scaled <- apply(tmp, 2, sd)
         final_beta_auto <-
-            rowMeans(beta_auto[chr.idx,
+            rowMeans(tmp[chr.idx,
                         abs(pred_scaled -
                             median(pred_scaled)) <
                             3 * mad(pred_scaled)])
