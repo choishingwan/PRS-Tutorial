@@ -86,7 +86,7 @@ Each of the parameters corresponds to the following
     
 Very high or low heterozygosity rates in individuals could be due to DNA contamination or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. 
 
-First, we perform prunning to remove highly correlated SNPs:
+First, we perform pruning to remove highly correlated SNPs:
 
 ```bash
 plink \
@@ -99,12 +99,12 @@ plink \
 
 Each of the parameters corresponds to the following
 
-| Paramter | Value | Description|
+| Parameter | Value | Description|
 |:-:|:-:|:-|
 | bfile | EUR | Informs `plink` that the input genotype files should have a prefix of `EUR` |
 | keep | EUR.QC.fam | Informs `plink` that we only want to use samples in `EUR.QC.fam` in the analysis |
 | extract | EUR.QC.snplist | Informs `plink` that we only want to use SNPs in `EUR.QC.snplist` in the analysis |
-|indep-pairwise| 200 50 0.25 | Informs `plink` that we wish to perform prunning with a window size of 200 variants, sliding across the genome with step size of 50 variants at a time, and filter out any SNPs with LD $r^2$ higher than 0.25|
+|indep-pairwise| 200 50 0.25 | Informs `plink` that we wish to perform pruning with a window size of 200 variants, sliding across the genome with step size of 50 variants at a time, and filter out any SNPs with LD $r^2$ higher than 0.25|
 | out | EUR.QC | Informs `plink` that all output should have a prefix of `EUR.QC` |
 
 
