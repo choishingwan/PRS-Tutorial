@@ -552,7 +552,7 @@ pred_auto <span style="color: #666666">&lt;-</span>
     chr.idx <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">which</span>(info_snp<span style="color: #666666">$</span>chr <span style="color: #666666">==</span> chr)
     ind.chr <span style="color: #666666">&lt;-</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`[chr.idx]
     tmp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">big_prodVec</span>(genotype,
-                            beta_inf[chr.idx],
+                            beta_inf,
                             ind.row <span style="color: #666666">=</span> ind.test,
                             ind.col <span style="color: #666666">=</span> ind.chr)
     <span style="color: #0000FF">if</span>(<span style="color: #0000FF">is.null</span>(pred_inf)){
@@ -575,7 +575,7 @@ pred_auto <span style="color: #666666">&lt;-</span>
     ind.chr <span style="color: #666666">&lt;-</span> info_snp<span style="color: #666666">$</span>`_NUM_ID_`[chr.idx]
 
     tmp <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">big_prodMat</span>( genotype, 
-                        beta_grid[chr.idx], 
+                        beta_grid, 
                         ind.col <span style="color: #666666">=</span> ind.chr)
 
     <span style="color: #0000FF">if</span>(<span style="color: #0000FF">is.null</span>(pred_grid)){
@@ -599,13 +599,13 @@ pred_auto <span style="color: #666666">&lt;-</span>
 
     tmp <span style="color: #666666">&lt;-</span>
         <span style="color: #0000FF">big_prodMat</span>(genotype,
-                    beta_auto[chr.idx],
+                    beta_auto,
                     ind.row <span style="color: #666666">=</span> ind.test,
                     ind.col <span style="color: #666666">=</span> ind.chr)
     <span style="color: #408080; font-style: italic"># scale the PRS generated from AUTO</span>
     pred_scaled <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">apply</span>(tmp, <span style="color: #666666">2</span>, sd)
     final_beta_auto <span style="color: #666666">&lt;-</span>
-        <span style="color: #0000FF">rowMeans</span>(beta_auto[chr.idx,
+        <span style="color: #0000FF">rowMeans</span>(tmp[chr.idx,
                     <span style="color: #0000FF">abs</span>(pred_scaled <span style="color: #666666">-</span>
                         <span style="color: #0000FF">median</span>(pred_scaled)) <span style="color: #666666">&lt;</span>
                         <span style="color: #666666">3</span> <span style="color: #666666">*</span> <span style="color: #0000FF">mad</span>(pred_scaled)])

@@ -227,7 +227,7 @@ individuals with low genotyping rate
 <table>
 <thead>
 <tr>
-<th align="center">Paramter</th>
+<th align="center">Parameter</th>
 <th align="center">Value</th>
 <th align="left">Description</th>
 </tr>
@@ -241,7 +241,7 @@ individuals with low genotyping rate
 <tr>
 <td align="center">maf</td>
 <td align="center">0.01</td>
-<td align="left">Removes all SNPs with minor allele frequency less than 0.05. Genotyping errors typically have a larger influence on SNPs with low MAF. Studies with large sample sizes could apply a lower MAF threshold</td>
+<td align="left">Removes all SNPs with minor allele frequency less than 0.01. Genotyping errors typically have a larger influence on SNPs with low MAF. Studies with large sample sizes could apply a lower MAF threshold</td>
 </tr>
 <tr>
 <td align="center">hwe</td>
@@ -291,7 +291,7 @@ solely on the list of samples and SNPs without duplicating the
 genotype file, reducing the storage space usage.  </p>
 </div>
 <p>Very high or low heterozygosity rates in individuals could be due to DNA contamination or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. </p>
-<p>First, we perform prunning to remove highly correlated SNPs:</p>
+<p>First, we perform pruning to remove highly correlated SNPs:</p>
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR <span style="color: #BB6622; font-weight: bold">\</span>
     --keep EUR.QC.fam <span style="color: #BB6622; font-weight: bold">\</span>
@@ -303,7 +303,7 @@ genotype file, reducing the storage space usage.  </p>
 <table>
 <thead>
 <tr>
-<th align="center">Paramter</th>
+<th align="center">Parameter</th>
 <th align="center">Value</th>
 <th align="left">Description</th>
 </tr>
@@ -327,7 +327,7 @@ genotype file, reducing the storage space usage.  </p>
 <tr>
 <td align="center">indep-pairwise</td>
 <td align="center">200 50 0.25</td>
-<td align="left">Informs <code>plink</code> that we wish to perform prunning with a window size of 200 variants, sliding across the genome with step size of 50 variants at a time, and filter out any SNPs with LD <span class="arithmatex">\(r^2\)</span> higher than 0.25</td>
+<td align="left">Informs <code>plink</code> that we wish to perform pruning with a window size of 200 variants, sliding across the genome with step size of 50 variants at a time, and filter out any SNPs with LD <span class="arithmatex">\(r^2\)</span> higher than 0.25</td>
 </tr>
 <tr>
 <td align="center">out</td>
