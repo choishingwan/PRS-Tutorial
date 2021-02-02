@@ -100,4 +100,4 @@ r2 <- max(target.res$validation.table$value)^2
 
 
 ??? note "How much phenotypic variation does the "best-fit" PRS explain?"
-    0.2395471
+    0.2474679

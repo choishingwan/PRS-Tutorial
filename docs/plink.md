@@ -308,5 +308,5 @@ This can be achieved using `R` as follows:
     0.3
 
 ??? note "How much phenotypic variation does the "best-fit" PRS explain?"
-    0.1638468
+    0.1612372
 

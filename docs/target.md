@@ -156,6 +156,11 @@ These were removed during the base data QC.
 ## \# Mismatching SNPs
 SNPs that have mismatching alleles reported in the base and target data may be resolvable by strand-flipping the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target. This can be achieved with the following steps:
 
+
+!!! note
+    Most PRS software will perform strand-flipping automatically, thus this step is usually not required.
+
+
 1\. Load the bim file, the summary statistic and the QC SNP list into R
 
 === "Without data.table"
@@ -287,11 +292,11 @@ SNPs that have mismatching alleles reported in the base and target data may be r
     tmp <- bim[com.snps,]$B.A1
     bim[com.snps,]$B.A1 <- as.character(sapply(bim[com.snps,]$B.A2, complement))
     bim[com.snps,]$B.A2 <- as.character(sapply(tmp, complement))
-
+    
     # Output updated bim file
     write.table(
-        bim,
-        "EUR.QC.adj.bim",
+        bim[,c("SNP", "B.A1")],
+        "EUR.a1",
         quote = F,
         row.names = F,
         col.names = F,
@@ -299,7 +304,7 @@ SNPs that have mismatching alleles reported in the base and target data may be r
     )
     ```
 
-=== "With data.table  and magrittr"
+=== "With data.table and magrittr"
 
     ```R
     # identify SNPs that need recoding
@@ -316,7 +321,7 @@ SNPs that have mismatching alleles reported in the base and target data may be r
             list(sapply(B.A2, complement),
                 sapply(B.A1, complement))]
     # Write the updated bim file
-    fwrite(bim, "EUR.QC.adj.bim", col.names=F, sep="\t")
+    fwrite(bim[,c("SNP", "B.A1")], "EUR.a1", col.names=F, sep="\t")
     ```
 
 
@@ -351,20 +356,7 @@ SNPs that have mismatching alleles reported in the base and target data may be r
     q() # exit R
     ```
 
-5\. Replace **EUR.bim** with **EUR.QC.adj.bim**:
-
-```bash
-# Make a back up
-mv EUR.bim EUR.bim.bk
-ln -s EUR.QC.adj.bim EUR.bim
-```
-The above commands do the following:
-
-1. Rename **EUR.bim** to **EUR.bim.bk**
-2. Soft linking (`ln -s`) **EUR.QC.adj.bim** as **EUR.bim**
-
-!!! note
-    Most PRS software will perform strand-flipping automatically, thus this step is usually not required.
+We can then use the **EUR.a1** file to update the A1 alleles
 
 ## \# Duplicate SNPs
 Make sure to remove any duplicate SNPs in your target data (these target data were simulated and so include no duplicated SNPs).
@@ -441,6 +433,7 @@ plink \
 
 ## Generate final QC'ed target data file
 After performing the full analysis, you can generate a QC'ed data set with the following command:
+
 ```bash
 plink \
     --bfile EUR \
@@ -448,5 +441,17 @@ plink \
     --keep EUR.QC.rel.id \
     --out EUR.QC \
     --extract EUR.QC.snplist \
-    --exclude EUR.mismatch
+    --exclude EUR.mismatch \
+    --a1-allele EUR.a1
 ```
+
+Each of the parameters corresponds to the following
+
+| Parameter | Value | Description|
+|:-:|:-:|:-|
+| bfile | EUR | Informs `plink` that the input genotype files should have a prefix of `EUR` |
+| keep | EUR.QC.rel.id | Informs `plink` that we only want to keep samples in `EUR.QC.rel.id` |
+| extract | EUR.QC.snplist | Informs `plink` that we only want to use SNPs in `EUR.QC.snplist` in the analysis |
+| exclude | EUR.mismatch | Informs `plink` that we wish to remove any SNPs in `EUR.mismatch`|
+| a1-allele |  EUR.a1 | Fix all A1 alleles to those specified in `EUR.a1` |
+| out | EUR.QC | Informs `plink` that all output should have a prefix of `EUR.QC` |

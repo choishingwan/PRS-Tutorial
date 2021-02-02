@@ -127,7 +127,7 @@ This will automatically perform "high-resolution scoring" and generate the "best
 Users should read Section 4.6 of our paper to learn more about issues relating to overfitting in PRS analyses.  
 
 ??? note "Which P-value threshold generates the "best-fit" PRS?"
-    0.13995
+    0.13995 
 
 ??? note "How much phenotypic variation does the "best-fit" PRS explain?"
-    0.166117
+    0.209902

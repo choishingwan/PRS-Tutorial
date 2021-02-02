@@ -530,8 +530,8 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
     ```
 
 ??? note "How much phenotypic variation does the PRS from each model explain?"
-    Infinitesimal = 0.0100
+    Infinitesimal = 0.0248696
     
-    Grid Model = 0.00180
+    Grid Model = 0.001746926
 
-    Auto Model = 0.171
+    Auto Model = 0.1751478
