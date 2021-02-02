@@ -376,6 +376,10 @@ valid <span style="color: #666666">&lt;-</span> dat[<span style="color: #008000"
 <p>These were removed during the base data QC.</p>
 <h2 id="mismatching-snps"># Mismatching SNPs<a class="headerlink" href="#mismatching-snps" title="Permanent link">&para;</a></h2>
 <p>SNPs that have mismatching alleles reported in the base and target data may be resolvable by strand-flipping the alleles to their complementary alleles in e.g. the target data, such as for a SNP with A/C in the base data and G/T in the target. This can be achieved with the following steps:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Most PRS software will perform strand-flipping automatically, thus this step is usually not required.</p>
+</div>
 <p>1. Load the bim file, the summary statistic and the QC SNP list into R</p>
 <div class="tabbed-set" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Without data.table</label><div class="tabbed-content">
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #408080; font-style: italic"># Read in bim file</span>
@@ -499,8 +503,8 @@ bim[com.snps,]<span style="color: #666666">$</span>B.A2 <span style="color: #666
 
 <span style="color: #408080; font-style: italic"># Output updated bim file</span>
 <span style="color: #0000FF">write.table</span>(
-    bim,
-    <span style="color: #BA2121">&quot;EUR.QC.adj.bim&quot;</span>,
+    bim[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;SNP&quot;</span>, <span style="color: #BA2121">&quot;B.A1&quot;</span>)],
+    <span style="color: #BA2121">&quot;EUR.a1&quot;</span>,
     quote <span style="color: #666666">=</span> <span style="color: #008000">F</span>,
     row.names <span style="color: #666666">=</span> <span style="color: #008000">F</span>,
     col.names <span style="color: #666666">=</span> <span style="color: #008000">F</span>,
@@ -508,7 +512,7 @@ bim[com.snps,]<span style="color: #666666">$</span>B.A2 <span style="color: #666
 )
 </code></pre></div>
 </div>
-<input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><label for="__tabbed_4_2">With data.table  and magrittr</label><div class="tabbed-content">
+<input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><label for="__tabbed_4_2">With data.table and magrittr</label><div class="tabbed-content">
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #408080; font-style: italic"># identify SNPs that need recoding</span>
 recode.snps <span style="color: #666666">&lt;-</span> info[B.A1<span style="color: #666666">==</span>A2 <span style="color: #666666">&amp;</span> B.A2<span style="color: #666666">==</span>A1, SNP]
 <span style="color: #408080; font-style: italic"># Update the bim file</span>
@@ -523,7 +527,7 @@ bim[SNP <span style="color: #666666">%in%</span> com.recode, <span style="color:
         <span style="color: #0000FF">list</span>(<span style="color: #0000FF">sapply</span>(B.A2, complement),
             <span style="color: #0000FF">sapply</span>(B.A1, complement))]
 <span style="color: #408080; font-style: italic"># Write the updated bim file</span>
-<span style="color: #0000FF">fwrite</span>(bim, <span style="color: #BA2121">&quot;EUR.QC.adj.bim&quot;</span>, col.names<span style="color: #666666">=</span><span style="color: #008000">F</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>)
+<span style="color: #0000FF">fwrite</span>(bim[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;SNP&quot;</span>, <span style="color: #BA2121">&quot;B.A1&quot;</span>)], <span style="color: #BA2121">&quot;EUR.a1&quot;</span>, col.names<span style="color: #666666">=</span><span style="color: #008000">F</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>)
 </code></pre></div>
 </div>
 </div>
@@ -554,20 +558,7 @@ bim[SNP <span style="color: #666666">%in%</span> com.recode, <span style="color:
 </code></pre></div>
 </div>
 </div>
-<p>5. Replace <strong>EUR.bim</strong> with <strong>EUR.QC.adj.bim</strong>:</p>
-<p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code><span style="color: #408080; font-style: italic"># Make a back up</span>
-mv EUR.bim EUR.bim.bk
-ln -s EUR.QC.adj.bim EUR.bim
-</code></pre></div>
-The above commands do the following:</p>
-<ol>
-<li>Rename <strong>EUR.bim</strong> to <strong>EUR.bim.bk</strong></li>
-<li>Soft linking (<code>ln -s</code>) <strong>EUR.QC.adj.bim</strong> as <strong>EUR.bim</strong></li>
-</ol>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Most PRS software will perform strand-flipping automatically, thus this step is usually not required.</p>
-</div>
+<p>We can then use the <strong>EUR.a1</strong> file to update the A1 alleles</p>
 <h2 id="duplicate-snps"># Duplicate SNPs<a class="headerlink" href="#duplicate-snps" title="Permanent link">&para;</a></h2>
 <p>Make sure to remove any duplicate SNPs in your target data (these target data were simulated and so include no duplicated SNPs).</p>
 <h2 id="sex-chromosomes"># Sex chromosomes<a class="headerlink" href="#sex-chromosomes" title="Permanent link">&para;</a></h2>
@@ -631,15 +622,58 @@ To minimize the removal of cases of a disease, the following algorithm can be us
 <a href="https://gitlab.com/choishingwan/GreedyRelated">GreedyRelated</a>.</p>
 </div>
 <h2 id="generate-final-qced-target-data-file">Generate final QC'ed target data file<a class="headerlink" href="#generate-final-qced-target-data-file" title="Permanent link">&para;</a></h2>
-<p>After performing the full analysis, you can generate a QC'ed data set with the following command:
+<p>After performing the full analysis, you can generate a QC'ed data set with the following command:</p>
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%; margin: 0;"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR <span style="color: #BB6622; font-weight: bold">\</span>
     --make-bed <span style="color: #BB6622; font-weight: bold">\</span>
     --keep EUR.QC.rel.id <span style="color: #BB6622; font-weight: bold">\</span>
     --out EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
     --extract EUR.QC.snplist <span style="color: #BB6622; font-weight: bold">\</span>
-    --exclude EUR.mismatch
-</code></pre></div></p>
+    --exclude EUR.mismatch <span style="color: #BB6622; font-weight: bold">\</span>
+    --a1-allele EUR.a1
+</code></pre></div>
+<p>Each of the parameters corresponds to the following</p>
+<table>
+<thead>
+<tr>
+<th align="center">Parameter</th>
+<th align="center">Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">bfile</td>
+<td align="center">EUR</td>
+<td align="left">Informs <code>plink</code> that the input genotype files should have a prefix of <code>EUR</code></td>
+</tr>
+<tr>
+<td align="center">keep</td>
+<td align="center">EUR.QC.rel.id</td>
+<td align="left">Informs <code>plink</code> that we only want to keep samples in <code>EUR.QC.rel.id</code></td>
+</tr>
+<tr>
+<td align="center">extract</td>
+<td align="center">EUR.QC.snplist</td>
+<td align="left">Informs <code>plink</code> that we only want to use SNPs in <code>EUR.QC.snplist</code> in the analysis</td>
+</tr>
+<tr>
+<td align="center">exclude</td>
+<td align="center">EUR.mismatch</td>
+<td align="left">Informs <code>plink</code> that we wish to remove any SNPs in <code>EUR.mismatch</code></td>
+</tr>
+<tr>
+<td align="center">a1-allele</td>
+<td align="center">EUR.a1</td>
+<td align="left">Fix all A1 alleles to those specified in <code>EUR.a1</code></td>
+</tr>
+<tr>
+<td align="center">out</td>
+<td align="center">EUR.QC</td>
+<td align="left">Informs <code>plink</code> that all output should have a prefix of <code>EUR.QC</code></td>
+</tr>
+</tbody>
+</table>
               
             </div>
           </div>
