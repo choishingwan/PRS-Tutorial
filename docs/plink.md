@@ -185,7 +185,7 @@ plink \
 Here the PCs have been stored in the **EUR.eigenvec** file and can be used as covariates in the regression model to account for population stratification.
 
 !!! important
-    If the base and target samples are collected from different worldwide populations then the results from the PRS analysis may be biased (see Section 3.4 of our papper).
+    If the base and target samples are collected from different worldwide populations then the results from the PRS analysis may be biased (see Section 3.4 of our paper).
 
 
 ## Finding the "best-fit" PRS

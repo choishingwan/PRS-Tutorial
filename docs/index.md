@@ -26,7 +26,7 @@ If you are only interested in how to perform PRS on previously QC'ed data then y
     |:-:|:-:|
     | terminal (OS X / Linux) |  [1](https://www.digitalocean.com/community/tutorials/basic-linux-navigation-and-file-management), [2](https://linuxconfig.org/bash-scripting-tutorial-for-beginners)
     | terminal (Windows)| [1](https://www.cs.princeton.edu/courses/archive/spr05/cos126/cmd-prompt.html), [2](https://www.tutorialspoint.com/batch_script/index.htm) |
-    | plink | [v1.90](https://www.cog-genomics.org/plink/1.9/), [v1.75](http://zzz.bwh.harvard.edu/plink/) |
+    | plink | [v1.90](https://www.cog-genomics.org/plink/1.9/), [v1.07](http://zzz.bwh.harvard.edu/plink/) |
     | R | [1](https://www.tutorialspoint.com/r/index.htm)
 
 

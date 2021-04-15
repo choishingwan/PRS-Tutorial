@@ -7,7 +7,7 @@ The first step in Polygenic Risk Score (PRS) analyses is to generate or obtain t
  
 
 !!! warning
-    If you download the summary statistics on a MAC machine, the gz file may decompress automatically, which might result in a corrupted Height.gwas.txt file (including only the header). If this happens then you'll need to disable automatic decompression when downloading the file (eg. follow instructions [here](https://octet.oberlin.edu/does-your-mac-unzip-zip-files-automatically/)
+    If you download the summary statistics on a MAC machine, the gz file may decompress automatically, which might result in a corrupted Height.gwas.txt file (including only the header). If this happens then you'll need to disable automatic decompression when downloading the file (eg. follow instructions [here](https://octet.oberlin.edu/does-your-mac-unzip-zip-files-automatically/))
 
 
 ## Reading the base data file
