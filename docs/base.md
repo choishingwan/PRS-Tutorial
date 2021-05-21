@@ -138,35 +138,18 @@ Most PRS software do not allow duplicated SNPs in the base data input and thus t
 
 ```bash
 gunzip -c Height.gz |\
-awk '{ print $3}' |\
-sort |\
-uniq -d > duplicated.snp
-```
-
-The above command does the following:
-
-1. Decompresses and reads the **Height.gz** file
-2. Prints out the third column of the file (which contains the SNP ID; change `$3` to another number if the SNP ID is located in another column, e.g. `$1` if the SNP ID is located on the first column)
-3. Sort the SNP IDs. This will put duplicated SNP IDs next to each other
-4. Print out any duplicated SNP IDs using the uniq command and print them to the *duplicated.snp* file
-
-
-??? note "How many duplicated SNPs are there?"
-    There are a total of `2` duplicated SNPs
-
-Duplicated SNPs can then be removed using the `grep` command:
-```bash
-gunzip -c Height.gz  |\
-grep -vf duplicated.snp |\
+awk '!seen[$3]++' |\
 gzip - > Height.nodup.gz
 ```
 
 The above command does the following:
 
 1. Decompresses and reads the **Height.gz** file
-2. From the file, remove (`-v`) any lines contains string within the **duplicated.snp** file (`-f`)
+2. Prints each line, except if the value on column three was already seen before (which contains the SNP ID; change `$3` to another number if the SNP ID is located in another column, e.g. `$1` if the SNP ID is located on the first column)
 3. Compresses and writes the results to **Height.nodup.gz**
 
+??? note "How many duplicated SNPs are there?"
+    There are a total of `2` duplicated SNPs
 
 ## \# Ambiguous SNPs
 If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) that was used for either is unknown, then it is not possible to pair-up the alleles of ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T SNPs) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. While allele frequencies could be used to infer which alleles are on the same strand, the accuracy of this could be low for SNPs with MAF close to 50% or when the base and target data are from different populations. Therefore, we recommend removing all ambiguous SNPs to avoid introducing this potential source of systematic error.
