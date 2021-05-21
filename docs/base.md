@@ -138,7 +138,7 @@ Most PRS software do not allow duplicated SNPs in the base data input and thus t
 
 ```bash
 gunzip -c Height.gz |\
-aawk '{seen[$1]++; if(seen[$1]==1){ print}}' |\
+awk '{seen[$3]++; if(seen[$3]==1){ print}}' |\
 gzip - > Height.nodup.gz
 ```
 
