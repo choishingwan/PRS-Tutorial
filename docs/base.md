@@ -138,15 +138,14 @@ Most PRS software do not allow duplicated SNPs in the base data input and thus t
 
 ```bash
 gunzip -c Height.gz |\
-awk '!seen[$3]++' |\
+aawk '{seen[$1]++; if(seen[$1]==1){ print}}' |\
 gzip - > Height.nodup.gz
 ```
 
 The above command does the following:
 
 1. Decompresses and reads the **Height.gz** file
-2. Prints each line, except if the value on column three was already seen before (which contains the SNP ID; change `$3` to another number if the SNP ID is located in another column, e.g. `$1` if the SNP ID is located on the first column)
-3. Compresses and writes the results to **Height.nodup.gz**
+2. Count number of time SNP ID was observed, assuming the third column contian the SNP ID (`seen[$3]++`). If this it the first time seeing this SNP ID, print it. 3. Compresses and writes the results to **Height.nodup.gz**
 
 ??? note "How many duplicated SNPs are there?"
     There are a total of `2` duplicated SNPs
