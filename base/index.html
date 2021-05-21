@@ -331,31 +331,17 @@ Most polygenic score software perform strand-flipping automatically for SNPs tha
 <p>If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
 Most PRS software do not allow duplicated SNPs in the base data input and thus they should be removed, using a command such as the one below: </p>
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.gz |<span style="color: #BB6622; font-weight: bold">\</span>
-awk <span style="color: #BA2121">&#39;{ print $3}&#39;</span> |<span style="color: #BB6622; font-weight: bold">\</span>
-sort |<span style="color: #BB6622; font-weight: bold">\</span>
-uniq -d &gt; duplicated.snp
+aawk <span style="color: #BA2121">&#39;{seen[$1]++; if(seen[$1]==1){ print}}&#39;</span> |<span style="color: #BB6622; font-weight: bold">\</span>
+gzip - &gt; Height.nodup.gz
 </code></pre></div>
 
 <p>The above command does the following:</p>
 <ol>
 <li>Decompresses and reads the <strong>Height.gz</strong> file</li>
-<li>Prints out the third column of the file (which contains the SNP ID; change <code>$3</code> to another number if the SNP ID is located in another column, e.g. <code>$1</code> if the SNP ID is located on the first column)</li>
-<li>Sort the SNP IDs. This will put duplicated SNP IDs next to each other</li>
-<li>Print out any duplicated SNP IDs using the uniq command and print them to the <em>duplicated.snp</em> file</li>
+<li>Count number of time SNP ID was observed, assuming the third column contian the SNP ID (<code>seen[$3]++</code>). If this it the first time seeing this SNP ID, print it. 3. Compresses and writes the results to <strong>Height.nodup.gz</strong></li>
 </ol>
 <details class="note"><summary>How many duplicated SNPs are there?</summary><p>There are a total of <code>2</code> duplicated SNPs</p>
 </details>
-<p>Duplicated SNPs can then be removed using the <code>grep</code> command:
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.gz  |<span style="color: #BB6622; font-weight: bold">\</span>
-grep -vf duplicated.snp |<span style="color: #BB6622; font-weight: bold">\</span>
-gzip - &gt; Height.nodup.gz
-</code></pre></div></p>
-<p>The above command does the following:</p>
-<ol>
-<li>Decompresses and reads the <strong>Height.gz</strong> file</li>
-<li>From the file, remove (<code>-v</code>) any lines contains string within the <strong>duplicated.snp</strong> file (<code>-f</code>)</li>
-<li>Compresses and writes the results to <strong>Height.nodup.gz</strong></li>
-</ol>
 <h2 id="ambiguous-snps"># Ambiguous SNPs<a class="headerlink" href="#ambiguous-snps" title="Permanent link">&para;</a></h2>
 <p>If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) that was used for either is unknown, then it is not possible to pair-up the alleles of ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T SNPs) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. While allele frequencies could be used to infer which alleles are on the same strand, the accuracy of this could be low for SNPs with MAF close to 50% or when the base and target data are from different populations. Therefore, we recommend removing all ambiguous SNPs to avoid introducing this potential source of systematic error.</p>
 <p>Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.</p>
