@@ -331,7 +331,7 @@ Most polygenic score software perform strand-flipping automatically for SNPs tha
 <p>If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
 Most PRS software do not allow duplicated SNPs in the base data input and thus they should be removed, using a command such as the one below: </p>
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.gz |<span style="color: #BB6622; font-weight: bold">\</span>
-aawk <span style="color: #BA2121">&#39;{seen[$1]++; if(seen[$1]==1){ print}}&#39;</span> |<span style="color: #BB6622; font-weight: bold">\</span>
+awk <span style="color: #BA2121">&#39;{seen[$3]++; if(seen[$3]==1){ print}}&#39;</span> |<span style="color: #BB6622; font-weight: bold">\</span>
 gzip - &gt; Height.nodup.gz
 </code></pre></div>
 
