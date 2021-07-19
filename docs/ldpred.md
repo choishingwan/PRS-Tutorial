@@ -73,7 +73,9 @@ LDpred2 authors recommend restricting the analysis to only the HapMap3 SNPs
 === "load HapMap3 SNPs"
 
     ```R
-    info <- readRDS(url("https://github.com/privefl/bigsnpr/raw/master/data-raw/hm3_variants.rds"))
+    info <- readRDS(runonce::download_file(
+      "https://ndownloader.figshare.com/files/25503788",
+      fname = "map_hm3_ldpred2.rds"))
     ```
 ### 3. Load and transform the summary statistic file 
 
