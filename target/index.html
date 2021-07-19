@@ -160,9 +160,8 @@
 <p>Target data consist of individual-level genotype-phenotype data, usually generated within your lab/department/collaboration. For this tutorial, we have simulated some genotype-phenotype data using the 1000 Genomes Project European samples. 
 You can download the data <a href="https://drive.google.com/file/d/1uhJR_3sn7RA8U5iYQbcmTp6vFdQiF4F2/view?usp=sharing">here</a></p>
 <p>Unzip the data as follow:</p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>unzip EUR.zip
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>unzip EUR.zip
 </code></pre></div>
-
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You will need <code>plink</code> in this section, which can be download from <a href="https://www.cog-genomics.org/plink/1.9/">here</a>.</p>
@@ -214,7 +213,7 @@ low minor allele frequency, out of Hardy-Weinberg Equilibrium, removing
 individuals with low genotyping rate 
 (see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6001694/">Marees et al</a>).</p>
 <p>The following <code>plink</code> command applies some of these QC metrics to the target data:</p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR <span style="color: #BB6622; font-weight: bold">\</span>
     --maf <span style="color: #666666">0</span>.01 <span style="color: #BB6622; font-weight: bold">\</span>
     --hwe 1e-6 <span style="color: #BB6622; font-weight: bold">\</span>
@@ -224,7 +223,6 @@ individuals with low genotyping rate
     --make-just-fam <span style="color: #BB6622; font-weight: bold">\</span>
     --out EUR.QC
 </code></pre></div>
-
 <p>Each of the parameters corresponds to the following</p>
 <table>
 <thead>
@@ -294,14 +292,13 @@ genotype file, reducing the storage space usage.  </p>
 </div>
 <p>Very high or low heterozygosity rates in individuals could be due to DNA contamination or to high levels of inbreeding. Therefore, samples with extreme heterozygosity are typically removed prior to downstream analyses. </p>
 <p>First, we perform pruning to remove highly correlated SNPs:</p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR <span style="color: #BB6622; font-weight: bold">\</span>
     --keep EUR.QC.fam <span style="color: #BB6622; font-weight: bold">\</span>
     --extract EUR.QC.snplist <span style="color: #BB6622; font-weight: bold">\</span>
     --indep-pairwise <span style="color: #666666">200</span> <span style="color: #666666">50</span> <span style="color: #666666">0</span>.25 <span style="color: #BB6622; font-weight: bold">\</span>
     --out EUR.QC
 </code></pre></div>
-
 <p>Each of the parameters corresponds to the following</p>
 <table>
 <thead>
@@ -341,28 +338,26 @@ genotype file, reducing the storage space usage.  </p>
 </table>
 <p>This will generate two files 1) <strong>EUR.QC.prune.in</strong> and 2) <strong>EUR.QC.prune.out</strong>. All SNPs within <strong>EUR.QC.prune.in</strong> have a pairwise <span class="arithmatex">\(r^2 &lt; 0.25\)</span>. </p>
 <p>Heterozygosity rates can then be computed using <code>plink</code>:</p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR <span style="color: #BB6622; font-weight: bold">\</span>
     --extract EUR.QC.prune.in <span style="color: #BB6622; font-weight: bold">\</span>
     --keep EUR.QC.fam <span style="color: #BB6622; font-weight: bold">\</span>
     --het <span style="color: #BB6622; font-weight: bold">\</span>
     --out EUR.QC
 </code></pre></div>
-
 <p>This will generate the <strong>EUR.QC.het</strong> file, which contains F coefficient estimates for assessing heterozygosity.
 We will remove individuals with F coefficients that are more than 3 standard deviation (SD) units from the mean, which can be performed using the following <code>R</code> command (assuming that you have R downloaded, then you can open an <code>R</code> session by typing <code>R</code> in your terminal):</p>
 <div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Without library</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.QC.het&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>) <span style="color: #408080; font-style: italic"># Read in the EUR.het file, specify it has header</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.QC.het&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>) <span style="color: #408080; font-style: italic"># Read in the EUR.het file, specify it has header</span>
 m <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">mean</span>(dat<span style="color: #666666">$</span><span style="color: #008000">F</span>) <span style="color: #408080; font-style: italic"># Calculate the mean  </span>
 s <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">sd</span>(dat<span style="color: #666666">$</span><span style="color: #008000">F</span>) <span style="color: #408080; font-style: italic"># Calculate the SD</span>
 valid <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">subset</span>(dat, <span style="color: #008000">F</span> <span style="color: #666666">&lt;=</span> m<span style="color: #666666">+3*</span>s <span style="color: #666666">&amp;</span> <span style="color: #008000">F</span> <span style="color: #666666">&gt;=</span> m<span style="color: #666666">-3*</span>s) <span style="color: #408080; font-style: italic"># Get any samples with F coefficient within 3 SD of the population mean</span>
 <span style="color: #0000FF">write.table</span>(valid[,<span style="color: #0000FF">c</span>(<span style="color: #666666">1</span>,<span style="color: #666666">2</span>)], <span style="color: #BA2121">&quot;EUR.valid.sample&quot;</span>, quote<span style="color: #666666">=</span><span style="color: #008000">F</span>, row.names<span style="color: #666666">=</span><span style="color: #008000">F</span>) <span style="color: #408080; font-style: italic"># print FID and IID for valid samples</span>
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
-
 </div>
 <input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">With data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #0000FF">library</span>(data.table)
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #0000FF">library</span>(data.table)
 <span style="color: #408080; font-style: italic"># Read in file</span>
 dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.QC.het&quot;</span>)
 <span style="color: #408080; font-style: italic"># Get samples with F coefficient within 3 SD of the population mean</span>
@@ -371,7 +366,6 @@ valid <span style="color: #666666">&lt;-</span> dat[<span style="color: #008000"
 <span style="color: #0000FF">fwrite</span>(valid[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>)], <span style="color: #BA2121">&quot;EUR.valid.sample&quot;</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>) 
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
-
 </div>
 </div>
 <details class="note"><summary>How many samples were excluded due to high heterozygosity rate?</summary><ul>
@@ -388,7 +382,7 @@ valid <span style="color: #666666">&lt;-</span> dat[<span style="color: #008000"
 </div>
 <p>1. Load the bim file, the summary statistic and the QC SNP list into R</p>
 <div class="tabbed-set" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Without data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># Read in bim file</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># Read in bim file</span>
 bim <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.bim&quot;</span>)
 <span style="color: #0000FF">colnames</span>(bim) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;CHR&quot;</span>, <span style="color: #BA2121">&quot;SNP&quot;</span>, <span style="color: #BA2121">&quot;CM&quot;</span>, <span style="color: #BA2121">&quot;BP&quot;</span>, <span style="color: #BA2121">&quot;B.A1&quot;</span>, <span style="color: #BA2121">&quot;B.A2&quot;</span>)
 <span style="color: #408080; font-style: italic"># Read in QCed SNPs</span>
@@ -405,10 +399,9 @@ height<span style="color: #666666">$</span>A2 <span style="color: #666666">&lt;-
 bim<span style="color: #666666">$</span>B.A1 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">toupper</span>(bim<span style="color: #666666">$</span>B.A1)
 bim<span style="color: #666666">$</span>B.A2 <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">toupper</span>(bim<span style="color: #666666">$</span>B.A2)
 </code></pre></div>
-
 </div>
 <input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">With data.table and magrittr</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># magrittr allow us to do piping, which help to reduce the </span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># magrittr allow us to do piping, which help to reduce the </span>
 <span style="color: #408080; font-style: italic"># amount of intermediate data types</span>
 <span style="color: #0000FF">library</span>(data.table)
 <span style="color: #0000FF">library</span>(magrittr)
@@ -428,12 +421,11 @@ height <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fr
 <span style="color: #408080; font-style: italic"># Read in QCed SNPs</span>
 qc <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.QC.snplist&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">F</span>)
 </code></pre></div>
-
 </div>
 </div>
 <p>2. Identify SNPs that require strand flipping </p>
 <div class="tabbed-set" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><label for="__tabbed_3_1">Without data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># Merge summary statistic with target</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># Merge summary statistic with target</span>
 info <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(bim, height, by <span style="color: #666666">=</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;SNP&quot;</span>, <span style="color: #BA2121">&quot;CHR&quot;</span>, <span style="color: #BA2121">&quot;BP&quot;</span>))
 <span style="color: #408080; font-style: italic"># Filter QCed SNPs</span>
 info <span style="color: #666666">&lt;-</span> info[info<span style="color: #666666">$</span>SNP <span style="color: #666666">%in%</span> qc<span style="color: #666666">$</span>V1,]
@@ -462,10 +454,9 @@ bim[complement.snps,]<span style="color: #666666">$</span>B.A1 <span style="colo
 bim[complement.snps,]<span style="color: #666666">$</span>B.A2 <span style="color: #666666">&lt;-</span>
     <span style="color: #0000FF">sapply</span>(bim[complement.snps,]<span style="color: #666666">$</span>B.A2, complement)
 </code></pre></div>
-
 </div>
 <input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><label for="__tabbed_3_2">With data.table and magrittr</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># Merge summary statistic with target</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># Merge summary statistic with target</span>
 info <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge</span>(bim, height, by<span style="color: #666666">=</span><span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;SNP&quot;</span>, <span style="color: #BA2121">&quot;CHR&quot;</span>, <span style="color: #BA2121">&quot;BP&quot;</span>)) <span style="color: #666666">%&gt;%</span>
     <span style="color: #408080; font-style: italic"># And filter out QCed SNPs</span>
     .[SNP <span style="color: #666666">%in%</span> qc[,V1]]
@@ -490,12 +481,11 @@ bim[SNP <span style="color: #666666">%in%</span> com.snps, <span style="color: #
         <span style="color: #0000FF">list</span>(<span style="color: #0000FF">sapply</span>(B.A1, complement),
             <span style="color: #0000FF">sapply</span>(B.A2, complement))]
 </code></pre></div>
-
 </div>
 </div>
 <p>3. Identify SNPs that require recoding in the target (to ensure the coding allele in the target data is the effective allele in the base summary statistic)</p>
 <div class="tabbed-set" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><label for="__tabbed_4_1">Without data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># identify SNPs that need recoding</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># identify SNPs that need recoding</span>
 info.recode <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">subset</span>(info, A1 <span style="color: #666666">==</span> B.A2 <span style="color: #666666">&amp;</span> A2 <span style="color: #666666">==</span> B.A1)
 <span style="color: #408080; font-style: italic"># Update the recode SNPs</span>
 recode.snps <span style="color: #666666">&lt;-</span> bim<span style="color: #666666">$</span>SNP <span style="color: #666666">%in%</span> info.recode<span style="color: #666666">$</span>SNP
@@ -521,10 +511,9 @@ bim[com.snps,]<span style="color: #666666">$</span>B.A2 <span style="color: #666
     sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>
 )
 </code></pre></div>
-
 </div>
 <input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><label for="__tabbed_4_2">With data.table and magrittr</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># identify SNPs that need recoding</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># identify SNPs that need recoding</span>
 recode.snps <span style="color: #666666">&lt;-</span> info[B.A1<span style="color: #666666">==</span>A2 <span style="color: #666666">&amp;</span> B.A2<span style="color: #666666">==</span>A1, SNP]
 <span style="color: #408080; font-style: italic"># Update the bim file</span>
 bim[SNP <span style="color: #666666">%in%</span> recode.snps, <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;B.A1&quot;</span>, <span style="color: #BA2121">&quot;B.A2&quot;</span>) <span style="color: #666666">:=</span>
@@ -540,12 +529,11 @@ bim[SNP <span style="color: #666666">%in%</span> com.recode, <span style="color:
 <span style="color: #408080; font-style: italic"># Write the updated bim file</span>
 <span style="color: #0000FF">fwrite</span>(bim[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;SNP&quot;</span>, <span style="color: #BA2121">&quot;B.A1&quot;</span>)], <span style="color: #BA2121">&quot;EUR.a1&quot;</span>, col.names<span style="color: #666666">=</span><span style="color: #008000">F</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>)
 </code></pre></div>
-
 </div>
 </div>
 <p>4. Identify SNPs that have different allele in base and target (usually due to difference in genome build or Indel)</p>
 <div class="tabbed-set" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><label for="__tabbed_5_1">Without data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>mismatch <span style="color: #666666">&lt;-</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>mismatch <span style="color: #666666">&lt;-</span>
     bim<span style="color: #666666">$</span>SNP[<span style="color: #666666">!</span>(bim<span style="color: #666666">$</span>SNP <span style="color: #666666">%in%</span> info.match<span style="color: #666666">$</span>SNP <span style="color: #666666">|</span>
                 bim<span style="color: #666666">$</span>SNP <span style="color: #666666">%in%</span> info.complement<span style="color: #666666">$</span>SNP <span style="color: #666666">|</span> 
                 bim<span style="color: #666666">$</span>SNP <span style="color: #666666">%in%</span> info.recode<span style="color: #666666">$</span>SNP <span style="color: #666666">|</span>
@@ -559,17 +547,15 @@ bim[SNP <span style="color: #666666">%in%</span> com.recode, <span style="color:
 )
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
-
 </div>
 <input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><label for="__tabbed_5_2">With data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>mismatch <span style="color: #666666">&lt;-</span> bim[<span style="color: #666666">!</span>(SNP <span style="color: #666666">%in%</span> info.match <span style="color: #666666">|</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>mismatch <span style="color: #666666">&lt;-</span> bim[<span style="color: #666666">!</span>(SNP <span style="color: #666666">%in%</span> info.match <span style="color: #666666">|</span>
                     SNP <span style="color: #666666">%in%</span> com.snps <span style="color: #666666">|</span>
                     SNP <span style="color: #666666">%in%</span> recode.snps <span style="color: #666666">|</span>
                     SNP <span style="color: #666666">%in%</span> com.recode), SNP]
 <span style="color: #0000FF">write.table</span>(mismatch, <span style="color: #BA2121">&quot;EUR.mismatch&quot;</span>, quote<span style="color: #666666">=</span><span style="color: #008000">F</span>, row.names<span style="color: #666666">=</span><span style="color: #008000">F</span>, col.names<span style="color: #666666">=</span><span style="color: #008000">F</span>)
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
-
 </div>
 </div>
 <p>We can then use the <strong>EUR.a1</strong> file to update the A1 alleles</p>
@@ -579,7 +565,7 @@ bim[SNP <span style="color: #666666">%in%</span> com.recode, <span style="color:
 <p>Sometimes sample mislabelling can occur, which may lead to invalid results. One indication of a mislabelled sample is a difference between reported sex and that indicated by the sex chromosomes. While this may be due to a difference in sex and gender identity, it could also reflect mislabeling of samples or misreporting and, thus, individuals in which there is a mismatch between biological and reported sex are typically removed. A sex check can be performed in PLINK, in which individuals are called as females if their X chromosome homozygosity estimate (F statistic) is &lt; 0.2 and as males if the estimate is &gt; 0.8.</p>
 <p>Before performing a sex check, pruning should be performed (see <a href="./#35-standard-gwas-qc">here</a>).
 A sex check can then easily be conducted using <code>plink</code>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR <span style="color: #BB6622; font-weight: bold">\</span>
     --extract EUR.QC.prune.in <span style="color: #BB6622; font-weight: bold">\</span>
     --keep EUR.valid.sample <span style="color: #BB6622; font-weight: bold">\</span>
@@ -588,24 +574,22 @@ A sex check can then easily be conducted using <code>plink</code>
 </code></pre></div></p>
 <p>This will generate a file called <strong>EUR.QC.sexcheck</strong> containing the F-statistics for each individual. Individuals are typically called as being biologically male if the F-statistic is &gt; 0.8 and biologically female if F &lt; 0.2.</p>
 <div class="tabbed-set" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><label for="__tabbed_6_1">Without library</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># Read in file</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># Read in file</span>
 valid <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.valid.sample&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
 dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.QC.sexcheck&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
 valid <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">subset</span>(dat, STATUS<span style="color: #666666">==</span><span style="color: #BA2121">&quot;OK&quot;</span> <span style="color: #666666">&amp;</span> FID <span style="color: #666666">%in%</span> valid<span style="color: #666666">$</span>FID)
 <span style="color: #0000FF">write.table</span>(valid[,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>)], <span style="color: #BA2121">&quot;EUR.QC.valid&quot;</span>, row.names<span style="color: #666666">=</span><span style="color: #008000">F</span>, col.names<span style="color: #666666">=</span><span style="color: #008000">F</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>, quote<span style="color: #666666">=</span><span style="color: #008000">F</span>) 
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
-
 </div>
 <input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><label for="__tabbed_6_2">With data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #0000FF">library</span>(data.table)
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #0000FF">library</span>(data.table)
 <span style="color: #408080; font-style: italic"># Read in file</span>
 valid <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.valid.sample&quot;</span>)
 dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.QC.sexcheck&quot;</span>)[FID<span style="color: #666666">%in%</span>valid<span style="color: #666666">$</span>FID]
 <span style="color: #0000FF">fwrite</span>(dat[STATUS<span style="color: #666666">==</span><span style="color: #BA2121">&quot;OK&quot;</span>,<span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>,<span style="color: #BA2121">&quot;IID&quot;</span>)], <span style="color: #BA2121">&quot;EUR.QC.valid&quot;</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>) 
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
-
 </div>
 </div>
 <details class="note"><summary>How many samples were excluded due mismatched Sex information?</summary><ul>
@@ -618,14 +602,13 @@ dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread
 <p>Closely related individuals in the target data may lead to overfitted results, limiting the generalisability of the results. </p>
 <p>Before calculating the relatedness, pruning should be performed (see <a href="./#35-standard-gwas-qc">here</a>).
 Individuals that have a first or second degree relative in the sample (<span class="arithmatex">\(\hat{\pi} &gt; 0.125\)</span>) can be removed with the following command:</p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR <span style="color: #BB6622; font-weight: bold">\</span>
     --extract EUR.QC.prune.in <span style="color: #BB6622; font-weight: bold">\</span>
     --keep EUR.QC.valid <span style="color: #BB6622; font-weight: bold">\</span>
     --rel-cutoff <span style="color: #666666">0</span>.125 <span style="color: #BB6622; font-weight: bold">\</span>
     --out EUR.QC
 </code></pre></div>
-
 <details class="note"><summary>How many related samples were excluded?</summary><ul>
 <li><code>0</code> samples were excluded</li>
 </ul>
@@ -640,7 +623,7 @@ To minimize the removal of cases of a disease, the following algorithm can be us
 </div>
 <h2 id="generate-final-qced-target-data-file">Generate final QC'ed target data file<a class="headerlink" href="#generate-final-qced-target-data-file" title="Permanent link">&para;</a></h2>
 <p>After performing the full analysis, you can generate a QC'ed data set with the following command:</p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR <span style="color: #BB6622; font-weight: bold">\</span>
     --make-bed <span style="color: #BB6622; font-weight: bold">\</span>
     --keep EUR.QC.rel.id <span style="color: #BB6622; font-weight: bold">\</span>
@@ -649,7 +632,6 @@ To minimize the removal of cases of a disease, the following algorithm can be us
     --exclude EUR.mismatch <span style="color: #BB6622; font-weight: bold">\</span>
     --a1-allele EUR.a1
 </code></pre></div>
-
 <p>Each of the parameters corresponds to the following</p>
 <table>
 <thead>
