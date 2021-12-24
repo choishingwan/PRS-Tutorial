@@ -184,18 +184,20 @@ This multi-step process is a good way to learn the processes involved in computi
 <p>When the effect size relates to disease risk and is thus given as an odds ratio (OR), rather than BETA (for continuous traits), then the PRS is computed as a product of ORs. To simplify this calculation, we take the natural logarithm of the OR so that the PRS can be computed using summation instead (which can be back-transformed afterwards). 
 We can obtain the transformed summary statistics with <code>R</code>:</p>
 <div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Without data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #0000FF">gzfile</span>(<span style="color: #BA2121">&quot;Height.QC.gz&quot;</span>), header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #0000FF">gzfile</span>(<span style="color: #BA2121">&quot;Height.QC.gz&quot;</span>), header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
 dat<span style="color: #666666">$</span>BETA <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">log</span>(dat<span style="color: #666666">$</span>OR)
 <span style="color: #0000FF">write.table</span>(dat, <span style="color: #BA2121">&quot;Height.QC.Transformed&quot;</span>, quote<span style="color: #666666">=</span><span style="color: #008000">F</span>, row.names<span style="color: #666666">=</span><span style="color: #008000">F</span>)
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
+
 </div>
 <input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">With data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #0000FF">library</span>(data.table)
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #0000FF">library</span>(data.table)
 dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;Height.QC.gz&quot;</span>)
 <span style="color: #0000FF">fwrite</span>(dat[,BETA<span style="color: #666666">:=</span><span style="color: #0000FF">log</span>(OR)], <span style="color: #BA2121">&quot;Height.QC.Transformed&quot;</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>)
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
+
 </div>
 </div>
 <div class="admonition warning">
@@ -206,7 +208,7 @@ dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread
 <p>Linkage disequilibrium, which corresponds to the correlation between the genotypes of genetic variants across the genome, makes identifying the contribution from causal independent genetic variants extremely challenging. 
 One way of approximately capturing the right level of causal signal is to perform clumping, which removes SNPs in ways that only weakly correlated SNPs are retained but preferentially retaining the SNPs most associated with the phenotype under study. 
 Clumping can be performed using the following command in <code>plink</code>: </p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
     --clump-p1 <span style="color: #666666">1</span> <span style="color: #BB6622; font-weight: bold">\</span>
     --clump-r2 <span style="color: #666666">0</span>.1 <span style="color: #BB6622; font-weight: bold">\</span>
@@ -216,6 +218,7 @@ Clumping can be performed using the following command in <code>plink</code>: </p
     --clump-field P <span style="color: #BB6622; font-weight: bold">\</span>
     --out EUR
 </code></pre></div>
+
 <p>Each of the new parameters corresponds to the following</p>
 <table>
 <thead>
@@ -265,8 +268,9 @@ Clumping can be performed using the following command in <code>plink</code>: </p
 </div>
 <p>This will generate <strong>EUR.clumped</strong>, containing the index SNPs after clumping is performed.
 We can extract the index SNP ID by performing the following command:</p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>awk <span style="color: #BA2121">&#39;NR!=1{print $3}&#39;</span> EUR.clumped <span style="color: #666666">&gt;</span>  EUR.valid.snp
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>awk <span style="color: #BA2121">&#39;NR!=1{print $3}&#39;</span> EUR.clumped <span style="color: #666666">&gt;</span>  EUR.valid.snp
 </code></pre></div>
+
 <blockquote>
 <p><code>$3</code> because the third column contains the SNP ID</p>
 </blockquote>
@@ -282,12 +286,13 @@ Make sure to use the population that most closely reflects represents the base s
 <li>The base data file: <strong>Height.QC.Transformed</strong></li>
 <li>A file containing SNP IDs and their corresponding P-values (<code>$3</code> because SNP ID is located in the third column; <code>$8</code> because the P-value is located in the eighth column)</li>
 </ol>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>awk <span style="color: #BA2121">&#39;{print $3,$8}&#39;</span> Height.QC.Transformed <span style="color: #666666">&gt;</span> SNP.pvalue
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>awk <span style="color: #BA2121">&#39;{print $3,$8}&#39;</span> Height.QC.Transformed <span style="color: #666666">&gt;</span> SNP.pvalue
 </code></pre></div>
+
 <ol>
 <li>A file containing the different P-value thresholds for inclusion of SNPs in the PRS. Here calculate PRS corresponding to a few thresholds for illustration purposes:</li>
 </ol>
-<p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.001 0 0.001&quot;</span> &gt; range_list 
+<p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.001 0 0.001&quot;</span> &gt; range_list 
 <span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.05 0 0.05&quot;</span> &gt;&gt; range_list
 <span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.1 0 0.1&quot;</span> &gt;&gt; range_list
 <span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.2 0 0.2&quot;</span> &gt;&gt; range_list
@@ -318,7 +323,7 @@ The format of the <strong>range_list</strong> file should be as follows:</p>
 <code>0</code> to <code>0.05</code>, <strong>including</strong> any SNPs with P-value equal to <code>0.05</code>.</p>
 </div>
 <p>We can then calculate the PRS with the following <code>plink</code> command:</p>
-<p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
+<p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
     --score Height.QC.Transformed <span style="color: #666666">3</span> <span style="color: #666666">4</span> <span style="color: #666666">12</span> header <span style="color: #BB6622; font-weight: bold">\</span>
     --q-score-range range_list SNP.pvalue <span style="color: #BB6622; font-weight: bold">\</span>
@@ -368,7 +373,7 @@ PRS_j =\frac{ \sum_i^NS_i*G_{ij}}{P*M_j}
 <h2 id="accounting-for-population-stratification">Accounting for Population Stratification<a class="headerlink" href="#accounting-for-population-stratification" title="Permanent link">&para;</a></h2>
 <p>Population structure is the principal source of confounding in GWAS and is usually accounted for by incorporating principal components (PCs) as covariates. We can incorporate PCs into our PRS analysis to account for population stratification.</p>
 <p>Again, we can calculate the PCs using <code>plink</code>: </p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># First, we need to perform prunning</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># First, we need to perform prunning</span>
 plink <span style="color: #BB6622; font-weight: bold">\</span>
     --bfile EUR.QC <span style="color: #BB6622; font-weight: bold">\</span>
     --indep-pairwise <span style="color: #666666">200</span> <span style="color: #666666">50</span> <span style="color: #666666">0</span>.25 <span style="color: #BB6622; font-weight: bold">\</span>
@@ -380,6 +385,7 @@ plink <span style="color: #BB6622; font-weight: bold">\</span>
     --pca <span style="color: #666666">6</span> <span style="color: #BB6622; font-weight: bold">\</span>
     --out EUR
 </code></pre></div>
+
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>One way to select the appropriate number of PCs is to perform GWAS on the phenotype under study with different numbers of PCs.
@@ -395,7 +401,7 @@ plink <span style="color: #BB6622; font-weight: bold">\</span>
 To approximate the "best-fit" PRS, we can perform a regression between PRS calculated at a range of P-value thresholds and then select the PRS that explains the highest phenotypic variance (please see Section 4.6 of our paper on overfitting issues). 
 This can be achieved using <code>R</code> as follows:</p>
 <div class="tabbed-set" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">detail</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>p.threshold <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #666666">0.001</span>,<span style="color: #666666">0.05</span>,<span style="color: #666666">0.1</span>,<span style="color: #666666">0.2</span>,<span style="color: #666666">0.3</span>,<span style="color: #666666">0.4</span>,<span style="color: #666666">0.5</span>)
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>p.threshold <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #666666">0.001</span>,<span style="color: #666666">0.05</span>,<span style="color: #666666">0.1</span>,<span style="color: #666666">0.2</span>,<span style="color: #666666">0.3</span>,<span style="color: #666666">0.4</span>,<span style="color: #666666">0.5</span>)
 <span style="color: #408080; font-style: italic"># Read in the phenotype file </span>
 phenotype <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
 <span style="color: #408080; font-style: italic"># Read in the PCs</span>
@@ -440,9 +446,10 @@ prs.result <span style="color: #666666">&lt;-</span> <span style="color: #008000
 prs.result[<span style="color: #0000FF">which.max</span>(prs.result<span style="color: #666666">$</span>R2),]
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
+
 </div>
 <input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">quick</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>p.threshold <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #666666">0.001</span>,<span style="color: #666666">0.05</span>,<span style="color: #666666">0.1</span>,<span style="color: #666666">0.2</span>,<span style="color: #666666">0.3</span>,<span style="color: #666666">0.4</span>,<span style="color: #666666">0.5</span>)
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>p.threshold <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #666666">0.001</span>,<span style="color: #666666">0.05</span>,<span style="color: #666666">0.1</span>,<span style="color: #666666">0.2</span>,<span style="color: #666666">0.3</span>,<span style="color: #666666">0.4</span>,<span style="color: #666666">0.5</span>)
 phenotype <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
 pcs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.eigenvec&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">F</span>)
 <span style="color: #0000FF">colnames</span>(pcs) <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #BA2121">&quot;FID&quot;</span>, <span style="color: #BA2121">&quot;IID&quot;</span>, <span style="color: #0000FF">paste0</span>(<span style="color: #BA2121">&quot;PC&quot;</span>,<span style="color: #666666">1:6</span>)) 
@@ -467,9 +474,10 @@ prs.result <span style="color: #666666">&lt;-</span> <span style="color: #008000
 <span style="color: #0000FF">print</span>(prs.result[<span style="color: #0000FF">which.max</span>(prs.result<span style="color: #666666">$</span>R2),])
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
+
 </div>
 <input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><label for="__tabbed_2_3">with data.table and magrittr</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #0000FF">library</span>(data.table)
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #0000FF">library</span>(data.table)
 <span style="color: #0000FF">library</span>(magrittr)
 p.threshold <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">c</span>(<span style="color: #666666">0.001</span>,<span style="color: #666666">0.05</span>,<span style="color: #666666">0.1</span>,<span style="color: #666666">0.2</span>,<span style="color: #666666">0.3</span>,<span style="color: #666666">0.4</span>,<span style="color: #666666">0.5</span>)
 phenotype <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>)
@@ -500,6 +508,7 @@ prs.result <span style="color: #666666">&lt;-</span> <span style="color: #008000
 <span style="color: #0000FF">print</span>(prs.result[<span style="color: #0000FF">which.max</span>(prs.result<span style="color: #666666">$</span>R2),])
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
+
 </div>
 </div>
 <details class="note"><summary>Which P-value threshold generates the "best-fit" PRS?</summary><p>0.3</p>

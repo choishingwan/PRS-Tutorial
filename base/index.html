@@ -170,8 +170,9 @@
 </div>
 <h2 id="reading-the-base-data-file">Reading the base data file<a class="headerlink" href="#reading-the-base-data-file" title="Permanent link">&para;</a></h2>
 <p><strong>Height.gwas.txt.gz</strong> is compressed. To read its content, you can type:</p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>gunzip -c Height.gwas.txt.gz | head
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.gwas.txt.gz | head
 </code></pre></div>
+
 <p>which will display the first 10 lines of the file</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -272,12 +273,14 @@ However, a <code>md5sum</code> hash is
 generally included in files so that file integrity can be checked. 
 The following command performs this <code>md5sum</code> check: </p>
 <div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Linux</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>md5sum Height.gwas.txt.gz
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>md5sum Height.gwas.txt.gz
 </code></pre></div>
+
 </div>
 <input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">OS X</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>md5 Height.gwas.txt.gz
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>md5 Height.gwas.txt.gz
 </code></pre></div>
+
 </div>
 </div>
 <p>if the file is intact, then <code>md5sum</code> generates a string of characters, which in this case should be: <code>a2b15fb6a2bbbe7ef49f67959b43b160</code>. 
@@ -293,13 +296,14 @@ Therefore, SNPs with low MAF and INFO are typically removed before performing do
 We recommend removing SNPs with MAF &lt; 1% and INFO &lt; 0.8 (with very large base sample sizes these thresholds could be reduced if sensitivity checks indicate reliable results).
 These SNP filters can be achieved using the following code:</p>
 <div class="tabbed-set" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Using bash</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>gunzip -c Height.gwas.txt.gz |<span style="color: #BB6622; font-weight: bold">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.gwas.txt.gz |<span style="color: #BB6622; font-weight: bold">\</span>
 awk <span style="color: #BA2121">&#39;NR==1 || ($11 &gt; 0.01) &amp;&amp; ($10 &gt; 0.8) {print}&#39;</span> |<span style="color: #BB6622; font-weight: bold">\</span>
 gzip  &gt; Height.gz
 </code></pre></div>
+
 </div>
 <input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">Using R with data.table</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># Alternatively, you can use R, with data.table v1.11.8+</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># Alternatively, you can use R, with data.table v1.11.8+</span>
 <span style="color: #0000FF">library</span>(data.table)
 <span style="color: #408080; font-style: italic"># Read in file</span>
 dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">fread</span>(<span style="color: #BA2121">&quot;Height.gwas.txt.gz&quot;</span>)
@@ -308,6 +312,7 @@ result <span style="color: #666666">&lt;-</span> dat[INFO <span style="color: #6
 <span style="color: #408080; font-style: italic"># Output the gz file</span>
 <span style="color: #0000FF">fwrite</span>(result, <span style="color: #BA2121">&quot;Height.gz&quot;</span>, sep<span style="color: #666666">=</span><span style="color: #BA2121">&quot;\t&quot;</span>)
 </code></pre></div>
+
 </div>
 </div>
 <p>The bash code above does the following:</p>
@@ -325,10 +330,11 @@ Most polygenic score software perform strand-flipping automatically for SNPs tha
 <h2 id="duplicate-snps"># Duplicate SNPs<a class="headerlink" href="#duplicate-snps" title="Permanent link">&para;</a></h2>
 <p>If an error has occurred in the generation of the base data then there may be duplicated SNPs in the base data file.
 Most PRS software do not allow duplicated SNPs in the base data input and thus they should be removed, using a command such as the one below: </p>
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>gunzip -c Height.gz |<span style="color: #BB6622; font-weight: bold">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.gz |<span style="color: #BB6622; font-weight: bold">\</span>
 awk <span style="color: #BA2121">&#39;{seen[$3]++; if(seen[$3]==1){ print}}&#39;</span> |<span style="color: #BB6622; font-weight: bold">\</span>
 gzip - &gt; Height.nodup.gz
 </code></pre></div>
+
 <p>The above command does the following:</p>
 <ol>
 <li>Decompresses and reads the <strong>Height.gz</strong> file</li>
@@ -340,7 +346,7 @@ gzip - &gt; Height.nodup.gz
 <p>If the base and target data were generated using different genotyping chips and the chromosome strand (+/-) that was used for either is unknown, then it is not possible to pair-up the alleles of ambiguous SNPs (i.e. those with complementary alleles, either C/G or A/T SNPs) across the data sets, because it will be unknown whether the base and target data are referring to the same allele or not. While allele frequencies could be used to infer which alleles are on the same strand, the accuracy of this could be low for SNPs with MAF close to 50% or when the base and target data are from different populations. Therefore, we recommend removing all ambiguous SNPs to avoid introducing this potential source of systematic error.</p>
 <p>Ambiguous SNPs can be removed in the base data and then there will be no such SNPs in the subsequent analyses, since analyses are performed only on SNPs that overlap between the base and target data.</p>
 <p>Nonambiguous SNPs can be retained using the following:
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>gunzip -c Height.nodup.gz |<span style="color: #BB6622; font-weight: bold">\</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>gunzip -c Height.nodup.gz |<span style="color: #BB6622; font-weight: bold">\</span>
 awk <span style="color: #BA2121">&#39;!( ($4==&quot;A&quot; &amp;&amp; $5==&quot;T&quot;) || \</span>
 <span style="color: #BA2121">        ($4==&quot;T&quot; &amp;&amp; $5==&quot;A&quot;) || \</span>
 <span style="color: #BA2121">        ($4==&quot;G&quot; &amp;&amp; $5==&quot;C&quot;) || \</span>

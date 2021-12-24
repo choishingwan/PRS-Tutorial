@@ -136,7 +136,7 @@
 <p>We will be using <code>prs.result</code> variable, which was generated in the <a href="#finding-the-best-p-value-threshold">previous section</a></p>
 </div>
 <div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Without ggplot2</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># We strongly recommend the use of ggplot2. Only follow this code if you</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># We strongly recommend the use of ggplot2. Only follow this code if you</span>
 <span style="color: #408080; font-style: italic"># are desperate.</span>
 <span style="color: #408080; font-style: italic"># Specify that we want to generate plot in EUR.height.bar.png</span>
 <span style="color: #0000FF">png</span>(<span style="color: #BA2121">&quot;EUR.height.bar.png&quot;</span>,
@@ -197,9 +197,10 @@ prs.result <span style="color: #666666">&lt;-</span> prs.result[<span style="col
 <span style="color: #0000FF">dev.off</span>()
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
+
 </div>
 <input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">ggplot2</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># ggplot2 is a handy package for plotting</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># ggplot2 is a handy package for plotting</span>
 <span style="color: #0000FF">library</span>(ggplot2)
 <span style="color: #408080; font-style: italic"># generate a pretty format for p-value output</span>
 prs.result<span style="color: #666666">$</span>print.p <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">round</span>(prs.result<span style="color: #666666">$</span>P, digits <span style="color: #666666">=</span> <span style="color: #666666">3</span>)
@@ -248,6 +249,7 @@ prs.result<span style="color: #666666">$</span>print.p <span style="color: #6666
 <span style="color: #0000FF">ggsave</span>(<span style="color: #BA2121">&quot;EUR.height.bar.png&quot;</span>, height <span style="color: #666666">=</span> <span style="color: #666666">7</span>, width <span style="color: #666666">=</span> <span style="color: #666666">7</span>)
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
+
 </div>
 </div>
 <p><img alt="Example Bar Plot" src="../img/EUR.height.bar.png" /></p>
@@ -256,7 +258,7 @@ prs.result<span style="color: #666666">$</span>print.p <span style="color: #6666
 </blockquote>
 <p>In addition, we can visualise the relationship between the "best-fit" PRS (which may have been obtained from any of the PRS programs) and the phenotype of interest, coloured according to sex:</p>
 <div class="tabbed-set" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Without ggplot2</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #408080; font-style: italic"># Read in the files</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #408080; font-style: italic"># Read in the files</span>
 prs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.0.3.profile&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
 height <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
 sex <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.cov&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
@@ -272,9 +274,10 @@ dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge
 <span style="color: #0000FF">with</span>(<span style="color: #0000FF">subset</span>(dat, Sex<span style="color: #666666">==</span><span style="color: #BA2121">&quot;Female&quot;</span>), <span style="color: #0000FF">points</span>(x<span style="color: #666666">=</span>SCORE, y<span style="color: #666666">=</span>Height, col<span style="color: #666666">=</span><span style="color: #BA2121">&quot;blue&quot;</span>))
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
+
 </div>
 <input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">ggplot2</label><div class="tabbed-content">
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #0000FF">library</span>(ggplot2)
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #0000FF">library</span>(ggplot2)
 <span style="color: #408080; font-style: italic"># Read in the files</span>
 prs <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.0.3.profile&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
 height <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">read.table</span>(<span style="color: #BA2121">&quot;EUR.height&quot;</span>, header<span style="color: #666666">=</span><span style="color: #008000">T</span>)
@@ -291,6 +294,7 @@ dat <span style="color: #666666">&lt;-</span> <span style="color: #0000FF">merge
     <span style="color: #0000FF">labs</span>(x<span style="color: #666666">=</span><span style="color: #BA2121">&quot;Polygenic Score&quot;</span>, y<span style="color: #666666">=</span><span style="color: #BA2121">&quot;Height&quot;</span>)
 <span style="color: #0000FF">q</span>() <span style="color: #408080; font-style: italic"># exit R</span>
 </code></pre></div>
+
 </div>
 </div>
 <p><img alt="Example Scatter Plot" src="../img/EUR.height.scatter.png" /></p>
