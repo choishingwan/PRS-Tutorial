@@ -55,7 +55,7 @@ To run PRSice-2 we need a single covariate file, and therefore our covariate fil
     q()
     ```
 
-which generates **EUR.cov**.
+which generates **EUR.covariate**.
 
 PRSice-2 can then be run to obtain the PRS results as follows:
 
