@@ -145,7 +145,7 @@ gzip - > Height.nodup.gz
 The above command does the following:
 
 1. Decompresses and reads the **Height.gz** file
-2. Count number of time SNP ID was observed, assuming the third column contian the SNP ID (`seen[$3]++`). If this it the first time seeing this SNP ID, print it. 
+2. Count number of time SNP ID was observed, assuming the third column contian the SNP ID (`seen[$3]++`). If this is the first time seeing this SNP ID, print it. 
 3. Compresses and writes the results to **Height.nodup.gz**
 
 ??? note "How many duplicated SNPs are there?"
