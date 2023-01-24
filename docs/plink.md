@@ -98,9 +98,9 @@ We will need three files:
 1. The base data file: **Height.QC.Transformed**
 2. A file containing SNP IDs and their corresponding P-values (`$3` because SNP ID is located in the third column; `$8` because the P-value is located in the eighth column)
 
-```awk
-awk '{print $3,$8}' Height.QC.Transformed > SNP.pvalue
-```
+    ```awk
+    awk '{print $3,$8}' Height.QC.Transformed > SNP.pvalue
+    ```
 
 3. A file containing the different P-value thresholds for inclusion of SNPs in the PRS. Here calculate PRS corresponding to a few thresholds for illustration purposes:
 
