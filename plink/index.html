@@ -284,13 +284,15 @@ Make sure to use the population that most closely reflects represents the base s
 <p>We will need three files:</p>
 <ol>
 <li>The base data file: <strong>Height.QC.Transformed</strong></li>
-<li>A file containing SNP IDs and their corresponding P-values (<code>$3</code> because SNP ID is located in the third column; <code>$8</code> because the P-value is located in the eighth column)</li>
-</ol>
+<li>
+<p>A file containing SNP IDs and their corresponding P-values (<code>$3</code> because SNP ID is located in the third column; <code>$8</code> because the P-value is located in the eighth column)</p>
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code>awk <span style="color: #BA2121">&#39;{print $3,$8}&#39;</span> Height.QC.Transformed <span style="color: #666666">&gt;</span> SNP.pvalue
 </code></pre></div>
 
-<ol>
-<li>A file containing the different P-value thresholds for inclusion of SNPs in the PRS. Here calculate PRS corresponding to a few thresholds for illustration purposes:</li>
+</li>
+<li>
+<p>A file containing the different P-value thresholds for inclusion of SNPs in the PRS. Here calculate PRS corresponding to a few thresholds for illustration purposes:</p>
+</li>
 </ol>
 <p><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.001 0 0.001&quot;</span> &gt; range_list 
 <span style="color: #008000">echo</span> <span style="color: #BA2121">&quot;0.05 0 0.05&quot;</span> &gt;&gt; range_list
